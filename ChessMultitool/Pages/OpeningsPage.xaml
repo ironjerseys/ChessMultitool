@@ -1,0 +1,34 @@
+<ContentPage
+    x:Class="ChessMultitool.OpeningsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Openings">
+    <StackLayout Padding="20" Spacing="20">
+        <!-- Picker pour choisir l'ouverture -->
+        <Picker x:Name="openingsPicker" 
+                Title="Choose an opening" 
+                SelectedIndexChanged="OnOpeningChanged"/>
+
+        <!-- Picker pour choisir la variation -->
+        <Picker x:Name="variationsPicker" 
+                Title="Choose a variation" 
+                SelectedIndexChanged="OnVariationChanged"/>
+
+        <!-- Image affichant le mouvement courant ou une image par défaut -->
+        <Image x:Name="moveImage" 
+               WidthRequest="300" 
+               HeightRequest="300"
+               Aspect="AspectFit"/>
+
+        <!-- Label pour afficher le texte du mouvement -->
+        <Label x:Name="moveLabel" 
+               FontSize="20" 
+               HorizontalOptions="Center" />
+
+        <!-- Boutons pour naviguer entre les mouvements -->
+        <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+            <Button Text="Previous" Clicked="OnPreviousClicked"/>
+            <Button Text="Next" Clicked="OnNextClicked" Margin="20,0,0,0"/>
+        </StackLayout>
+    </StackLayout>
+</ContentPage>

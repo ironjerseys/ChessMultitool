@@ -1,0 +1,788 @@
+{
+  "traps": {
+    "Legal's Mate": {
+      "Main Line": [
+        {
+          "move": "1.e4",
+          "image": "chess_images_traps/image1.png"
+        },
+        {
+          "move": "1...e5",
+          "image": "chess_images_traps/image2.png"
+        },
+        {
+          "move": "2.Nf3",
+          "image": "chess_images_traps/image3.png"
+        },
+        {
+          "move": "2...Nc6",
+          "image": "chess_images_traps/image4.png"
+        },
+        {
+          "move": "3.Bc4",
+          "image": "chess_images_traps/image5.png"
+        },
+        {
+          "move": "3...d6",
+          "image": "chess_images_traps/image6.png"
+        },
+        {
+          "move": "4.Nc3",
+          "image": "chess_images_traps/image7.png"
+        },
+        {
+          "move": "4...Bg4",
+          "image": "chess_images_traps/image8.png"
+        },
+        {
+          "move": "5.h3",
+          "image": "chess_images_traps/image9.png"
+        },
+        {
+          "move": "5...Bh5",
+          "image": "chess_images_traps/image10.png"
+        },
+        {
+          "move": "6.Nxe5",
+          "image": "chess_images_traps/image11.png"
+        },
+        {
+          "move": "6...Bxd1",
+          "image": "chess_images_traps/image12.png"
+        },
+        {
+          "move": "7.Bxf7+",
+          "image": "chess_images_traps/image13.png"
+        },
+        {
+          "move": "7...Ke7",
+          "image": "chess_images_traps/image14.png"
+        },
+        {
+          "move": "8.Nd5#",
+          "image": "chess_images_traps/image15.png"
+        }
+      ]
+    },
+    "Noah's Ark Trap": {
+      "Main Line": [
+        {
+          "move": "1.e4",
+          "image": "chess_images_traps/image1.png"
+        },
+        {
+          "move": "1...e5",
+          "image": "chess_images_traps/image2.png"
+        },
+        {
+          "move": "2.Nf3",
+          "image": "chess_images_traps/image3.png"
+        },
+        {
+          "move": "2...Nc6",
+          "image": "chess_images_traps/image4.png"
+        },
+        {
+          "move": "3.Bb5",
+          "image": "chess_images_traps/image16.png"
+        },
+        {
+          "move": "3...a6",
+          "image": "chess_images_traps/image17.png"
+        },
+        {
+          "move": "4.Ba4",
+          "image": "chess_images_traps/image18.png"
+        },
+        {
+          "move": "4...d6",
+          "image": "chess_images_traps/image19.png"
+        },
+        {
+          "move": "5.d4",
+          "image": "chess_images_traps/image20.png"
+        },
+        {
+          "move": "5...b5",
+          "image": "chess_images_traps/image21.png"
+        },
+        {
+          "move": "6.Bb3",
+          "image": "chess_images_traps/image22.png"
+        },
+        {
+          "move": "6...Nxd4",
+          "image": "chess_images_traps/image23.png"
+        },
+        {
+          "move": "7.Nxd4",
+          "image": "chess_images_traps/image24.png"
+        },
+        {
+          "move": "7...exd4",
+          "image": "chess_images_traps/image25.png"
+        },
+        {
+          "move": "8.Qxd4",
+          "image": "chess_images_traps/image26.png"
+        },
+        {
+          "move": "8...c5",
+          "image": "chess_images_traps/image27.png"
+        },
+        {
+          "move": "9.Qd5",
+          "image": "chess_images_traps/image28.png"
+        },
+        {
+          "move": "9...Be6",
+          "image": "chess_images_traps/image29.png"
+        },
+        {
+          "move": "10.Qc6+",
+          "image": "chess_images_traps/image30.png"
+        },
+        {
+          "move": "10...Bd7",
+          "image": "chess_images_traps/image31.png"
+        },
+        {
+          "move": "11.Qd5",
+          "image": "chess_images_traps/image32.png"
+        },
+        {
+          "move": "11...c4",
+          "image": "chess_images_traps/image33.png"
+        }
+      ]
+    },
+    "Cambridge Springs Trap": {
+      "Main Line": [
+        {
+          "move": "1.d4",
+          "image": "chess_images_traps/image34.png"
+        },
+        {
+          "move": "1...d5",
+          "image": "chess_images_traps/image35.png"
+        },
+        {
+          "move": "2.c4",
+          "image": "chess_images_traps/image36.png"
+        },
+        {
+          "move": "2...e6",
+          "image": "chess_images_traps/image37.png"
+        },
+        {
+          "move": "3.Nc3",
+          "image": "chess_images_traps/image38.png"
+        },
+        {
+          "move": "3...Nf6",
+          "image": "chess_images_traps/image39.png"
+        },
+        {
+          "move": "4.Bg5",
+          "image": "chess_images_traps/image40.png"
+        },
+        {
+          "move": "4...Nbd7",
+          "image": "chess_images_traps/image41.png"
+        },
+        {
+          "move": "5.cxd5",
+          "image": "chess_images_traps/image42.png"
+        },
+        {
+          "move": "5...exd5",
+          "image": "chess_images_traps/image43.png"
+        },
+        {
+          "move": "6.Nxd5",
+          "image": "chess_images_traps/image44.png"
+        },
+        {
+          "move": "6...Nxd5",
+          "image": "chess_images_traps/image45.png"
+        },
+        {
+          "move": "7.Bxd8",
+          "image": "chess_images_traps/image46.png"
+        },
+        {
+          "move": "7...Bb4+",
+          "image": "chess_images_traps/image47.png"
+        },
+        {
+          "move": "8.Qd2",
+          "image": "chess_images_traps/image48.png"
+        },
+        {
+          "move": "8...Bxd2+",
+          "image": "chess_images_traps/image49.png"
+        },
+        {
+          "move": "9.Kxd2",
+          "image": "chess_images_traps/image50.png"
+        },
+        {
+          "move": "9...Kxd8",
+          "image": "chess_images_traps/image51.png"
+        }
+      ]
+    },
+    "Lasker Trap": {
+      "Main Line": [
+        {
+          "move": "1.d4",
+          "image": "chess_images_traps/image34.png"
+        },
+        {
+          "move": "1...d5",
+          "image": "chess_images_traps/image35.png"
+        },
+        {
+          "move": "2.c4",
+          "image": "chess_images_traps/image36.png"
+        },
+        {
+          "move": "2...e5",
+          "image": "chess_images_traps/image52.png"
+        },
+        {
+          "move": "3.dxe5",
+          "image": "chess_images_traps/image53.png"
+        },
+        {
+          "move": "3...d4",
+          "image": "chess_images_traps/image54.png"
+        },
+        {
+          "move": "4.e3",
+          "image": "chess_images_traps/image55.png"
+        },
+        {
+          "move": "4...Bb4+",
+          "image": "chess_images_traps/image56.png"
+        },
+        {
+          "move": "5.Bd2",
+          "image": "chess_images_traps/image57.png"
+        },
+        {
+          "move": "5...dxe3",
+          "image": "chess_images_traps/image58.png"
+        },
+        {
+          "move": "6.Bxb4",
+          "image": "chess_images_traps/image59.png"
+        },
+        {
+          "move": "6...exf2+",
+          "image": "chess_images_traps/image60.png"
+        },
+        {
+          "move": "7.Ke2",
+          "image": "chess_images_traps/image61.png"
+        },
+        {
+          "move": "7...fxg1=N+",
+          "image": "chess_images_traps/image62.png"
+        },
+        {
+          "move": "8.Ke1",
+          "image": "chess_images_traps/image63.png"
+        },
+        {
+          "move": "8...Qh4+",
+          "image": "chess_images_traps/image64.png"
+        },
+        {
+          "move": "9.Kd2",
+          "image": "chess_images_traps/image65.png"
+        },
+        {
+          "move": "9...Nc6",
+          "image": "chess_images_traps/image66.png"
+        },
+        {
+          "move": "10.Bc3",
+          "image": "chess_images_traps/image67.png"
+        },
+        {
+          "move": "10...Bg4",
+          "image": "chess_images_traps/image68.png"
+        },
+        {
+          "move": "11.Be2",
+          "image": "chess_images_traps/image69.png"
+        },
+        {
+          "move": "11...0-0-0+",
+          "image": "chess_images_traps/image70.png"
+        }
+      ]
+    },
+    "Rubinstein Trap": {
+      "Main Line": [
+        {
+          "move": "1.d4",
+          "image": "chess_images_traps/image34.png"
+        },
+        {
+          "move": "1...d5",
+          "image": "chess_images_traps/image35.png"
+        },
+        {
+          "move": "2.Nf3",
+          "image": "chess_images_traps/image71.png"
+        },
+        {
+          "move": "2...Nf6",
+          "image": "chess_images_traps/image72.png"
+        },
+        {
+          "move": "3.c4",
+          "image": "chess_images_traps/image73.png"
+        },
+        {
+          "move": "3...e6",
+          "image": "chess_images_traps/image74.png"
+        },
+        {
+          "move": "4.Bg5",
+          "image": "chess_images_traps/image75.png"
+        },
+        {
+          "move": "4...Nbd7",
+          "image": "chess_images_traps/image76.png"
+        },
+        {
+          "move": "5.e3",
+          "image": "chess_images_traps/image77.png"
+        },
+        {
+          "move": "5...Be7",
+          "image": "chess_images_traps/image78.png"
+        },
+        {
+          "move": "6.Nc3",
+          "image": "chess_images_traps/image79.png"
+        },
+        {
+          "move": "6...0-0",
+          "image": "chess_images_traps/image80.png"
+        },
+        {
+          "move": "7.Rc1",
+          "image": "chess_images_traps/image81.png"
+        },
+        {
+          "move": "7...Re8",
+          "image": "chess_images_traps/image82.png"
+        },
+        {
+          "move": "8.Qc2",
+          "image": "chess_images_traps/image83.png"
+        },
+        {
+          "move": "8...a6",
+          "image": "chess_images_traps/image84.png"
+        },
+        {
+          "move": "9.cxd5",
+          "image": "chess_images_traps/image85.png"
+        },
+        {
+          "move": "9...exd5",
+          "image": "chess_images_traps/image86.png"
+        },
+        {
+          "move": "10.Bd3",
+          "image": "chess_images_traps/image87.png"
+        },
+        {
+          "move": "10...c6",
+          "image": "chess_images_traps/image88.png"
+        },
+        {
+          "move": "11.0-0",
+          "image": "chess_images_traps/image89.png"
+        },
+        {
+          "move": "11...Ne4",
+          "image": "chess_images_traps/image90.png"
+        },
+        {
+          "move": "12.Bf4",
+          "image": "chess_images_traps/image91.png"
+        },
+        {
+          "move": "12...f5",
+          "image": "chess_images_traps/image92.png"
+        },
+        {
+          "move": "13.Nxd5",
+          "image": "chess_images_traps/image93.png"
+        },
+        {
+          "move": "13...cxd5",
+          "image": "chess_images_traps/image94.png"
+        },
+        {
+          "move": "14.Bc7",
+          "image": "chess_images_traps/image95.png"
+        }
+      ]
+    },
+    "Siberian Trap": {
+      "Main Line": [
+        {
+          "move": "1.e4",
+          "image": "chess_images_traps/image1.png"
+        },
+        {
+          "move": "1...c5",
+          "image": "chess_images_traps/image96.png"
+        },
+        {
+          "move": "2.d4",
+          "image": "chess_images_traps/image97.png"
+        },
+        {
+          "move": "2...cxd4",
+          "image": "chess_images_traps/image98.png"
+        },
+        {
+          "move": "3.c3",
+          "image": "chess_images_traps/image99.png"
+        },
+        {
+          "move": "3...dxc3",
+          "image": "chess_images_traps/image100.png"
+        },
+        {
+          "move": "4.Nxc3",
+          "image": "chess_images_traps/image101.png"
+        },
+        {
+          "move": "4...Nc6",
+          "image": "chess_images_traps/image102.png"
+        },
+        {
+          "move": "5.Nf3",
+          "image": "chess_images_traps/image103.png"
+        },
+        {
+          "move": "5...e6",
+          "image": "chess_images_traps/image104.png"
+        },
+        {
+          "move": "6.Bc4",
+          "image": "chess_images_traps/image105.png"
+        },
+        {
+          "move": "6...Qc7",
+          "image": "chess_images_traps/image106.png"
+        },
+        {
+          "move": "7.O-O",
+          "image": "chess_images_traps/image107.png"
+        },
+        {
+          "move": "7...Nf6",
+          "image": "chess_images_traps/image108.png"
+        },
+        {
+          "move": "8.Qe2",
+          "image": "chess_images_traps/image109.png"
+        },
+        {
+          "move": "8...Ng4",
+          "image": "chess_images_traps/image110.png"
+        },
+        {
+          "move": "9.h3",
+          "image": "chess_images_traps/image111.png"
+        },
+        {
+          "move": "9...Nd4",
+          "image": "chess_images_traps/image112.png"
+        },
+        {
+          "move": "10.Nxd4",
+          "image": "chess_images_traps/image113.png"
+        },
+        {
+          "move": "10...Qh2#",
+          "image": "chess_images_traps/image114.png"
+        }
+      ]
+    },
+    "Fajarowicz Trap": {
+      "Main Line": [
+        {
+          "move": "1.d4",
+          "image": "chess_images_traps/image34.png"
+        },
+        {
+          "move": "1...Nf6",
+          "image": "chess_images_traps/image115.png"
+        },
+        {
+          "move": "2.c4",
+          "image": "chess_images_traps/image116.png"
+        },
+        {
+          "move": "2...e5",
+          "image": "chess_images_traps/image117.png"
+        },
+        {
+          "move": "3.dxe5",
+          "image": "chess_images_traps/image118.png"
+        },
+        {
+          "move": "3...Ne4",
+          "image": "chess_images_traps/image119.png"
+        },
+        {
+          "move": "4.a3",
+          "image": "chess_images_traps/image120.png"
+        },
+        {
+          "move": "4...d6",
+          "image": "chess_images_traps/image121.png"
+        },
+        {
+          "move": "5.exd6",
+          "image": "chess_images_traps/image122.png"
+        },
+        {
+          "move": "5...Bxd6",
+          "image": "chess_images_traps/image123.png"
+        },
+        {
+          "move": "6.g3",
+          "image": "chess_images_traps/image124.png"
+        },
+        {
+          "move": "6...Nxf2",
+          "image": "chess_images_traps/image125.png"
+        },
+        {
+          "move": "7.Kxf2",
+          "image": "chess_images_traps/image126.png"
+        },
+        {
+          "move": "7...Bxg3+",
+          "image": "chess_images_traps/image127.png"
+        }
+      ]
+    },
+    "Blackburne Shilling Trap": {
+      "Main Line": [
+        {
+          "move": "1.e4",
+          "image": "chess_images_traps/image1.png"
+        },
+        {
+          "move": "1...e5",
+          "image": "chess_images_traps/image2.png"
+        },
+        {
+          "move": "2.Nf3",
+          "image": "chess_images_traps/image3.png"
+        },
+        {
+          "move": "2...Nc6",
+          "image": "chess_images_traps/image4.png"
+        },
+        {
+          "move": "3.Bc4",
+          "image": "chess_images_traps/image5.png"
+        },
+        {
+          "move": "3...Nd4",
+          "image": "chess_images_traps/image128.png"
+        },
+        {
+          "move": "4.Nxe5",
+          "image": "chess_images_traps/image129.png"
+        },
+        {
+          "move": "4...Qg5",
+          "image": "chess_images_traps/image130.png"
+        },
+        {
+          "move": "5.Nxf7",
+          "image": "chess_images_traps/image131.png"
+        },
+        {
+          "move": "5...Qxg2",
+          "image": "chess_images_traps/image132.png"
+        },
+        {
+          "move": "6.Rf1",
+          "image": "chess_images_traps/image133.png"
+        },
+        {
+          "move": "6...Qxe4+",
+          "image": "chess_images_traps/image134.png"
+        },
+        {
+          "move": "7.Be2",
+          "image": "chess_images_traps/image135.png"
+        },
+        {
+          "move": "7...Nf3#",
+          "image": "chess_images_traps/image136.png"
+        }
+      ]
+    },
+    "Englund Gambit Trap": {
+      "Main Line": [
+        {
+          "move": "1.d4",
+          "image": "chess_images_traps/image34.png"
+        },
+        {
+          "move": "1...e5",
+          "image": "chess_images_traps/image137.png"
+        },
+        {
+          "move": "2.dxe5",
+          "image": "chess_images_traps/image138.png"
+        },
+        {
+          "move": "2...Nc6",
+          "image": "chess_images_traps/image139.png"
+        },
+        {
+          "move": "3.Nf3",
+          "image": "chess_images_traps/image140.png"
+        },
+        {
+          "move": "3...Qe7",
+          "image": "chess_images_traps/image141.png"
+        },
+        {
+          "move": "4.Bf4",
+          "image": "chess_images_traps/image142.png"
+        },
+        {
+          "move": "4...Qb4+",
+          "image": "chess_images_traps/image143.png"
+        },
+        {
+          "move": "5.Bd2",
+          "image": "chess_images_traps/image144.png"
+        },
+        {
+          "move": "5...Qxb2",
+          "image": "chess_images_traps/image145.png"
+        },
+        {
+          "move": "6.Bc3",
+          "image": "chess_images_traps/image146.png"
+        },
+        {
+          "move": "6...Bb4",
+          "image": "chess_images_traps/image147.png"
+        },
+        {
+          "move": "7.Qd2",
+          "image": "chess_images_traps/image148.png"
+        },
+        {
+          "move": "7...Bxc3",
+          "image": "chess_images_traps/image149.png"
+        },
+        {
+          "move": "8.Qxc3",
+          "image": "chess_images_traps/image150.png"
+        },
+        {
+          "move": "8...Qc1#",
+          "image": "chess_images_traps/image151.png"
+        }
+      ]
+    },
+    "Fishing Pole Trap": {
+      "Main Line": [
+        {
+          "move": "1.e4",
+          "image": "chess_images_traps/image1.png"
+        },
+        {
+          "move": "1...e5",
+          "image": "chess_images_traps/image2.png"
+        },
+        {
+          "move": "2.Nf3",
+          "image": "chess_images_traps/image3.png"
+        },
+        {
+          "move": "2...Nc6",
+          "image": "chess_images_traps/image4.png"
+        },
+        {
+          "move": "3.Bb5",
+          "image": "chess_images_traps/image16.png"
+        },
+        {
+          "move": "3...Nf6",
+          "image": "chess_images_traps/image152.png"
+        },
+        {
+          "move": "4.0-0",
+          "image": "chess_images_traps/image153.png"
+        },
+        {
+          "move": "4...Ng4",
+          "image": "chess_images_traps/image154.png"
+        },
+        {
+          "move": "5.h3",
+          "image": "chess_images_traps/image155.png"
+        },
+        {
+          "move": "5...h5",
+          "image": "chess_images_traps/image156.png"
+        },
+        {
+          "move": "6.hxg4",
+          "image": "chess_images_traps/image157.png"
+        },
+        {
+          "move": "6...hxg4",
+          "image": "chess_images_traps/image158.png"
+        },
+        {
+          "move": "7.Ne1",
+          "image": "chess_images_traps/image159.png"
+        },
+        {
+          "move": "7...Qh4",
+          "image": "chess_images_traps/image160.png"
+        },
+        {
+          "move": "8.f3",
+          "image": "chess_images_traps/image161.png"
+        },
+        {
+          "move": "8...g3",
+          "image": "chess_images_traps/image162.png"
+        },
+        {
+          "move": "8.d4",
+          "image": "chess_images_traps/image163.png"
+        },
+        {
+          "move": "8...Qh2#",
+          "image": "chess_images_traps/image164.png"
+        }
+      ]
+    }
+  }
+  }
