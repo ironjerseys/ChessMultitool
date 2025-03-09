@@ -32,18 +32,30 @@
 
                 <!-- Élo pour bullet / blitz / rapid -->
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="30">
-                    <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="Bullet" HorizontalOptions="Center" />
-                        <Label x:Name="BulletEloLabel" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="Blitz" HorizontalOptions="Center" />
-                        <Label x:Name="BlitzEloLabel" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
-                    <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="Rapid" HorizontalOptions="Center" />
-                        <Label x:Name="RapidEloLabel" HorizontalOptions="Center" />
-                    </VerticalStackLayout>
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Bullet" HorizontalOptions="Center" />
+                                <Image Source="bulleticon.png" WidthRequest="20" HeightRequest="20" />
+                            </HorizontalStackLayout>
+                            <Label x:Name="BulletEloLabel" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Blitz" HorizontalOptions="Center" />
+                                <Image Source="blitzicon.png" WidthRequest="20" HeightRequest="20" />
+                            </HorizontalStackLayout>
+                            <Label x:Name="BlitzEloLabel" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                                <Label Text="Rapid" HorizontalOptions="Center" />
+                                <Image Source="rapidicon.png" WidthRequest="20" HeightRequest="20" />
+                            </HorizontalStackLayout>
+                            <Label x:Name="RapidEloLabel" HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
                 </HorizontalStackLayout>
 
                 <!-- Pourcentages White / Black -->
