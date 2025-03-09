@@ -33,10 +33,20 @@ public partial class TrapsPage : ContentPage
             // Met à jour le Picker des variations pour l'ouverture sélectionnée
             var variations = trapsData.Traps[selectedTrap].Keys.ToList();
             variationsPicker.ItemsSource = variations;
-            variationsPicker.SelectedIndex = -1;
 
-            moves = null;
-            currentMoveIndex = 0;
+            if (variations.Any())
+            {
+                variationsPicker.SelectedIndex = 0;
+                selectedVariation = variations[0];
+                moves = trapsData.Traps[selectedTrap][selectedVariation];
+                currentMoveIndex = 0;
+            }
+            else
+            {
+                variationsPicker.SelectedIndex = -1;
+                moves = null;
+                currentMoveIndex = 0;
+            }
             UpdateUI();
         }
     }
