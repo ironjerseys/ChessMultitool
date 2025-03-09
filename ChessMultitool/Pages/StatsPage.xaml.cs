@@ -362,7 +362,7 @@ public partial class StatsPage : ContentPage
         }
 
         // Nombre de parties
-        NumGamesLabel.Text = $"Number of Games: {st.TotalGames}";
+        NumGamesLabel.Text = $"Games played this month: {st.TotalGames}";
 
         // ELO
         BulletEloLabel.Text = st.BulletElo.ToString();
@@ -371,10 +371,10 @@ public partial class StatsPage : ContentPage
 
         // White
         WhiteStatsLabel.Text =
-            $"White: W {(st.PercentWinWhite * 100):0.0}% / D {(st.PercentDrawWhite * 100):0.0}% / L {(st.PercentLostWhite * 100):0.0}%";
+            $"White: Win {(st.PercentWinWhite * 100):0.0}% / Draw {(st.PercentDrawWhite * 100):0.0}% / Loss {(st.PercentLostWhite * 100):0.0}%";
         // Black
         BlackStatsLabel.Text =
-            $"Black: W {(st.PercentWinBlack * 100):0.0}% / D {(st.PercentDrawBlack * 100):0.0}% / L {(st.PercentLostBlack * 100):0.0}%";
+            $"Black: Win {(st.PercentWinBlack * 100):0.0}% / Draw {(st.PercentDrawBlack * 100):0.0}% / Loss {(st.PercentLostBlack * 100):0.0}%";
 
         // e4 / d4
         E4Label.Text = $"1.e4 Win rate: {(st.E4WinRate * 100):0.0}%";
