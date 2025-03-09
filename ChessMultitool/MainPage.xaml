@@ -2,33 +2,4 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ChessMultitool.MainPage">
-
-    <Grid>
-        <!-- Image de fond -->
-        <Image
-            Source="background_image.png" 
-            Aspect="AspectFill"
-            HorizontalOptions="FillAndExpand"
-            VerticalOptions="FillAndExpand" />
-
-        <!-- Contenu principal (texte, etc.) -->
-        <ScrollView>
-            <VerticalStackLayout 
-                Spacing="20"
-                Padding="10"
-                VerticalOptions="Center"
-                HorizontalOptions="Center">
-
-                <Label 
-                    Text="Chess Multitool"
-                    FontSize="36"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    HorizontalTextAlignment="Center" />
-
-                <!-- Ajouter d’autres contrôles si besoin -->
-            </VerticalStackLayout>
-        </ScrollView>
-    </Grid>
-
 </ContentPage>

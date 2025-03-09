@@ -8,10 +8,6 @@
     Title="ChessMultitool">
 
     <TabBar>
-        <ShellContent
-         Title="Home"
-         ContentTemplate="{DataTemplate local:MainPage}"
-         Route="MainPage" />
 
         <ShellContent 
         Title="Openings" 
