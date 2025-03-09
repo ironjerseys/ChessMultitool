@@ -62,38 +62,38 @@
 
                 <!-- Pourcentages White / Black -->
                 <VerticalStackLayout HorizontalOptions="Center">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10 0 0 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10, 0, 0, 0">
                         <Label x:Name="WhiteStatsLabel" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0 0 10 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0, 0, 10, 0">
                         <Label x:Name="BlackStatsLabel" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
 
                 <!-- e4 / d4, etc. -->
                 <VerticalStackLayout HorizontalOptions="Center">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10 0 0 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10, 0, 0, 0">
                         <Label x:Name="E4Label" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0 0 10 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0, 0, 10, 0">
                         <Label x:Name="D4Label" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
 
                 <VerticalStackLayout HorizontalOptions="Center">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10 0 0 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10, 0, 0, 0">
                         <Label x:Name="SameSideLabel" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0 0 10 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0, 0, 10, 0">
                         <Label x:Name="OppositeSideLabel" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
 
                 <VerticalStackLayout HorizontalOptions="Center">
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10 0 0 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="10, 0, 0, 0">
                         <Label x:Name="LongestGameLabel" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0 0 10 0">
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="30" Margin="0, 0, 10, 0">
                         <Label x:Name="ShortestGameLabel" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
