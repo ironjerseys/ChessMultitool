@@ -15,6 +15,11 @@ namespace ChessMultitool
 
             // Timer toutes les 1s
             _timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+            // Initialiser les temps et mettre à jour l'interface utilisateur
+            _whiteTime = 2 * 60;
+            _blackTime = 2 * 60;
+            UpdateUI();
         }
 
         private void OnSetTimeClicked(object sender, EventArgs e)
