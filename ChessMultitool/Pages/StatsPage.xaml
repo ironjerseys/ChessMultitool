@@ -11,7 +11,7 @@
 
             <!-- Champ pour le pseudo -->
             <Label Text="Chess.com Username:" />
-            <Entry x:Name="UsernameEntry" Placeholder="JustMovingPieces01" />
+            <Entry x:Name="UsernameEntry" Text="MagnusCarlsen"/>
 
             <!-- Bouton pour charger -->
             <Button
