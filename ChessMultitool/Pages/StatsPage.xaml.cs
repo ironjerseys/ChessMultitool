@@ -42,7 +42,7 @@ public partial class StatsPage : ContentPage
             var averageMovesByPieces = GetAverageMovesByPieceAsync(currentGamesList, playerUsername);
 
             // 3) Affiche
-            DisplayStats(currentGamesList, playerUsername);
+            DisplayStats(currentGamesList, averageMovesByPieces, playerUsername);
         }
         catch (Exception ex)
         {
@@ -363,7 +363,7 @@ public partial class StatsPage : ContentPage
     //====================
     // 3) AFFICHER
     //====================
-    private void DisplayStats(List<Game> games, string playerUsername)
+    private void DisplayStats(List<Game> games, AverageMovesByPiece avgMoves, string playerUsername)
     {
         if (games == null || games.Count == 0)
         {
@@ -434,7 +434,13 @@ public partial class StatsPage : ContentPage
 
         // Moyenne de coups (approximative, ici nombre total de coups / parties)
         double meanMoves = playerGames.Average(g => g.Moves?.Split(' ').Length / 2.0 ?? 0);
-        MeanMovesLabel.Text = $"Avg moves/game: {meanMoves:0.0}";
+
+        AvgPawnMovesLabel.Text = $"{avgMoves.AvgPawnMoves:0.00}";
+        AvgKnightMovesLabel.Text = $"{avgMoves.AvgKnightMoves:0.00}";
+        AvgBishopMovesLabel.Text = $"{avgMoves.AvgBishopMoves:0.00}";
+        AvgRookMovesLabel.Text = $"{avgMoves.AvgRookMoves:0.00}";
+        AvgQueenMovesLabel.Text = $"{avgMoves.AvgQueenMoves:0.00}";
+        AvgKingMovesLabel.Text = $"{avgMoves.AvgKingMoves:0.00}";
 
         // Affichage final
         StatsContainer.IsVisible = true;
