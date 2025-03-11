@@ -39,6 +39,7 @@ public partial class StatsPage : ContentPage
             // 2)  Formatte la liste de parties
             List<Game> currentGamesList = CreateFormattedGamesList(dataList, playerUsername);
 
+            var averageMovesByPieces = GetAverageMovesByPieceAsync(currentGamesList, playerUsername);
 
             // 3) Affiche
             DisplayStats(currentGamesList, playerUsername);
@@ -55,6 +56,8 @@ public partial class StatsPage : ContentPage
             BusyIndicator.IsVisible = false;
         }
     }
+
+
 
     //====================
     // 1) APPEL API
@@ -284,8 +287,76 @@ public partial class StatsPage : ContentPage
         return "";
     }
 
+    private AverageMovesByPiece GetAverageMovesByPieceAsync(List<Game> games, string playerUsername)
+    {
 
+        int totalGames = games.Count;
 
+        int pawnMoves = 0, knightMoves = 0, bishopMoves = 0;
+        int rookMoves = 0, queenMoves = 0, kingMoves = 0;
+
+        // On compte les coups pour chaque partie
+        foreach (var game in games)
+        {
+            var movesDict = CountPieceMoves(game.Moves);
+            pawnMoves += movesDict["pawn"];
+            knightMoves += movesDict["knight"];
+            bishopMoves += movesDict["bishop"];
+            rookMoves += movesDict["rook"];
+            queenMoves += movesDict["queen"];
+            kingMoves += movesDict["king"];
+        }
+
+        // On calcule les moyennes
+        var averageMoves = new AverageMovesByPiece
+        {
+            PlayerUsername = playerUsername,
+            AvgPawnMoves = (double)pawnMoves / totalGames,
+            AvgKnightMoves = (double)knightMoves / totalGames,
+            AvgBishopMoves = (double)bishopMoves / totalGames,
+            AvgRookMoves = (double)rookMoves / totalGames,
+            AvgQueenMoves = (double)queenMoves / totalGames,
+            AvgKingMoves = (double)kingMoves / totalGames
+        };
+
+        return averageMoves;
+    }
+
+    private Dictionary<string, int> CountPieceMoves(string movesString)
+    {
+        var movesCount = new Dictionary<string, int>
+            {
+                { "pawn",   0 },
+                { "knight", 0 },
+                { "bishop", 0 },
+                { "rook",   0 },
+                { "queen",  0 },
+                { "king",   0 }
+            };
+
+        if (string.IsNullOrWhiteSpace(movesString))
+            return movesCount;
+
+        var moves = movesString.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var move in moves)
+        {
+            // Ignorer les numéros de tour "1.", "2." etc.
+            if (char.IsDigit(move[0]) && move.Contains('.'))
+                continue;
+
+            // On se base sur la notation classique
+            if (move.StartsWith("N")) movesCount["knight"]++;
+            else if (move.StartsWith("B")) movesCount["bishop"]++;
+            else if (move.StartsWith("R")) movesCount["rook"]++;
+            else if (move.StartsWith("Q")) movesCount["queen"]++;
+            else if (move.StartsWith("K")) movesCount["king"]++;
+            else if (char.IsLower(move[0]))
+                movesCount["pawn"]++;
+        }
+
+        return movesCount;
+    }
 
 
 

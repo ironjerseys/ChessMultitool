@@ -50,4 +50,6 @@ class Game
     public string? Eco { get; set; }
 
     public DateTime DateAndEndTime { get; set; }
+
+
 }
