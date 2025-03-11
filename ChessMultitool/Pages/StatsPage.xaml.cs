@@ -426,8 +426,43 @@ public partial class StatsPage : ContentPage
         OppositeSideLabel.Text = $"Opposite castling: 0%";
 
         // Longest and shortest game
-        int longestGame = playerGames.Max(g => g.Moves?.Split(' ').Length / 2 ?? 0); // divisé par 2 car 1 coup = 2 demi-coups
-        int shortestGame = playerGames.Min(g => g.Moves?.Split(' ').Length / 2 ?? 0);
+        int longestGame = playerGames.Max(g =>
+        {
+            if (string.IsNullOrWhiteSpace(g.Moves)) return 0;
+
+            // Cherche tous les numéros de coups via regex : "1.", "2.", "3.", etc.
+            var matches = Regex.Matches(g.Moves, @"\d+\.");
+
+            if (matches.Count == 0) return 0;
+
+            // Prend le dernier numéro (ex: "33.")
+            var lastMove = matches[^1].Value;
+
+            // Extrait le nombre (en enlevant le ".")
+            if (int.TryParse(lastMove.TrimEnd('.'), out int moveNumber))
+                return moveNumber;
+
+            return 0;
+        });
+
+        int shortestGame = playerGames.Min(g =>
+        {
+            if (string.IsNullOrWhiteSpace(g.Moves)) return 0;
+
+            // Cherche tous les numéros de coups via regex : "1.", "2.", "3.", etc.
+            var matches = Regex.Matches(g.Moves, @"\d+\.");
+
+            if (matches.Count == 0) return 0;
+
+            // Prend le dernier numéro (ex: "33.")
+            var lastMove = matches[^1].Value;
+
+            // Extrait le nombre (en enlevant le ".")
+            if (int.TryParse(lastMove.TrimEnd('.'), out int moveNumber))
+                return moveNumber;
+
+            return 0;
+        });
 
         LongestGameLabel.Text = $"Longest game (moves): {longestGame}";
         ShortestGameLabel.Text = $"Shortest game (moves): {shortestGame}";
@@ -435,16 +470,14 @@ public partial class StatsPage : ContentPage
         // Moyenne de coups (approximative, ici nombre total de coups / parties)
         double meanMoves = playerGames.Average(g => g.Moves?.Split(' ').Length / 2.0 ?? 0);
 
-        AvgPawnMovesLabel.Text = $"{avgMoves.AvgPawnMoves:0.00}";
-        AvgKnightMovesLabel.Text = $"{avgMoves.AvgKnightMoves:0.00}";
-        AvgBishopMovesLabel.Text = $"{avgMoves.AvgBishopMoves:0.00}";
-        AvgRookMovesLabel.Text = $"{avgMoves.AvgRookMoves:0.00}";
-        AvgQueenMovesLabel.Text = $"{avgMoves.AvgQueenMoves:0.00}";
-        AvgKingMovesLabel.Text = $"{avgMoves.AvgKingMoves:0.00}";
+        AvgPawnMovesLabel.Text = $"{avgMoves.AvgPawnMoves:0}";
+        AvgKnightMovesLabel.Text = $"{avgMoves.AvgKnightMoves:0}";
+        AvgBishopMovesLabel.Text = $"{avgMoves.AvgBishopMoves:0}";
+        AvgRookMovesLabel.Text = $"{avgMoves.AvgRookMoves:0}";
+        AvgQueenMovesLabel.Text = $"{avgMoves.AvgQueenMoves:0}";
+        AvgKingMovesLabel.Text = $"{avgMoves.AvgKingMoves:0}";
 
         // Affichage final
         StatsContainer.IsVisible = true;
     }
-
-
 }
