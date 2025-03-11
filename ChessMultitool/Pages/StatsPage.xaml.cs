@@ -41,7 +41,7 @@ public partial class StatsPage : ContentPage
 
 
             // 3) Affiche
-            //DisplayStats(stats);
+            DisplayStats(currentGamesList, playerUsername);
         }
         catch (Exception ex)
         {
@@ -292,43 +292,82 @@ public partial class StatsPage : ContentPage
     //====================
     // 3) AFFICHER
     //====================
-    private void DisplayStats(ChessStats st)
+    private void DisplayStats(List<Game> games, string playerUsername)
     {
-        if (st.TotalGames == 0)
+        if (games == null || games.Count == 0)
         {
             NumGamesLabel.Text = "No games found this month.";
             StatsContainer.IsVisible = true;
             return;
         }
 
-        // Nombre de parties
-        NumGamesLabel.Text = $"Games played this month: {st.TotalGames}";
+        // Filtrer les parties du joueur
+        var playerGames = games.Where(g => g.PlayerUsername?.ToLower() == playerUsername.ToLower()).ToList();
+        if (playerGames.Count == 0)
+        {
+            NumGamesLabel.Text = "No games found for this player.";
+            StatsContainer.IsVisible = true;
+            return;
+        }
 
-        // ELO
-        BulletEloLabel.Text = st.BulletElo.ToString();
-        BlitzEloLabel.Text = st.BlitzElo.ToString();
-        RapidEloLabel.Text = st.RapidElo.ToString();
+        // Nombre total de parties
+        NumGamesLabel.Text = $"Games played this month: {playerGames.Count}";
 
-        // White
-        WhiteStatsLabel.Text =
-            $"White: Win {(st.PercentWinWhite * 100):0.0}% / Draw {(st.PercentDrawWhite * 100):0.0}% / Loss {(st.PercentLostWhite * 100):0.0}%";
-        // Black
-        BlackStatsLabel.Text =
-            $"Black: Win {(st.PercentWinBlack * 100):0.0}% / Draw {(st.PercentDrawBlack * 100):0.0}% / Loss {(st.PercentLostBlack * 100):0.0}%";
+        // Dernier ELO par catégorie
+        var latestBullet = playerGames.Where(g => g.Category == "bullet").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
+        var latestBlitz = playerGames.Where(g => g.Category == "blitz").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
+        var latestRapid = playerGames.Where(g => g.Category == "rapid").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
 
-        // e4 / d4
-        E4Label.Text = $"1.e4 Win rate: {(st.E4WinRate * 100):0.0}%";
-        D4Label.Text = $"1.d4 Win rate: {(st.D4WinRate * 100):0.0}%";
+        BulletEloLabel.Text = latestBullet.ToString();
+        BlitzEloLabel.Text = latestBlitz.ToString();
+        RapidEloLabel.Text = latestRapid.ToString();
 
-        // placeholders
-        SameSideLabel.Text = $"Same-side castling: {(st.PercentSameCastling * 100):0.0}%";
-        OppositeSideLabel.Text = $"Opposite castling: {(st.PercentOppositeCastling * 100):0.0}%";
+        // Résultats par couleur
+        var whiteGames = playerGames.Where(g => g.White?.ToLower() == playerUsername.ToLower()).ToList();
+        var blackGames = playerGames.Where(g => g.Black?.ToLower() == playerUsername.ToLower()).ToList();
 
-        LongestGameLabel.Text = $"Longest game (moves): {st.LongestGameMoves}";
-        ShortestGameLabel.Text = $"Shortest game (moves): {st.ShortestGameMoves}";
-        MeanMovesLabel.Text = $"Avg moves/piece: {st.MeanMovesByPiece:0.00}";
+        double percentWinWhite = whiteGames.Count > 0 ? whiteGames.Count(g => g.ResultForPlayer == "won") / (double)whiteGames.Count : 0;
+        double percentDrawWhite = whiteGames.Count > 0 ? whiteGames.Count(g => g.ResultForPlayer == "drawn") / (double)whiteGames.Count : 0;
+        double percentLostWhite = whiteGames.Count > 0 ? whiteGames.Count(g => g.ResultForPlayer == "lost") / (double)whiteGames.Count : 0;
 
-        // Affiche la section stats
+        double percentWinBlack = blackGames.Count > 0 ? blackGames.Count(g => g.ResultForPlayer == "won") / (double)blackGames.Count : 0;
+        double percentDrawBlack = blackGames.Count > 0 ? blackGames.Count(g => g.ResultForPlayer == "drawn") / (double)blackGames.Count : 0;
+        double percentLostBlack = blackGames.Count > 0 ? blackGames.Count(g => g.ResultForPlayer == "lost") / (double)blackGames.Count : 0;
+
+        WhiteStatsLabel.Text = $"White: Win {(percentWinWhite * 100):0.0}% / Draw {(percentDrawWhite * 100):0.0}% / Loss {(percentLostWhite * 100):0.0}%";
+        BlackStatsLabel.Text = $"Black: Win {(percentWinBlack * 100):0.0}% / Draw {(percentDrawBlack * 100):0.0}% / Loss {(percentLostBlack * 100):0.0}%";
+
+        // Stats d'ouvertures : e4 / d4
+        int e4Games = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. e4"));
+        int e4Wins = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. e4") && g.ResultForPlayer == "won");
+
+        int d4Games = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. d4"));
+        int d4Wins = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. d4") && g.ResultForPlayer == "won");
+
+        double e4WinRate = e4Games > 0 ? (double)e4Wins / e4Games : 0;
+        double d4WinRate = d4Games > 0 ? (double)d4Wins / d4Games : 0;
+
+        E4Label.Text = $"1.e4 Win rate: {(e4WinRate * 100):0.0}%";
+        D4Label.Text = $"1.d4 Win rate: {(d4WinRate * 100):0.0}%";
+
+        // Castling : placeholders (valeurs fictives à calculer selon tes règles si nécessaire)
+        SameSideLabel.Text = $"Same-side castling: 0%";
+        OppositeSideLabel.Text = $"Opposite castling: 0%";
+
+        // Longest and shortest game
+        int longestGame = playerGames.Max(g => g.Moves?.Split(' ').Length / 2 ?? 0); // divisé par 2 car 1 coup = 2 demi-coups
+        int shortestGame = playerGames.Min(g => g.Moves?.Split(' ').Length / 2 ?? 0);
+
+        LongestGameLabel.Text = $"Longest game (moves): {longestGame}";
+        ShortestGameLabel.Text = $"Shortest game (moves): {shortestGame}";
+
+        // Moyenne de coups (approximative, ici nombre total de coups / parties)
+        double meanMoves = playerGames.Average(g => g.Moves?.Split(' ').Length / 2.0 ?? 0);
+        MeanMovesLabel.Text = $"Avg moves/game: {meanMoves:0.0}";
+
+        // Affichage final
         StatsContainer.IsVisible = true;
     }
+
+
 }
