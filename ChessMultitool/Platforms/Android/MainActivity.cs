@@ -1,5 +1,6 @@
 ﻿using Android.App;
 using Android.Content.PM;
+using Android.Gms.Ads;
 using Android.OS;
 using Android.Views;
 using AndroidX.Core.View;
@@ -12,6 +13,7 @@ public class MainActivity : MauiAppCompatActivity
     protected override void OnCreate(Bundle savedInstanceState)
     {
         base.OnCreate(savedInstanceState);
+        MobileAds.Initialize(this);
 
         // Changer la couleur de la barre d'état (Status Bar)
         if (Build.VERSION.SdkInt >= BuildVersionCodes.Lollipop)

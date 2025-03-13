@@ -10,6 +10,7 @@ public partial class StatsPage : ContentPage
     public StatsPage()
     {
         InitializeComponent();
+        AdView.AdsId = "ca-app-pub-6452917997330099/6971133842";
     }
 
     private async void OnLoadStatsClicked(object sender, EventArgs e)

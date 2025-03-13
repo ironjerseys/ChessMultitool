@@ -3,11 +3,14 @@
     x:Class="ChessMultitool.StatsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ads="clr-namespace:Plugin.MauiMTAdmob.Controls;assembly=Plugin.MauiMtAdmob"
     Title="Chess Stats">
 
     <!-- On utilise un ScrollView pour pouvoir scroller si la liste est longue -->
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="10">
+            
+            
 
             <!-- Champ pour le pseudo -->
             <Label Text="Chess.com Username:" />
@@ -129,6 +132,8 @@
 
 
             </VerticalStackLayout>
+
+            <ads:MTAdView x:Name="AdView" HeightRequest="{OnIdiom Phone=50, Tablet=90, Desktop=120}" />
 
             <!-- Label d'erreur -->
             <Label x:Name="ErrorLabel" TextColor="Red" IsVisible="False" />
