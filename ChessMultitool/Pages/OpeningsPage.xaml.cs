@@ -14,7 +14,6 @@ public partial class OpeningsPage : ContentPage
     {
         InitializeComponent();
 
-        AdView.AdsId = "ca-app-pub-6452917997330099/6971133842";
 
         moveImage.Source = "start.png";
         LoadOpenings();
