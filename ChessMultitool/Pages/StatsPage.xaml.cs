@@ -1,4 +1,4 @@
-using ChessMultitool.Models;
+Ôªøusing ChessMultitool.Models;
 using Newtonsoft.Json.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -14,11 +14,11 @@ public partial class StatsPage : ContentPage
 
     private async void OnLoadStatsClicked(object sender, EventArgs e)
     {
-        // RÈinitialise l'affichage
+        // R√©initialise l'affichage
         ErrorLabel.IsVisible = false;
         StatsContainer.IsVisible = false;
 
-        // RÈcupËre le username
+        // R√©cup√®re le username
         string playerUsername = UsernameEntry.Text?.Trim() ?? "";
         if (string.IsNullOrEmpty(playerUsername))
         {
@@ -27,13 +27,13 @@ public partial class StatsPage : ContentPage
             return;
         }
 
-        // DÈmarre l'indicateur de chargement
+        // D√©marre l'indicateur de chargement
         BusyIndicator.IsVisible = true;
         BusyIndicator.IsRunning = true;
 
         try
         {
-            // 1) RÈcupËre les donnÈes de líAPI
+            // 1) R√©cup√®re les donn√©es de l‚ÄôAPI
             string dataList = await GetGamesFromChessComAsync(playerUsername);
 
             // 2)  Formatte la liste de parties
@@ -51,7 +51,7 @@ public partial class StatsPage : ContentPage
         }
         finally
         {
-            // ArrÍte l'indicateur
+            // Arr√™te l'indicateur
             BusyIndicator.IsRunning = false;
             BusyIndicator.IsVisible = false;
         }
@@ -124,8 +124,8 @@ public partial class StatsPage : ContentPage
                 {
                     if (line.StartsWith("[Event "))
                     {
-                        // DËs qu'on detecte un nouvel Event,
-                        // on ajoute le prÈcÈdent s'il est plus rÈcent que lastGameDateAndTime
+                        // D√®s qu'on detecte un nouvel Event,
+                        // on ajoute le pr√©c√©dent s'il est plus r√©cent que lastGameDateAndTime
                         if (currentGame != null)
                         {
                             gamesToReturn.Add(currentGame);
@@ -233,11 +233,11 @@ public partial class StatsPage : ContentPage
     public string DetectCastlingPattern(string moves)
     {
         // Compter le nombre de "O-O"
-        int kingSideCastlingCount = Regex.Matches(moves, "O-O(?!-)").Count; // Attention ‡ ne pas capturer "O-O-O"
+        int kingSideCastlingCount = Regex.Matches(moves, "O-O(?!-)").Count; // Attention √† ne pas capturer "O-O-O"
                                                                             // Compter le nombre de "O-O-O"
         int queenSideCastlingCount = Regex.Matches(moves, "O-O-O").Count;
 
-        // VÈrifier les conditions
+        // V√©rifier les conditions
         if (kingSideCastlingCount >= 2 || queenSideCastlingCount >= 2)
             return "sameSide";
         else if (kingSideCastlingCount >= 1 && queenSideCastlingCount >= 1)
@@ -281,7 +281,7 @@ public partial class StatsPage : ContentPage
         if (termination.Contains("temps", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("time", StringComparison.OrdinalIgnoreCase))
             return "time";
-        if (termination.Contains("Èchec et mat", StringComparison.OrdinalIgnoreCase)
+        if (termination.Contains("√©chec et mat", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("checkmate", StringComparison.OrdinalIgnoreCase))
             return "checkmate";
         if (termination.Contains("abandon", StringComparison.OrdinalIgnoreCase)
@@ -290,13 +290,13 @@ public partial class StatsPage : ContentPage
         if (termination.Contains("accord mutuel", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("mutual agreement", StringComparison.OrdinalIgnoreCase))
             return "agreement";
-        if (termination.Contains("manque de matÈriel", StringComparison.OrdinalIgnoreCase)
+        if (termination.Contains("manque de mat√©riel", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("insufficient material", StringComparison.OrdinalIgnoreCase))
             return "lack of equipment";
         if (termination.Contains("pat", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("stalemate", StringComparison.OrdinalIgnoreCase))
             return "pat";
-        if (termination.Contains("rÈpÈtition", StringComparison.OrdinalIgnoreCase)
+        if (termination.Contains("r√©p√©tition", StringComparison.OrdinalIgnoreCase)
             || termination.Contains("repetition", StringComparison.OrdinalIgnoreCase))
             return "repeat";
 
@@ -357,7 +357,7 @@ public partial class StatsPage : ContentPage
 
         foreach (var move in moves)
         {
-            // Ignorer les numÈros de tour "1.", "2." etc.
+            // Ignorer les num√©ros de tour "1.", "2." etc.
             if (char.IsDigit(move[0]) && move.Contains('.'))
                 continue;
 
@@ -388,7 +388,6 @@ public partial class StatsPage : ContentPage
             return;
         }
 
-        // Filtrer les parties du joueur
         var playerGames = games.Where(g => g.PlayerUsername?.ToLower() == playerUsername.ToLower()).ToList();
         if (playerGames.Count == 0)
         {
@@ -397,10 +396,9 @@ public partial class StatsPage : ContentPage
             return;
         }
 
-        // Nombre total de parties
         NumGamesLabel.Text = $"Games played this month: {playerGames.Count}";
 
-        // Dernier ELO par catÈgorie
+        // Ratings
         var latestBullet = playerGames.Where(g => g.Category == "bullet").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
         var latestBlitz = playerGames.Where(g => g.Category == "blitz").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
         var latestRapid = playerGames.Where(g => g.Category == "rapid").OrderByDescending(g => g.DateAndEndTime).FirstOrDefault()?.PlayerElo ?? 0;
@@ -409,7 +407,7 @@ public partial class StatsPage : ContentPage
         BlitzEloLabel.Text = latestBlitz.ToString();
         RapidEloLabel.Text = latestRapid.ToString();
 
-        // RÈsultats par couleur
+        // Color results
         var whiteGames = playerGames.Where(g => g.White?.ToLower() == playerUsername.ToLower()).ToList();
         var blackGames = playerGames.Where(g => g.Black?.ToLower() == playerUsername.ToLower()).ToList();
 
@@ -421,10 +419,11 @@ public partial class StatsPage : ContentPage
         double percentDrawBlack = blackGames.Count > 0 ? blackGames.Count(g => g.ResultForPlayer == "drawn") / (double)blackGames.Count : 0;
         double percentLostBlack = blackGames.Count > 0 ? blackGames.Count(g => g.ResultForPlayer == "lost") / (double)blackGames.Count : 0;
 
-        WhiteStatsLabel.Text = $"White: Win {(percentWinWhite * 100):0.0}% / Draw {(percentDrawWhite * 100):0.0}% / Loss {(percentLostWhite * 100):0.0}%";
-        BlackStatsLabel.Text = $"Black: Win {(percentWinBlack * 100):0.0}% / Draw {(percentDrawBlack * 100):0.0}% / Loss {(percentLostBlack * 100):0.0}%";
+        // ‚úÖ Color winrate Formatted
+        WhiteStatsLabel.FormattedText = CreateFormattedPercent("White: ", percentWinWhite, percentDrawWhite, percentLostWhite);
+        BlackStatsLabel.FormattedText = CreateFormattedPercent("Black: ", percentWinBlack, percentDrawBlack, percentLostBlack);
 
-        // Stats d'ouvertures : e4 / d4
+        // Openings winrate (e4, d4)
         int e4Games = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. e4"));
         int e4Wins = playerGames.Count(g => g.Moves != null && g.Moves.Trim().StartsWith("1. e4") && g.ResultForPlayer == "won");
 
@@ -434,61 +433,30 @@ public partial class StatsPage : ContentPage
         double e4WinRate = e4Games > 0 ? (double)e4Wins / e4Games : 0;
         double d4WinRate = d4Games > 0 ? (double)d4Wins / d4Games : 0;
 
-        E4Label.Text = $"1.e4 Win rate: {(e4WinRate * 100):0.0}%";
-        D4Label.Text = $"1.d4 Win rate: {(d4WinRate * 100):0.0}%";
+        // ‚úÖ FormattedString pour e4 et d4
+        E4Label.FormattedText = CreateFormattedSingle("1.e4 Win rate: ", e4WinRate);
+        D4Label.FormattedText = CreateFormattedSingle("1.d4 Win rate: ", d4WinRate);
 
-        // Castling 
+        // Castling
         int sameSideCastling = playerGames.Count(g => g.CastlingSameOrOppositeSide == "sameSide");
         int oppositeSideCastling = playerGames.Count(g => g.CastlingSameOrOppositeSide == "oppositeSide");
 
-        SameSideLabel.Text = sameSideCastling > 0 ? $"Same side castling: {(sameSideCastling / (double)playerGames.Count) * 100:0.0}%" : "Same side castling: 0%";
-        OppositeSideLabel.Text = oppositeSideCastling > 0 ? $"Opposite side castling: {(oppositeSideCastling / (double)playerGames.Count) * 100:0.0}%" : "Opposite side castling: 0%";
+        double sameSidePercent = sameSideCastling > 0 ? (sameSideCastling / (double)playerGames.Count) : 0;
+        double oppositeSidePercent = oppositeSideCastling > 0 ? (oppositeSideCastling / (double)playerGames.Count) : 0;
+
+        // ‚úÖ FormattedString pour castling
+        SameSideLabel.FormattedText = CreateFormattedSingle("Same side castling: ", sameSidePercent);
+        OppositeSideLabel.FormattedText = CreateFormattedSingle("Opposite side castling: ", oppositeSidePercent);
 
         // Longest and shortest game
-        int longestGame = playerGames.Max(g =>
-        {
-            if (string.IsNullOrWhiteSpace(g.Moves)) return 0;
+        int longestGame = playerGames.Max(GetGameMoves);
+        int shortestGame = playerGames.Min(GetGameMoves);
 
-            // Cherche tous les numÈros de coups via regex : "1.", "2.", "3.", etc.
-            var matches = Regex.Matches(g.Moves, @"\d+\.");
+        // ‚úÖ FormattedString pour game length
+        LongestGameLabel.FormattedText = CreateFormattedInt("Longest game (moves): ", longestGame);
+        ShortestGameLabel.FormattedText = CreateFormattedInt("Shortest game (moves): ", shortestGame);
 
-            if (matches.Count == 0) return 0;
-
-            // Prend le dernier numÈro (ex: "33.")
-            var lastMove = matches[^1].Value;
-
-            // Extrait le nombre (en enlevant le ".")
-            if (int.TryParse(lastMove.TrimEnd('.'), out int moveNumber))
-                return moveNumber;
-
-            return 0;
-        });
-
-        int shortestGame = playerGames.Min(g =>
-        {
-            if (string.IsNullOrWhiteSpace(g.Moves)) return 0;
-
-            // Cherche tous les numÈros de coups via regex : "1.", "2.", "3.", etc.
-            var matches = Regex.Matches(g.Moves, @"\d+\.");
-
-            if (matches.Count == 0) return 0;
-
-            // Prend le dernier numÈro (ex: "33.")
-            var lastMove = matches[^1].Value;
-
-            // Extrait le nombre (en enlevant le ".")
-            if (int.TryParse(lastMove.TrimEnd('.'), out int moveNumber))
-                return moveNumber;
-
-            return 0;
-        });
-
-        LongestGameLabel.Text = $"Longest game (moves): {longestGame}";
-        ShortestGameLabel.Text = $"Shortest game (moves): {shortestGame}";
-
-        // Moyenne de coups (approximative, ici nombre total de coups / parties)
-        double meanMoves = playerGames.Average(g => g.Moves?.Split(' ').Length / 2.0 ?? 0);
-
+        // Moyenne de coups par pi√®ce
         AvgPawnMovesLabel.Text = $"{avgMoves.AvgPawnMoves:0}";
         AvgKnightMovesLabel.Text = $"{avgMoves.AvgKnightMoves:0}";
         AvgBishopMovesLabel.Text = $"{avgMoves.AvgBishopMoves:0}";
@@ -496,7 +464,59 @@ public partial class StatsPage : ContentPage
         AvgQueenMovesLabel.Text = $"{avgMoves.AvgQueenMoves:0}";
         AvgKingMovesLabel.Text = $"{avgMoves.AvgKingMoves:0}";
 
-        // Affichage final
         StatsContainer.IsVisible = true;
     }
+
+    // ‚úÖ Fonction utilitaire pour FormattedString avec 3 pourcentages (Win/Draw/Loss)
+    private FormattedString CreateFormattedPercent(string label, double win, double draw, double loss)
+    {
+        return new FormattedString
+        {
+            Spans = {
+            new Span { Text = label },
+            new Span { Text = $"Win {(win * 100):0.0}%", TextColor = Color.FromArgb("#d18b47"), FontAttributes = FontAttributes.Bold, FontSize = 18 },
+            new Span { Text = " / Draw " },
+            new Span { Text = $"{(draw * 100):0.0}%", TextColor = Color.FromArgb("#d18b47"), FontAttributes = FontAttributes.Bold, FontSize = 18 },
+            new Span { Text = " / Loss " },
+            new Span { Text = $"{(loss * 100):0.0}%", TextColor = Color.FromArgb("#d18b47"), FontAttributes = FontAttributes.Bold, FontSize = 18 }
+        }
+        };
+    }
+
+    // ‚úÖ Fonction utilitaire pour FormattedString avec 1 pourcentage (ex: e4/d4, castling)
+    private FormattedString CreateFormattedSingle(string label, double percent)
+    {
+        return new FormattedString
+        {
+            Spans = {
+            new Span { Text = label },
+            new Span { Text = $"{(percent * 100):0.0}%", TextColor = Color.FromArgb("#d18b47"), FontAttributes = FontAttributes.Bold, FontSize = 18 }
+        }
+        };
+    }
+
+    // ‚úÖ Fonction utilitaire pour FormattedString avec un entier (ex: nombre de coups)
+    private FormattedString CreateFormattedInt(string label, int value)
+    {
+        return new FormattedString
+        {
+            Spans = {
+            new Span { Text = label },
+            new Span { Text = $"{value}", TextColor = Color.FromArgb("#d18b47"), FontAttributes = FontAttributes.Bold, FontSize = 18 }
+        }
+        };
+    }
+
+    // ‚öôÔ∏è Fonction r√©utilisable pour compter les coups dans une partie
+    private int GetGameMoves(Game g)
+    {
+        if (string.IsNullOrWhiteSpace(g.Moves)) return 0;
+
+        var matches = Regex.Matches(g.Moves, @"\d+\.");
+        if (matches.Count == 0) return 0;
+
+        var lastMove = matches[^1].Value;
+        return int.TryParse(lastMove.TrimEnd('.'), out int moveNumber) ? moveNumber : 0;
+    }
+
 }
