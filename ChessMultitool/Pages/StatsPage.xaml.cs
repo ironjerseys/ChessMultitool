@@ -213,10 +213,8 @@ public partial class StatsPage : ContentPage
                     currentGame.ResultForPlayer =
                         FindResultForPlayer(currentGame.Termination, currentGame.PlayerUsername);
                     currentGame.EndOfGameBy = HowEndedTheGame(currentGame.Termination);
-
-
+                    currentGame.CastlingSameOrOppositeSide = DetectCastlingPattern(currentGame.Moves);
                     gamesToReturn.Add(currentGame);
-
                 }
             }
         }
@@ -231,6 +229,24 @@ public partial class StatsPage : ContentPage
         var filteredMoves = movesArray.Where(move => !move.Contains("...")).ToArray();
         return string.Join(" ", filteredMoves).Replace("  ", " ");
     }
+
+    public string DetectCastlingPattern(string moves)
+    {
+        // Compter le nombre de "O-O"
+        int kingSideCastlingCount = Regex.Matches(moves, "O-O(?!-)").Count; // Attention à ne pas capturer "O-O-O"
+                                                                            // Compter le nombre de "O-O-O"
+        int queenSideCastlingCount = Regex.Matches(moves, "O-O-O").Count;
+
+        // Vérifier les conditions
+        if (kingSideCastlingCount >= 2 || queenSideCastlingCount >= 2)
+            return "sameSide";
+        else if (kingSideCastlingCount >= 1 && queenSideCastlingCount >= 1)
+            return "oppositeSide";
+
+        // Si aucune condition remplie
+        return string.Empty; // ou "none" selon ce que tu veux
+    }
+
 
     private static string FindResultForPlayer(string termination, string playerUsername)
     {
@@ -421,9 +437,12 @@ public partial class StatsPage : ContentPage
         E4Label.Text = $"1.e4 Win rate: {(e4WinRate * 100):0.0}%";
         D4Label.Text = $"1.d4 Win rate: {(d4WinRate * 100):0.0}%";
 
-        // Castling : placeholders (valeurs fictives à calculer selon tes règles si nécessaire)
-        SameSideLabel.Text = $"Same-side castling: 0%";
-        OppositeSideLabel.Text = $"Opposite castling: 0%";
+        // Castling 
+        int sameSideCastling = playerGames.Count(g => g.CastlingSameOrOppositeSide == "sameSide");
+        int oppositeSideCastling = playerGames.Count(g => g.CastlingSameOrOppositeSide == "oppositeSide");
+
+        SameSideLabel.Text = sameSideCastling > 0 ? $"Same side castling: {(sameSideCastling / (double)playerGames.Count) * 100:0.0}%" : "Same side castling: 0%";
+        OppositeSideLabel.Text = oppositeSideCastling > 0 ? $"Opposite side castling: {(oppositeSideCastling / (double)playerGames.Count) * 100:0.0}%" : "Opposite side castling: 0%";
 
         // Longest and shortest game
         int longestGame = playerGames.Max(g =>

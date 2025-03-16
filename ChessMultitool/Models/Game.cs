@@ -51,5 +51,6 @@ class Game
 
     public DateTime DateAndEndTime { get; set; }
 
+    public string CastlingSameOrOppositeSide { get; set; }
 
 }
