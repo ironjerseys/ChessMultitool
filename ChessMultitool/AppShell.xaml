@@ -10,6 +10,11 @@
     <TabBar>
 
         <ShellContent 
+        Title="Game" 
+        Icon="icon_chess.png"
+        ContentTemplate="{DataTemplate local:ChessGame}" />
+
+        <ShellContent 
         Title="Openings" 
         Icon="openings.png" 
         ContentTemplate="{DataTemplate local:OpeningsPage}" />
@@ -28,6 +33,7 @@
         Title="Clock" 
         Icon="clock.png" 
         ContentTemplate="{DataTemplate local:ClockPage}" />
+
     </TabBar>
 
 </Shell>

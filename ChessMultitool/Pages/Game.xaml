@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="ChessMultitool.ChessGame"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Chess">
+
+    <Grid>
+        <!-- Conteneur centré -->
+        <Grid VerticalOptions="Center" HorizontalOptions="Center">
+            <!-- Plateau de jeu, taille adaptée à chaque plateforme -->
+            <Grid x:Name="BoardGrid"
+                  WidthRequest="{OnPlatform Android=320, iOS=320, WinUI=600}"
+                  HeightRequest="{OnPlatform Android=320, iOS=320, WinUI=600}">
+
+                <!-- Fond du plateau -->
+                <Image Source="Board.png"
+                       Aspect="AspectFill"
+                       Opacity="1"
+                       InputTransparent="True"
+                       ZIndex="0" />
+
+                <!-- Grille de surlignage -->
+                <Grid x:Name="HighlightGrid"
+                      RowSpacing="0"
+                      ColumnSpacing="0"
+                      BackgroundColor="Transparent"
+                      InputTransparent="False"
+                      ZIndex="1" />
+
+                <!-- Grille des pièces -->
+                <Grid x:Name="PieceGrid"
+                      RowSpacing="0"
+                      ColumnSpacing="0"
+                      BackgroundColor="Transparent"
+                      InputTransparent="True"
+                      ZIndex="2" />
+
+                <!-- Menu contextuel dynamique (promotion, pause, fin) -->
+                <ContentView x:Name="MenuContainer"
+                             BackgroundColor="Transparent"
+                             ZIndex="3" />
+            </Grid>
+        </Grid>
+    </Grid>
+
+</ContentPage>

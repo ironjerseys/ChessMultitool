@@ -827,10 +827,36 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ChessLogic\ChessLogic.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\Images\bishopb.png" />
+	  <Resource Include="Resources\Images\bishopw.png" />
+	  <Resource Include="Resources\Images\board.png" />
+	  <Resource Include="Resources\Images\cursorb.cur" />
+	  <Resource Include="Resources\Images\cursorw.cur" />
+	  <Resource Include="Resources\Images\icon.ico" />
+	  <Resource Include="Resources\Images\kingb.png" />
+	  <Resource Include="Resources\Images\kingw.png" />
+	  <Resource Include="Resources\Images\knightb.png" />
+	  <Resource Include="Resources\Images\knightw.png" />
+	  <Resource Include="Resources\Images\pawnb.png" />
+	  <Resource Include="Resources\Images\pawnw.png" />
+	  <Resource Include="Resources\Images\queenb.png" />
+	  <Resource Include="Resources\Images\queenw.png" />
+	  <Resource Include="Resources\Images\rookb.png" />
+	  <Resource Include="Resources\Images\rookw.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <MauiXaml Update="Pages\AdBanner.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\ClockPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\Game.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\OpeningsPage.xaml">
