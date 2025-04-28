@@ -160,9 +160,26 @@ public partial class ChessGame : ContentPage
         pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
         pieceImages[from.Row, from.Column].Source = null;
 
-        // À remplacer par ton vrai menu MAUI si nécessaire
-        // Ici tu peux créer une page/modal/ContentView pour gérer le choix de la pièce
+        // Crée le menu de promotion MAUI
+        PromotionMenu promMenu = new PromotionMenu(gameState.CurrentPlayer);
+
+        // Affiche le menu dans ton conteneur (MenuContainer est un ContentView sur ton plateau)
+        MenuContainer.Content = promMenu;
+
+        // Quand l'utilisateur sélectionne une pièce
+        promMenu.PieceSelected += type =>
+        {
+            // Supprime le menu après sélection
+            MenuContainer.Content = null;
+
+            // Crée un mouvement de promotion avec la pièce choisie
+            Move promMove = new PawnPromotion(from, to, type);
+
+            // Joue le coup de promotion
+            HandleMove(promMove);
+        };
     }
+
 
     private void ShowGameOver()
     {

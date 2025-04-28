@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Plugin.MauiMTAdmob;
+﻿using Plugin.MauiMTAdmob;
 
 namespace ChessMultitool;
 
