@@ -1,4 +1,5 @@
 using ChessLogic;
+using ChessUI;
 
 namespace ChessMultitool;
 
@@ -183,9 +184,31 @@ public partial class ChessGame : ContentPage
 
     private void ShowGameOver()
     {
-        // Idem ici : crée une ContentView ou Popup MAUI
-        // Exemple : MenuContainer.Content = new GameOverView(...);
+        // Crée le menu Game Over MAUI
+        GameOverMenu gameOverMenu = new GameOverMenu(gameState);
+
+        // Affiche le menu dans ton conteneur MenuContainer
+        MenuContainer.Content = gameOverMenu;
+
+        // Gestion du clic sur un des boutons du menu
+        gameOverMenu.OptionSelected += option =>
+        {
+            if (option == Option.Restart)
+            {
+                MenuContainer.Content = null;
+                RestartGame();
+            }
+        };
     }
 
     private bool IsMenuOnScreen() => MenuContainer.Content != null;
+
+    private void RestartGame()
+    {
+        selectedPos = null;
+        HideHighlights();
+        moveCache.Clear();
+        gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(gameState.Board);
+    }
 }

@@ -850,6 +850,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="GameOverMenu.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\AdBanner.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

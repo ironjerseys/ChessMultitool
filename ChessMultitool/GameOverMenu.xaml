@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="ChessMultitool.GameOverMenu"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Frame
+        WidthRequest="275"
+        HeightRequest="150"
+        BackgroundColor="#101010"
+        CornerRadius="10"
+        Padding="10"
+        HasShadow="True"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+
+        <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *" RowSpacing="10" ColumnSpacing="10">
+
+            <!-- Winner Text -->
+            <Label
+                x:Name="WinnerText"
+                Grid.ColumnSpan="2"
+                FontSize="28"
+                TextColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HorizontalTextAlignment="Center" />
+
+            <!-- Reason Text -->
+            <Label
+                x:Name="ReasonText"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                FontSize="16"
+                TextColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                HorizontalTextAlignment="Center" />
+
+            <!-- Restart Button -->
+            <Button
+                Text="RESTART"
+                Grid.Row="2"
+                Grid.ColumnSpan="2" 
+                WidthRequest="100"
+                HeightRequest="40"
+                HorizontalOptions="Center"
+                BackgroundColor="#d18b47"
+                TextColor="White"
+                Clicked="Restart_Click" />
+        </Grid>
+
+    </Frame>
+
+</ContentView>

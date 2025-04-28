@@ -1,9 +1,8 @@
-﻿namespace ChessUI
+﻿namespace ChessUI;
+
+public enum Option
 {
-    public enum Option
-    {
-        Restart,
-        Exit,
-        Continue
-    }
+    Restart,
+    //Exit,
+    //Continue
 }
