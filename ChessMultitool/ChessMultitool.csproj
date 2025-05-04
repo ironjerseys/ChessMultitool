@@ -834,8 +834,6 @@
 	  <Resource Include="Resources\Images\bishopb.png" />
 	  <Resource Include="Resources\Images\bishopw.png" />
 	  <Resource Include="Resources\Images\board.png" />
-	  <Resource Include="Resources\Images\cursorb.cur" />
-	  <Resource Include="Resources\Images\cursorw.cur" />
 	  <Resource Include="Resources\Images\icon.ico" />
 	  <Resource Include="Resources\Images\kingb.png" />
 	  <Resource Include="Resources\Images\kingw.png" />
@@ -847,6 +845,12 @@
 	  <Resource Include="Resources\Images\queenw.png" />
 	  <Resource Include="Resources\Images\rookb.png" />
 	  <Resource Include="Resources\Images\rookw.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Update="Resources\Images\explorer.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </MauiImage>
 	</ItemGroup>
 
 	<ItemGroup>
