@@ -42,11 +42,13 @@
 
 
             </VerticalStackLayout>
-
+        
         </ScrollView>
-        
-        <local:AdBanner Grid.Row="1"/>
-        
+        <!-- Banniere fixée en bas, hors scroll -->
+        <Grid Grid.Row="1" BackgroundColor="Transparent" Padding="0">
+            <local:AdBanner/>
+        </Grid>
+
     </Grid>
     
 </ContentPage>
