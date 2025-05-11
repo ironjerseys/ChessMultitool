@@ -1,0 +1,853 @@
+{
+  "openings": {
+    "Scoth Game": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4"
+      ],
+      "Advance Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...exd4",
+        "4.Nxd4",
+        "4...Bc5"
+      ],
+      "Schmidt Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...exd4",
+        "4.Nxd4",
+        "4...Nf6"
+      ],
+      "Scoth Gambit": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...exd4",
+        "4.Bc4"
+      ],
+      "Goring Gambit": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...exd4",
+        "4.c3"
+      ]
+    },
+    "Ruy Lopez": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bb5"
+      ],
+      "Berlin Defense": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bb5",
+        "3...Nf6"
+      ],
+      "Closed Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bb5",
+        "3...a6",
+        "4.Ba4",
+        "4...Nf6"
+      ],
+      "Exchange Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bb5",
+        "3...a6",
+        "4.Bxc6"
+      ]
+    },
+    "Sicilian Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...c5"
+      ],
+      "Svechnikov": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...cxd4",
+        "4.Nxd4",
+        "4...Nf6",
+        "5.Nc3",
+        "5...e5"
+      ],
+      "Kalashnikov": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...cxd4",
+        "4.Nxd4",
+        "4...e5",
+        "5.Nb5",
+        "5...d6"
+      ],
+      "Scheveningue's Variation": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...d6",
+        "3.d4",
+        "3...cxd4",
+        "4.Nxd4",
+        "4...Nf6",
+        "5.Nc3",
+        "5...e6"
+      ],
+      "Dragon": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...cxd4",
+        "4.Nxd4",
+        "4...g6"
+      ],
+      "Maroczy's System": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.d4",
+        "3...cxd4",
+        "4.Nxd4",
+        "4...g6",
+        "5.c4"
+      ],
+      "Rossolimo": [
+        "1.e4",
+        "1...c5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bb5"
+      ]
+    },
+    "English Opening": {
+      "Main Line": [
+        "1.c4"
+      ],
+      "Reversed Sicilian": [
+        "1.c4",
+        "1...e5"
+      ],
+      "Four Knights System": [
+        "1.c4",
+        "1...e5",
+        "2.Nc3",
+        "2...Nf6",
+        "3.Nf3",
+        "3...Nc6"
+      ],
+      "Botvinnik System": [
+        "1.c4",
+        "1...c5",
+        "2.Nf3",
+        "2...d5",
+        "3.d4"
+      ]
+    },
+    "French Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...e6"
+      ],
+      "Advance Variation": [
+        "1.e4",
+        "1...e6",
+        "2.d4",
+        "2...d5",
+        "3.e5"
+      ],
+      "Tarrasch Variation": [
+        "1.e4",
+        "1...e6",
+        "2.d4",
+        "2...d5",
+        "3.Nd2"
+      ],
+      "Winawer Variation": [
+        "1.e4",
+        "1...e6",
+        "2.d4",
+        "2...d5",
+        "3.Nc3",
+        "3...Bb4"
+      ]
+    },
+    "Caro-Kann Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...c6"
+      ],
+      "Advance Variation": [
+        "1.e4",
+        "1...c6",
+        "2.d4",
+        "2...d5",
+        "3.e5"
+      ],
+      "Exchange Variation": [
+        "1.e4",
+        "1...c6",
+        "2.d4",
+        "2...d5",
+        "3.exd5",
+        "3...cxd5"
+      ],
+      "Panov-Botvinnik Attack": [
+        "1.e4",
+        "1...c6",
+        "2.d4",
+        "2...d5",
+        "3.exd5",
+        "3...cxd5",
+        "4.c4"
+      ],
+      "Bronstein-Larsen Variation": [
+        "1.e4",
+        "1...c6",
+        "2.d4",
+        "2...d5",
+        "3.Nc3",
+        "3...dxe4",
+        "4.Nxe4",
+        "4...Nf6",
+        "5.Nxf6+",
+        "5...gxf6"
+      ]
+    },
+    "Italian Game": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bc4"
+      ],
+      "Giuoco Pianissimo": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bc4",
+        "3...Bc5",
+        "4.d3"
+      ],
+      "Evans Gambit": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bc4",
+        "3...Bc5",
+        "4.b4"
+      ],
+      "Two Knights Defense": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Bc4",
+        "3...Nf6"
+      ]
+    },
+    "Petrov Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nf6"
+      ],
+      "Classical Attack": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nf6",
+        "3.Nxe5",
+        "3...d6",
+        "4.Nf3"
+      ],
+      "Steinitz Attack": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nf6",
+        "3.d4"
+      ],
+      "Cochrane Gambit": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nf6",
+        "3.Nxe5",
+        "3...d6",
+        "4.Nxf7"
+      ]
+    },
+    "Scandinavian Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...d5"
+      ],
+      "Modern Variation": [
+        "1.e4",
+        "1...d5",
+        "2.exd5",
+        "2...Nf6"
+      ],
+      "Classical Variation": [
+        "1.e4",
+        "1...d5",
+        "2.exd5",
+        "2...Qxd5",
+        "3.Nc3"
+      ],
+      "Portuguese Gambit": [
+        "1.e4",
+        "1...d5",
+        "2.exd5",
+        "2...Nf6",
+        "3.d4",
+        "3...Bg4"
+      ]
+    },
+    "Alekhine's Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...Nf6"
+      ],
+      "Four Pawns Attack": [
+        "1.e4",
+        "1...Nf6",
+        "2.e5",
+        "2...Nd5",
+        "3.d4",
+        "3...d6",
+        "4.c4",
+        "4...Nb6",
+        "5.f4"
+      ],
+      "Exchange Variation": [
+        "1.e4",
+        "1...Nf6",
+        "2.e5",
+        "2...Nd5",
+        "3.d4",
+        "3...d6",
+        "4.c4",
+        "4...Nb6",
+        "5.exd6"
+      ],
+      "Modern Variation": [
+        "1.e4",
+        "1...Nf6",
+        "2.Nc3"
+      ]
+    },
+    "Benko Gambit": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...c5",
+        "3.d5",
+        "3...b5"
+      ],
+      "Accepted Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...c5",
+        "3.d5",
+        "3...b5",
+        "4.cxb5"
+      ],
+      "Declined Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...c5",
+        "3.d5",
+        "3...b5",
+        "4.Nf3"
+      ],
+      "Fianchetto Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...c5",
+        "3.d5",
+        "3...b5",
+        "4.g3"
+      ]
+    },
+    "Queen's Gambit": {
+      "Main Line": [
+        "1.d4",
+        "1...d5",
+        "2.c4"
+      ],
+      "Tchigorin Defense": [
+        "1.d4",
+        "1...d5",
+        "2.c4",
+        "2...Nc6"
+      ],
+      "Slav Defense": [
+        "1.d4",
+        "1...d5",
+        "2.c4",
+        "2...c6"
+      ]
+    },
+    "Dutch Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...f5"
+      ],
+      "Leningrad Variation": [
+        "1.d4",
+        "1...f5",
+        "2.g3",
+        "2...Nf6",
+        "3.Bg2",
+        "3...g6"
+      ],
+      "Classical Variation": [
+        "1.d4",
+        "1...f5",
+        "2.Nf3",
+        "2...e6",
+        "3.g3",
+        "3...Nf6"
+      ],
+      "Stonewall Variation": [
+        "1.d4",
+        "1...f5",
+        "2.Nf3",
+        "2...e6",
+        "3.c4",
+        "3...d5"
+      ]
+    },
+    "King's Gambit": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.f4"
+      ],
+      "Classical Variation": [
+        "1.e4",
+        "1...e5",
+        "2.f4",
+        "2...exf4",
+        "3.Nf3"
+      ],
+      "Fischer Defense": [
+        "1.e4",
+        "1...e5",
+        "2.f4",
+        "2...exf4",
+        "3.Nf3",
+        "3...d6"
+      ],
+      "Modern Defense": [
+        "1.e4",
+        "1...e5",
+        "2.f4",
+        "2...exf4",
+        "3.Nf3",
+        "3...g5"
+      ]
+    },
+    "London System": {
+      "Main Line": [
+        "1.d4",
+        "1...d5",
+        "2.Nf3",
+        "2...Nf6",
+        "3.Bf4"
+      ],
+      "Jobava-London System": [
+        "1.d4",
+        "1...d5",
+        "2.Nc3",
+        "2...Nf6",
+        "3.Bf4"
+      ],
+      "Barry Attack": [
+        "1.d4",
+        "1...Nf6",
+        "2.Nf3",
+        "2...g6",
+        "3.Bf4",
+        "3...Bg7"
+      ]
+    },
+    "Four Knights Game": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Nc3",
+        "3...Nf6"
+      ],
+      "Spanish Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Nc3",
+        "3...Nf6",
+        "4.Bb5"
+      ],
+      "Scotch Four Knights": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...Nc6",
+        "3.Nc3",
+        "3...Nf6",
+        "4.d4"
+      ]
+    },
+    "Grünfeld Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.Nc3",
+        "3...d5"
+      ],
+      "Exchange Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.Nc3",
+        "3...d5",
+        "4.cxd5",
+        "4...Nxd5"
+      ],
+      "Russian System": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.Nf3",
+        "3...Bg7",
+        "4.Qb3"
+      ],
+      "Fianchetto Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.g3",
+        "3...d5"
+      ]
+    },
+    "King's Indian Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.Nc3",
+        "3...Bg7"
+      ],
+      "Fianchetto Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.g3",
+        "3...Bg7",
+        "4.Bg2",
+        "4...O-O"
+      ],
+      "Sämisch Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...g6",
+        "3.Nc3",
+        "3...Bg7",
+        "4.e4",
+        "4...d6",
+        "5.f3"
+      ]
+    },
+    "Nimzo-Indian Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.Nc3",
+        "3...Bb4"
+      ],
+      "Rubinstein Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.Nc3",
+        "3...Bb4",
+        "4.e3"
+      ],
+      "Hübner Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.Nc3",
+        "3...Bb4",
+        "4.e3",
+        "4...c5"
+      ]
+    },
+    "Réti Opening (Classical)": {
+      "Main Line": [
+        "1.Nf3",
+        "1...d5",
+        "2.c4"
+      ],
+      "Zukertort Variation": [
+        "1.Nf3",
+        "1...d5",
+        "2.c4",
+        "2...e6"
+      ],
+      "Réti Gambit": [
+        "1.Nf3",
+        "1...d5",
+        "2.c4",
+        "2...dxc4"
+      ],
+      "KIA Structure": [
+        "1.Nf3",
+        "1...d5",
+        "2.g3",
+        "2...Nf6"
+      ]
+    },
+    "Réti Opening (Modern)": {
+      "Main Line": [
+        "1.Nf3",
+        "1...d5",
+        "2.g3"
+      ],
+      "Double Fianchetto": [
+        "1.Nf3",
+        "1...d5",
+        "2.g3",
+        "2...g6"
+      ],
+      "Réti-Larsen Attack": [
+        "1.Nf3",
+        "1...d5",
+        "2.b3"
+      ],
+      "Symmetric Variation": [
+        "1.Nf3",
+        "1...Nf6",
+        "2.c4",
+        "2...c5"
+      ]
+    },
+    "Philidor Defense": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...d6"
+      ],
+      "Hanham Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...d6",
+        "3.d4",
+        "3...Nbd7"
+      ],
+      "Antoshin Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...d6",
+        "3.d4",
+        "3...exd4"
+      ],
+      "Exchange Variation": [
+        "1.e4",
+        "1...e5",
+        "2.Nf3",
+        "2...d6",
+        "3.d4",
+        "3...exd4",
+        "4.Nxd4"
+      ]
+    },
+    "West Indian Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.Nf3",
+        "3...b6"
+      ],
+      "Fianchetto Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.g3",
+        "3...b6"
+      ]
+    },
+    "Old Indian Defense": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...d6"
+      ],
+      "Janowski Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...d6",
+        "3.Nc3",
+        "3...Bf5"
+      ],
+      "Ukrainian Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...d6",
+        "3.Nf3",
+        "3...Bg4"
+      ]
+    },
+    "Trompowsky Attack": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.Bg5"
+      ],
+      "Raptor Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.Bg5",
+        "2...c5",
+        "3.d5"
+      ],
+      "Poisoned Pawn Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.Bg5",
+        "2...Ne4",
+        "3.Bf4"
+      ]
+    },
+    "Bird's Opening": {
+      "Main Line": [
+        "1.f4"
+      ],
+      "Larsen's Variation": [
+        "1.f4",
+        "1...d5",
+        "2.Nf3",
+        "2...Nf6"
+      ],
+      "From Gambit": [
+        "1.f4",
+        "1...e5",
+        "2.fxe5",
+        "2...d6"
+      ]
+    },
+    "Catalan Opening": {
+      "Main Line": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.g3"
+      ],
+      "Open Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.g3",
+        "3...d5",
+        "4.Bg2",
+        "4...dxc4"
+      ],
+      "Closed Variation": [
+        "1.d4",
+        "1...Nf6",
+        "2.c4",
+        "2...e6",
+        "3.g3",
+        "3...d5",
+        "4.Bg2",
+        "4...Be7"
+      ]
+    },
+    "Alapin Opening": {
+      "Main Line": [
+        "1.e4",
+        "1...e5",
+        "2.Ne2"
+      ],
+      "Modern Variation": [
+        "1.e4",
+        "1...c5",
+        "2.c3"
+      ],
+      "Accelerated Variation": [
+        "1.e4",
+        "1...c5",
+        "2.c3",
+        "2...d5"
+      ]
+    }
+  }
+}

@@ -1,101 +1,154 @@
-using ChessMultitool.Models;
+﻿using ChessLogic;
+using Newtonsoft.Json;
 
 namespace ChessMultitool;
 
 public partial class OpeningsPage : ContentPage
 {
-    private OpeningsData openingsData;
+    private Dictionary<string, Dictionary<string, List<string>>> openings;    // ouverture -> variation -> coups
     private string selectedOpening;
     private string selectedVariation;
-    private List<MoveData> moves;
-    private int currentMoveIndex = 0;
+    private List<string> moveList;
+    private int currentMoveIndex;
+
+    private readonly Image[,] pieceImgs = new Image[8, 8];
+    private GameState gameState;
 
     public OpeningsPage()
     {
         InitializeComponent();
-
-
-        moveImage.Source = "start.png";
+        InitBoard();
+        gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(gameState.Board);
         LoadOpenings();
     }
 
-    async void LoadOpenings()
+    #region Board setup
+    void InitBoard()
     {
-        openingsData = await OpeningService.LoadOpeningsAsync();
-        // Remplit le premier Picker avec les cl�s des ouvertures
-        openingsPicker.ItemsSource = openingsData.Openings.Keys.ToList();
+        for (int i = 0; i < 8; i++)
+        {
+            HighlightGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+            HighlightGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+            PieceGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Star });
+            PieceGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+        }
+
+        for (int r = 0; r < 8; r++)
+            for (int c = 0; c < 8; c++)
+            {
+                var img = new Image { Aspect = Aspect.AspectFit };
+                Grid.SetRow(img, r);
+                Grid.SetColumn(img, c);
+                PieceGrid.Children.Add(img);
+                pieceImgs[r, c] = img;
+            }
     }
 
+    void DrawBoard(Board board)
+    {
+        for (int r = 0; r < 8; r++)
+            for (int c = 0; c < 8; c++)
+                pieceImgs[r, c].Source = Images.GetImage(board[r, c]);
+    }
+    #endregion
+
+    #region Load JSON
+    async void LoadOpenings()
+    {
+        using var stream = await FileSystem.OpenAppPackageFileAsync("openings.json");
+        using var reader = new StreamReader(stream);
+        string json = await reader.ReadToEndAsync();
+
+        var raw = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, List<string>>>>>(json);
+        openings = raw["openings"];
+        openingsPicker.ItemsSource = openings.Keys.ToList();
+    }
+    #endregion
+
+    #region Pickers
     void OnOpeningChanged(object sender, EventArgs e)
     {
-        if (openingsPicker.SelectedIndex != -1)
-        {
-            selectedOpening = openingsPicker.Items[openingsPicker.SelectedIndex];
-
-            // Met � jour le Picker des variations pour l'ouverture s�lectionn�e
-            var variations = openingsData.Openings[selectedOpening].Keys.ToList();
-
-            variationsPicker.ItemsSource = variations;
-
-            if (variations.Any())
-            {
-                variationsPicker.SelectedIndex = 0;
-                selectedVariation = variations[0];
-                moves = openingsData.Openings[selectedOpening][selectedVariation];
-                currentMoveIndex = 0;
-            }
-            else
-            {
-                variationsPicker.SelectedIndex = -1;
-                moves = null;
-                currentMoveIndex = 0;
-            }
-            UpdateUI();
-        }
+        if (openingsPicker.SelectedIndex == -1) return;
+        selectedOpening = openingsPicker.Items[openingsPicker.SelectedIndex];
+        variationsPicker.ItemsSource = openings[selectedOpening].Keys.ToList();
+        variationsPicker.SelectedIndex = 0;   // déclenche l’autre handler
     }
 
     void OnVariationChanged(object sender, EventArgs e)
     {
-        if (variationsPicker.SelectedIndex != -1)
-        {
-            selectedVariation = variationsPicker.Items[variationsPicker.SelectedIndex];
-            moves = openingsData.Openings[selectedOpening][selectedVariation];
-            currentMoveIndex = 0;
-        }
-        UpdateUI();
+        if (variationsPicker.SelectedIndex == -1) return;
+        selectedVariation = variationsPicker.Items[variationsPicker.SelectedIndex];
+        moveList = openings[selectedOpening][selectedVariation];
+        currentMoveIndex = 0;
+        ResetBoard();
     }
+    #endregion
 
-    void UpdateUI()
-    {
-        if (moves != null && moves.Any())
-        {
-            var move = moves[currentMoveIndex];
-            moveImage.Source = move.Image;
-            moveLabel.Text = move.Move;
-        }
-        else
-        {
-            // Affiche une image de d�marrage par d�faut si aucun mouvement n'est charg�
-            moveImage.Source = "start.png";
-            moveLabel.Text = string.Empty;
-        }
-    }
-
+    #region Navigation
     void OnPreviousClicked(object sender, EventArgs e)
     {
-        if (moves != null && currentMoveIndex > 0)
-        {
-            currentMoveIndex--;
-            UpdateUI();
-        }
+        if (moveList == null || currentMoveIndex == 0) return;
+        currentMoveIndex--;
+        RebuildPosition();
+        moveLabel.Text = moveList[currentMoveIndex];
     }
 
     void OnNextClicked(object sender, EventArgs e)
     {
-        if (moves != null && currentMoveIndex < moves.Count - 1)
-        {
-            currentMoveIndex++;
-            UpdateUI();
-        }
+        if (moveList == null || currentMoveIndex >= moveList.Count) return;
+        PlayAlgebraic(moveList[currentMoveIndex]);
+        moveLabel.Text = moveList[currentMoveIndex];
+        currentMoveIndex++;
     }
+    #endregion
+
+    #region Moteur
+    void ResetBoard()
+    {
+        gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(gameState.Board);
+        moveLabel.Text = string.Empty;
+    }
+
+    void RebuildPosition()
+    {
+        ResetBoard();
+        for (int i = 0; i < currentMoveIndex; i++)
+        {
+            PlayAlgebraic(moveList[i], false);
+        }
+        DrawBoard(gameState.Board);
+    }
+
+    void PlayAlgebraic(string notation, bool update = true)
+    {
+        var move = FindMove(notation);
+        if (move == null) return;
+
+        gameState.MakeMove(move);
+        if (update) DrawBoard(gameState.Board);
+    }
+
+    Move FindMove(string fullMove)
+    {
+        // nettoie “1.e4” ou “1...cxd4” -> “e4”, “cxd4”
+        string alg = fullMove.Split('.').Last().Replace("...", "").Trim();
+
+        // Si capture : “cxd4” -> “d4”, “Nxd4” -> “Nd4”
+        if (alg.Contains('x'))
+        {
+            var parts = alg.Split('x');
+
+            // Pièce (lettre majuscule) ou pion (lettre minuscule)
+            if (char.IsUpper(parts[0][0]))
+                alg = parts[0][0] + parts[1];   // ex. "N" + "d4" → "Nd4"
+            else
+                alg = parts[1];                 // ex. "cxd4" -> "d4"
+        }
+
+        var legals = gameState.AllLegalMovesFor(gameState.CurrentPlayer);
+        return legals.FirstOrDefault(m => m.ToAlgebraic(gameState.Board) == alg);
+    }
+    #endregion
 }

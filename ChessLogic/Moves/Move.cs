@@ -15,4 +15,29 @@ public abstract class Move
         Execute(boardCopy);
         return !boardCopy.IsInCheck(player);
     }
+
+    public string ToAlgebraic(Board board)
+    {
+        // version ultra-simple : on renvoie
+        //  - “e4” pour un pion
+        //  - “Nf3”, “Bc4”, etc. pour pièces
+        //  - sans indications + ni # ni prise “x”
+        char file = (char)('a' + ToPos.Column);
+        int rank = 8 - ToPos.Row;
+
+        string pieceLetter = Type == MoveType.Normal && board[FromPos].Type == PieceType.Pawn
+            ? string.Empty
+            : board[FromPos].Type switch
+            {
+                PieceType.Knight => "N",
+                PieceType.Bishop => "B",
+                PieceType.Rook => "R",
+                PieceType.Queen => "Q",
+                PieceType.King => "K",
+                _ => string.Empty
+            };
+
+        return $"{pieceLetter}{file}{rank}";
+    }
+
 }
