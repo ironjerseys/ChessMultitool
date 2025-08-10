@@ -20,11 +20,6 @@
         ContentTemplate="{DataTemplate local:OpeningsPage}" />
 
         <ShellContent 
-        Title="Traps" 
-        Icon="traps.png" 
-        ContentTemplate="{DataTemplate local:TrapsPage}" />
-
-        <ShellContent 
         Title="Stats" 
         Icon="stats.png" 
         ContentTemplate="{DataTemplate local:StatsPage}" />
