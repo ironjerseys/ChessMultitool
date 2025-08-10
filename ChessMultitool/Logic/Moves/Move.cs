@@ -39,5 +39,4 @@ public abstract class Move
 
         return $"{pieceLetter}{file}{rank}";
     }
-
 }
