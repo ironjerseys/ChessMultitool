@@ -1,4 +1,5 @@
 using ChessLogic;
+using ChessMultitool.Logic;
 
 namespace ChessMultitool;
 

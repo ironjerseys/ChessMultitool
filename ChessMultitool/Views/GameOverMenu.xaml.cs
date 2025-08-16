@@ -1,5 +1,5 @@
 using ChessLogic;
-using ChessUI;
+using ChessMultitool.Logic;
 
 namespace ChessMultitool;
 

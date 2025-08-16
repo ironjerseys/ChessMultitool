@@ -1,4 +1,4 @@
-﻿namespace ChessUI;
+﻿namespace ChessMultitool.Logic;
 
 public enum Option
 {

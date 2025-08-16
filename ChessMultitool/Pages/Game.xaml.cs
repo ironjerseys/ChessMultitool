@@ -1,5 +1,5 @@
 using ChessLogic;
-using ChessUI;
+using ChessMultitool.Logic;
 using System.Collections.ObjectModel;
 using System.Text;
 

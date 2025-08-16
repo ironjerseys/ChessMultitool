@@ -124,7 +124,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="GameOverMenu.xaml">
+	  <MauiXaml Update="Views\GameOverMenu.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\AdBanner.xaml">
@@ -142,7 +142,7 @@
 	  <MauiXaml Update="Pages\StatsPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="PromotionMenu.xaml">
+	  <MauiXaml Update="Views\PromotionMenu.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
