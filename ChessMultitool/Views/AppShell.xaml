@@ -10,7 +10,7 @@
     <TabBar>
 
         <ShellContent 
-        Title="Explorer" 
+        Title="Play" 
         Icon="explorer.png"
         ContentTemplate="{DataTemplate local:ChessGame}" />
 

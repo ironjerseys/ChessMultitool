@@ -22,6 +22,10 @@ public partial class ChessGame : ContentPage
     private readonly StringBuilder _movesBuffer = new();
     private int _plyCount = 0;
 
+    private bool vsAi = true;
+    private Player aiPlays = Player.Black;     // l’IA joue Noir par ex.
+    private bool isThinking = false;
+
     public class MoveRow
     {
         public int No { get; set; }
@@ -98,30 +102,16 @@ public partial class ChessGame : ContentPage
     // Premiere fonction appelée dès qu'on touche l'écran, avec les coordonées en parametre
     private void OnBoardTapped(object sender, TappedEventArgs e)
     {
-        if (IsMenuOnScreen()) return;
+        if (isThinking || IsMenuOnScreen()) return;
 
-        // Enregistre les coordonnées X Y sur l'écran
         var touchPoint = e.GetPosition(BoardGrid) ?? new Point(0, 0);
-
-        // On calcule la width d'une case de l'échiquier
         var squareSize = BoardGrid.Width / 8;
-
-        // On calcule quelle case a été touchée
         int row = (int)(touchPoint.Y / squareSize);
         int col = (int)(touchPoint.X / squareSize);
-
-        // Exemple de Position Column 3 Row 6 => D2
-        // (0,0) semble etre en haut a gauche, à confirmer
         var pos = new Position(row, col);
 
-        if (selectedPos == null)
-        {
-            OnFromPositionSelected(pos);
-        }
-        else
-        {
-            OnToPositionSelected(pos);
-        }
+        if (selectedPos == null) OnFromPositionSelected(pos);
+        else OnToPositionSelected(pos);
     }
 
     private void OnFromPositionSelected(Position pos)
@@ -211,6 +201,9 @@ public partial class ChessGame : ContentPage
 
         if (gameState.IsGameOver())
             ShowGameOver();
+
+        if (vsAi && gameState.CurrentPlayer == aiPlays)
+            _ = PlayAiMoveAsync();
     }
 
 
@@ -239,6 +232,29 @@ public partial class ChessGame : ContentPage
             HandleMove(promMove);
         };
     }
+
+    private async Task PlayAiMoveAsync()
+    {
+        try
+        {
+            isThinking = true;
+            DisableInput(); // BoardGrid.InputTransparent = true; etc.
+
+            var engine = new MiniMaxEngine();          // (voir section 2)
+            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: 3, timeMs: 2000)); // simple
+
+            if (best != null)
+                HandleMove(best);
+        }
+        finally
+        {
+            EnableInput();
+            isThinking = false;
+        }
+    }
+
+    private void DisableInput() => BoardGrid.InputTransparent = true;
+    private void EnableInput() => BoardGrid.InputTransparent = false;
 
 
     private void ShowGameOver()
