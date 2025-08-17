@@ -284,11 +284,15 @@ public partial class ChessGame : ContentPage
         selectedPos = null;
         HideHighlights();
         moveCache.Clear();
+
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
 
+        _plyCount = 0;
         plyCount = 0;
         moveLines.Clear();
+        _movesBuffer.Clear();
+
         MovesBlock.Text = string.Empty;
     }
 
