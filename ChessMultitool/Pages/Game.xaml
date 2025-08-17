@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Chess">
 
-    <Grid RowDefinitions="Auto,Auto" Padding="0,12,0,12">
+    <Grid RowDefinitions="Auto,*" Padding="0,12,0,12">
 
         <!-- Ligne 0 : le plateau centré -->
         <Grid Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center">
@@ -22,14 +22,15 @@
         <ScrollView Grid.Row="1"
             x:Name="MovesScroll"
             Orientation="Vertical"
+            VerticalOptions="FillAndExpand"
             HorizontalOptions="Center"
             Padding="12,8,12,0">
             <Label x:Name="MovesBlock"
-         WidthRequest="{Binding Source={x:Reference BoardGrid}, Path=Width}"
-         FontSize="20"
-         LineBreakMode="WordWrap"
-         HorizontalTextAlignment="Start"
-         TextColor="{AppThemeBinding Light=#111, Dark=#EEE}" />
+                 WidthRequest="{Binding Source={x:Reference BoardGrid}, Path=Width}"
+                 FontSize="16"
+                 LineBreakMode="WordWrap"
+                 HorizontalTextAlignment="Start"
+                 TextColor="{AppThemeBinding Light=#111, Dark=#EEE}" />
         </ScrollView>
     </Grid>
 </ContentPage>
