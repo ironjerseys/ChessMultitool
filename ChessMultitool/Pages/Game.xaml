@@ -4,13 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Chess">
 
-    <Grid RowDefinitions="Auto,*" Padding="0,12,0,12">
+    <Grid Padding="20" RowSpacing="20" RowDefinitions="100,Auto,*">
 
-        <!-- Ligne 0 : le plateau centré -->
-        <Grid Grid.Row="0" VerticalOptions="Center" HorizontalOptions="Center">
+        <!-- ROW 0 : Spacer (même hauteur que le header de OpeningsPage) -->
+        <Grid Grid.Row="0" />
+
+        <!-- ROW 1 : Plateau -->
+        <Grid Grid.Row="1" VerticalOptions="Start" HorizontalOptions="Center">
             <Grid x:Name="BoardGrid"
-                  WidthRequest="{OnPlatform Android=320, iOS=320, WinUI=600}"
-                  HeightRequest="{OnPlatform Android=320, iOS=320, WinUI=600}">
+            WidthRequest="320" HeightRequest="320">
                 <Image Source="Board.png" Aspect="AspectFill" InputTransparent="True" ZIndex="0" />
                 <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
                 <Grid x:Name="PieceGrid"     RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
@@ -18,19 +20,16 @@
             </Grid>
         </Grid>
 
-        <!-- Ligne 1 : l’historique SAN -->
-        <ScrollView Grid.Row="1"
-            x:Name="MovesScroll"
-            Orientation="Vertical"
-            VerticalOptions="FillAndExpand"
-            HorizontalOptions="Center"
-            Padding="12,8,12,0">
+
+        <!-- ROW 2 : Historique SAN -->
+        <ScrollView Grid.Row="2" x:Name="MovesScroll" Orientation="Vertical"
+                VerticalOptions="FillAndExpand" HorizontalOptions="Center"
+                Padding="12,8,12,0">
             <Label x:Name="MovesBlock"
-                 WidthRequest="{Binding Source={x:Reference BoardGrid}, Path=Width}"
-                 FontSize="16"
-                 LineBreakMode="WordWrap"
-                 HorizontalTextAlignment="Start"
-                 TextColor="{AppThemeBinding Light=#111, Dark=#EEE}" />
+             WidthRequest="{Binding Source={x:Reference BoardGrid}, Path=Width}"
+             FontSize="16" LineBreakMode="WordWrap"
+             HorizontalTextAlignment="Start"
+             TextColor="{AppThemeBinding Light=#111, Dark=#EEE}" />
         </ScrollView>
     </Grid>
 </ContentPage>
