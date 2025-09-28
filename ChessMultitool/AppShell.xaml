@@ -28,6 +28,9 @@
         Title="Clock" 
         Icon="clock.png" 
         ContentTemplate="{DataTemplate local:ClockPage}" />
+        
+        <ShellContent Title="Settings" Icon="settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
+
 
     </TabBar>
 

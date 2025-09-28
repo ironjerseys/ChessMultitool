@@ -1,4 +1,4 @@
-﻿<?xml version = "1.0" encoding = "UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:ChessMultitool"
@@ -9,6 +9,19 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Dark Mode -->
+            <Style x:Key="DarkModeStyle" TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="#333333" />
+            </Style>
+
+            <!-- Light Mode -->
+            <Style x:Key="LightModeStyle" TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="#FFFFFF" />
+            </Style>
+
+            <!-- Par défaut, on utilise le mode sombre -->
+            <Style x:Key="CurrentContentPageStyle" TargetType="ContentPage" BasedOn="{StaticResource DarkModeStyle}" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
