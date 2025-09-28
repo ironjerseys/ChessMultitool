@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:ChessMultitool"
              x:Class="ChessMultitool.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -10,18 +9,13 @@
                 <ResourceDictionary Source="../Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Dark Mode -->
-            <Style x:Key="DarkModeStyle" TargetType="ContentPage">
-                <Setter Property="BackgroundColor" Value="#333333" />
-            </Style>
+            <!-- Default = Dark mode so UI is already dark before visiting SettingsPage -->
+            <Color x:Key="GlobalBackgroundColor">#333333</Color>
+            <Color x:Key="GlobalTextColor">#FFFFFF</Color>
+            <Color x:Key="GlobalControlBackgroundColor">#444444</Color>
 
-            <!-- Light Mode -->
-            <Style x:Key="LightModeStyle" TargetType="ContentPage">
-                <Setter Property="BackgroundColor" Value="#FFFFFF" />
-            </Style>
-
-            <!-- Par défaut, on utilise le mode sombre -->
-            <Style x:Key="CurrentContentPageStyle" TargetType="ContentPage" BasedOn="{StaticResource DarkModeStyle}" />
+            <!-- Default board image (must exist in Resources/Images) -->
+            <x:String x:Key="BoardImageSource">board_brown.png</x:String>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -10,21 +10,23 @@
         <!-- ROW 0 : Header fixe (100) avec les 2 Pickers -->
         <Grid Grid.Row="0" RowDefinitions="Auto,12,Auto">
             <Picker x:Name="openingsPicker"
-              Title="Choose an opening"
               HeightRequest="44"
+              TextColor="{DynamicResource GlobalTextColor}"
+              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
               SelectedIndexChanged="OnOpeningChanged" />
             <BoxView Grid.Row="1" HeightRequest="12" Opacity="0"/>
             <Picker x:Name="variationsPicker"
               Grid.Row="2"
-              Title="Choose a variation"
               HeightRequest="44"
+              TextColor="{DynamicResource GlobalTextColor}"
+              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
               SelectedIndexChanged="OnVariationChanged" />
         </Grid>
 
         <!-- ROW 1 : Plateau -->
         <Grid Grid.Row="1" x:Name="BoardGrid"
           HorizontalOptions="FillAndExpand">
-            <Image Source="Board.png" Aspect="AspectFill" ZIndex="0" />
+            <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" ZIndex="0" />
             <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
             <Grid x:Name="PieceGrid"     RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
         </Grid>

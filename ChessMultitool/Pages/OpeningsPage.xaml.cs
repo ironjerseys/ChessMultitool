@@ -68,19 +68,26 @@ public partial class OpeningsPage : ContentPage
 
         var raw = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, Dictionary<string, List<string>>>>>(json);
         openings = raw["openings"];
-        openingsPicker.ItemsSource = openings.Keys.ToList();
+        var keys = openings.Keys.ToList();
+        openingsPicker.ItemsSource = keys;
+        if (keys.Count > 0)
+        {
+            openingsPicker.SelectedIndex = 0; // triggers OnOpeningChanged
+        }
     }
-    #endregion
 
-    #region Pickers
     void OnOpeningChanged(object sender, EventArgs e)
     {
         if (openingsPicker.SelectedIndex == -1) return;
         selectedOpening = openingsPicker.Items[openingsPicker.SelectedIndex];
-        variationsPicker.ItemsSource = openings[selectedOpening].Keys.ToList();
-        variationsPicker.SelectedIndex = 0;   // déclenche l’autre handler
+        var vars = openings[selectedOpening].Keys.ToList();
+        variationsPicker.ItemsSource = vars;
+        if (vars.Count > 0)
+            variationsPicker.SelectedIndex = 0; // triggers OnVariationChanged
     }
+    #endregion
 
+    #region Pickers
     void OnVariationChanged(object sender, EventArgs e)
     {
         if (variationsPicker.SelectedIndex == -1) return;

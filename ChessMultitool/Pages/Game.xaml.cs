@@ -130,7 +130,13 @@ public partial class ChessGame : ContentPage
         var touchPoint = e.GetPosition(BoardGrid) ?? new Point(0, 0);
         var squareSize = BoardGrid.Width / 8;
         int row = (int)(touchPoint.Y / squareSize);
-        int col = (int)(touchPoint.X / squareSize);
+
+        // si row=8, on est en dehors de l'échiquier, mettre row=7, ça arrive si touchPoint.Y = 360,XX
+        if (row > 7) row = 7;
+
+        int col = (int)(touchPoint.X / squareSize); 
+        if (col > 7) col = 7;
+
         var pos = new Position(row, col);
 
         if (selectedPos == null) OnFromPositionSelected(pos);

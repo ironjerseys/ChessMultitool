@@ -1,8 +1,22 @@
-﻿<maui:MauiWinUIApplication
-    x:Class="ChessMultitool.WinUI.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:maui="using:Microsoft.Maui"
-    xmlns:local="using:ChessMultitool.WinUI">
+﻿<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChessMultitool.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Couleurs dynamiques -->
+            <Color x:Key="GlobalBackgroundColor">#333333</Color> <!-- Dark Mode par défaut -->
+            <Color x:Key="GlobalTextColor">#FFFFFF</Color> <!-- Texte blanc par défaut -->
 
-</maui:MauiWinUIApplication>
+            <!-- Styles globaux -->
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="{DynamicResource GlobalBackgroundColor}" />
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{DynamicResource GlobalTextColor}" />
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="TextColor" Value="{DynamicResource GlobalTextColor}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
