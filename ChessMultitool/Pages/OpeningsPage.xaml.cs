@@ -1,4 +1,5 @@
 ﻿using ChessLogic;
+using ChessMultitool.Logic;
 using Newtonsoft.Json;
 
 namespace ChessMultitool;
@@ -17,6 +18,11 @@ public partial class OpeningsPage : ContentPage
     public OpeningsPage()
     {
         InitializeComponent();
+        // Le board s'ajuste pour garder un ratio carré
+        BoardGrid.SizeChanged += (s, e) =>
+        {
+            BoardGrid.HeightRequest = BoardGrid.Width;
+        };
         InitBoard();
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);

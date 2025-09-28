@@ -1,5 +1,5 @@
 using ChessLogic;
-using ChessUI;
+using ChessMultitool.Logic;
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -22,6 +22,13 @@ public partial class ChessGame : ContentPage
     private readonly StringBuilder _movesBuffer = new();
     private int _plyCount = 0;
 
+    private bool vsAi = true;
+    private Player aiPlays = Player.Black;     // l’IA joue Noir par ex.
+    private bool isThinking = false;
+
+    private int searchDepth = 3;
+    private TimeSpan thinkingTime = TimeSpan.FromSeconds(2);
+
     public class MoveRow
     {
         public int No { get; set; }
@@ -33,15 +40,35 @@ public partial class ChessGame : ContentPage
     public ChessGame()
     {
         InitializeComponent();
-        BoardGrid.SizeChanged += (_, __) =>
+        // Le board s'ajuste pour garder un ratio carré
+        BoardGrid.SizeChanged += (s, e) =>
         {
-            // suit la largeur réelle du plateau (utile au 1er layout / rotation)
+            BoardGrid.HeightRequest = BoardGrid.Width;
             MovesBlock.WidthRequest = BoardGrid.Width;
         };
         CreateGrids();
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
         AddTapGesture();
+    }
+
+    public ChessGame(int searchDepth, TimeSpan thinkingTime)
+    {
+        InitializeComponent();
+        // Le board s'ajuste pour garder un ratio carré
+        BoardGrid.SizeChanged += (s, e) =>
+        {
+            BoardGrid.HeightRequest = BoardGrid.Width;
+            MovesBlock.WidthRequest = BoardGrid.Width;
+        };
+        CreateGrids();
+        gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(gameState.Board);
+        AddTapGesture();
+
+        // Configure AI parameters
+        this.searchDepth = searchDepth;
+        this.thinkingTime = thinkingTime;
     }
 
     private void CreateGrids()
@@ -98,30 +125,16 @@ public partial class ChessGame : ContentPage
     // Premiere fonction appelée dès qu'on touche l'écran, avec les coordonées en parametre
     private void OnBoardTapped(object sender, TappedEventArgs e)
     {
-        if (IsMenuOnScreen()) return;
+        if (isThinking || IsMenuOnScreen()) return;
 
-        // Enregistre les coordonnées X Y sur l'écran
         var touchPoint = e.GetPosition(BoardGrid) ?? new Point(0, 0);
-
-        // On calcule la width d'une case de l'échiquier
         var squareSize = BoardGrid.Width / 8;
-
-        // On calcule quelle case a été touchée
         int row = (int)(touchPoint.Y / squareSize);
         int col = (int)(touchPoint.X / squareSize);
-
-        // Exemple de Position Column 3 Row 6 => D2
-        // (0,0) semble etre en haut a gauche, à confirmer
         var pos = new Position(row, col);
 
-        if (selectedPos == null)
-        {
-            OnFromPositionSelected(pos);
-        }
-        else
-        {
-            OnToPositionSelected(pos);
-        }
+        if (selectedPos == null) OnFromPositionSelected(pos);
+        else OnToPositionSelected(pos);
     }
 
     private void OnFromPositionSelected(Position pos)
@@ -211,6 +224,9 @@ public partial class ChessGame : ContentPage
 
         if (gameState.IsGameOver())
             ShowGameOver();
+
+        if (vsAi && gameState.CurrentPlayer == aiPlays)
+            _ = PlayAiMoveAsync();
     }
 
 
@@ -240,6 +256,29 @@ public partial class ChessGame : ContentPage
         };
     }
 
+    private async Task PlayAiMoveAsync()
+    {
+        try
+        {
+            isThinking = true;
+            DisableInput(); // BoardGrid.InputTransparent = true; etc.
+
+            var engine = new MiniMaxEngine();          // (voir section 2)
+            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: searchDepth, timeMs: (int)thinkingTime.TotalMilliseconds)); // simple
+
+            if (best != null)
+                HandleMove(best);
+        }
+        finally
+        {
+            EnableInput();
+            isThinking = false;
+        }
+    }
+
+    private void DisableInput() => BoardGrid.InputTransparent = true;
+    private void EnableInput() => BoardGrid.InputTransparent = false;
+
 
     private void ShowGameOver()
     {
@@ -268,11 +307,15 @@ public partial class ChessGame : ContentPage
         selectedPos = null;
         HideHighlights();
         moveCache.Clear();
+
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
 
+        _plyCount = 0;
         plyCount = 0;
         moveLines.Clear();
+        _movesBuffer.Clear();
+
         MovesBlock.Text = string.Empty;
     }
 

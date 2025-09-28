@@ -1,6 +1,6 @@
 ﻿using ChessLogic;
 
-namespace ChessMultitool;
+namespace ChessMultitool.Logic;
 
 public static class Images
 {
