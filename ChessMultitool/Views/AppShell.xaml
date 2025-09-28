@@ -12,12 +12,7 @@
         <ShellContent 
         Title="Play" 
         Icon="explorer.png"
-        ContentTemplate="{DataTemplate local:ChessGame}" />
-
-        <ShellContent 
-        Title="Openings" 
-        Icon="openings.png" 
-        ContentTemplate="{DataTemplate local:OpeningsPage}" />
+        ContentTemplate="{DataTemplate local:AILevelSelectionPage}" />
 
         <ShellContent 
         Title="Stats" 

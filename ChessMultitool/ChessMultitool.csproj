@@ -124,6 +124,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Pages\AILevelSelectionPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\GameOverMenu.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

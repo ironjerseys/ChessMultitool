@@ -26,6 +26,9 @@ public partial class ChessGame : ContentPage
     private Player aiPlays = Player.Black;     // l’IA joue Noir par ex.
     private bool isThinking = false;
 
+    private int searchDepth = 3;
+    private TimeSpan thinkingTime = TimeSpan.FromSeconds(2);
+
     public class MoveRow
     {
         public int No { get; set; }
@@ -47,6 +50,25 @@ public partial class ChessGame : ContentPage
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
         AddTapGesture();
+    }
+
+    public ChessGame(int searchDepth, TimeSpan thinkingTime)
+    {
+        InitializeComponent();
+        // Le board s'ajuste pour garder un ratio carré
+        BoardGrid.SizeChanged += (s, e) =>
+        {
+            BoardGrid.HeightRequest = BoardGrid.Width;
+            MovesBlock.WidthRequest = BoardGrid.Width;
+        };
+        CreateGrids();
+        gameState = new GameState(Player.White, Board.Initial());
+        DrawBoard(gameState.Board);
+        AddTapGesture();
+
+        // Configure AI parameters
+        this.searchDepth = searchDepth;
+        this.thinkingTime = thinkingTime;
     }
 
     private void CreateGrids()
@@ -242,7 +264,7 @@ public partial class ChessGame : ContentPage
             DisableInput(); // BoardGrid.InputTransparent = true; etc.
 
             var engine = new MiniMaxEngine();          // (voir section 2)
-            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: 3, timeMs: 2000)); // simple
+            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: searchDepth, timeMs: (int)thinkingTime.TotalMilliseconds)); // simple
 
             if (best != null)
                 HandleMove(best);

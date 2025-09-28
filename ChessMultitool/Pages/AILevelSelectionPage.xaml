@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChessMultitool.AILevelSelectionPage"
+             Title="Chess Trainer">
+  <ScrollView>
+    <VerticalStackLayout Padding="20" Spacing="15">
+      <Label Text="Select the AI Level"
+             FontSize="24"
+             HorizontalOptions="Center" />
+      <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
+        <Button Text="Level 1" Grid.Row="0" Grid.Column="0" Margin="10" Clicked="OnLevel1Clicked" />
+        <Button Text="Level 2" Grid.Row="0" Grid.Column="1" Margin="10" Clicked="OnLevel2Clicked" />
+        <Button Text="Level 3" Grid.Row="0" Grid.Column="2" Margin="10" Clicked="OnLevel3Clicked" />
+        <Button Text="Level 4" Grid.Row="1" Grid.Column="0" Margin="10" Clicked="OnLevel4Clicked" />
+        <Button Text="Level 5" Grid.Row="1" Grid.Column="1" Margin="10" Clicked="OnLevel5Clicked" />
+        <Button Text="Level 6" Grid.Row="1" Grid.Column="2" Margin="10" Clicked="OnLevel6Clicked" />
+      </Grid>
+
+      <!-- New Section for Openings -->
+      <Label Text="Learn Openings"
+             FontSize="24"
+             HorizontalOptions="Center"
+             Margin="20,40,20,10" />
+      <Button Text="Open Openings Page"
+              HorizontalOptions="Center"
+              Clicked="OnOpeningsClicked" />
+    </VerticalStackLayout>
+  </ScrollView>
+</ContentPage>
