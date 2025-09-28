@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Openings">
 
-    <Grid Padding="20" RowSpacing="20" RowDefinitions="100,Auto,Auto,*">
+    <Grid Padding="0" RowSpacing="20" RowDefinitions="100,Auto,Auto,*">
 
         <!-- ROW 0 : Header fixe (100) avec les 2 Pickers -->
         <Grid Grid.Row="0" RowDefinitions="Auto,12,Auto">
@@ -23,8 +23,7 @@
 
         <!-- ROW 1 : Plateau -->
         <Grid Grid.Row="1" x:Name="BoardGrid"
-          WidthRequest="320" HeightRequest="320"
-          HorizontalOptions="Center">
+          HorizontalOptions="FillAndExpand">
             <Image Source="Board.png" Aspect="AspectFill" ZIndex="0" />
             <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
             <Grid x:Name="PieceGrid"     RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />

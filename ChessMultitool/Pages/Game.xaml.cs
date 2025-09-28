@@ -37,9 +37,10 @@ public partial class ChessGame : ContentPage
     public ChessGame()
     {
         InitializeComponent();
-        BoardGrid.SizeChanged += (_, __) =>
+        // Le board s'ajuste pour garder un ratio carré
+        BoardGrid.SizeChanged += (s, e) =>
         {
-            // suit la largeur réelle du plateau (utile au 1er layout / rotation)
+            BoardGrid.HeightRequest = BoardGrid.Width;
             MovesBlock.WidthRequest = BoardGrid.Width;
         };
         CreateGrids();
