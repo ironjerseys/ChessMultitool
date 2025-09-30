@@ -1,7 +1,6 @@
 using ChessLogic;
 using ChessMultitool.Logic;
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace ChessMultitool;
 
@@ -14,61 +13,56 @@ public partial class ChessGame : ContentPage
     private GameState gameState;
     private Position selectedPos = null;
 
-    private readonly List<string> moveLines = new(); // "1. e4 e5", "2. Cf3 Cc6", ...
-    private int plyCount = 0; // demi-coups
-
-    private readonly ObservableCollection<MoveRow> moveTable = new();
-
-    private readonly StringBuilder _movesBuffer = new();
-    private int _plyCount = 0;
+    // Historique des positions (ply 0 = position initiale)
+    private readonly List<GameState> history = new();
+    // Collection bindée aux coups (un élément = un demi-coup)
+    private readonly ObservableCollection<MoveItem> moves = new();
+    // Ply actuellement visualisé
+    private int viewPly = 0;
+    // Compteur demi-coups joués (live)
+    private int plyCount = 0;
 
     private bool vsAi = true;
-    private Player aiPlays = Player.Black;     // l’IA joue Noir par ex.
+    private Player aiPlays = Player.Black;     // l'IA joue Noir
     private bool isThinking = false;
 
     private int searchDepth = 3;
     private TimeSpan thinkingTime = TimeSpan.FromSeconds(2);
 
-    public class MoveRow
+    public class MoveItem
     {
-        public int No { get; set; }
-        public string White { get; set; } = "";
-        public string Black { get; set; } = "";
+        public int Ply { get; init; } // 1..N (correspond à history index)
+        public string Text { get; init; } = ""; // ex: "1. e4" ou "e5"
     }
-
 
     public ChessGame()
     {
         InitializeComponent();
-        // Le board s'ajuste pour garder un ratio carré
-        BoardGrid.SizeChanged += (s, e) =>
-        {
-            BoardGrid.HeightRequest = BoardGrid.Width;
-            MovesBlock.WidthRequest = BoardGrid.Width;
-        };
+        InitBoardGridSizeSync();
         CreateGrids();
         gameState = new GameState(Player.White, Board.Initial());
+        history.Add(Clone(gameState));
         DrawBoard(gameState.Board);
+        MovesView.ItemsSource = moves;
         AddTapGesture();
+        UpdateNavButtons();
     }
 
-    public ChessGame(int searchDepth, TimeSpan thinkingTime)
+    public ChessGame(int searchDepth, TimeSpan thinkingTime) : this()
     {
-        InitializeComponent();
-        // Le board s'ajuste pour garder un ratio carré
-        BoardGrid.SizeChanged += (s, e) =>
-        {
-            BoardGrid.HeightRequest = BoardGrid.Width;
-            MovesBlock.WidthRequest = BoardGrid.Width;
-        };
-        CreateGrids();
-        gameState = new GameState(Player.White, Board.Initial());
-        DrawBoard(gameState.Board);
-        AddTapGesture();
-
-        // Configure AI parameters
         this.searchDepth = searchDepth;
         this.thinkingTime = thinkingTime;
+    }
+
+    private static GameState Clone(GameState s) => new GameState(s.CurrentPlayer, s.Board.Copy());
+
+    private void InitBoardGridSizeSync()
+    {
+        BoardGrid.SizeChanged += (s, e) =>
+        {
+            // Conserve un plateau carré
+            BoardGrid.HeightRequest = BoardGrid.Width;
+        };
     }
 
     private void CreateGrids()
@@ -100,20 +94,13 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    // Fonction appelée au lancement de l'app
     private void DrawBoard(Board board)
     {
-        for (int row = 0; row < 8; row++)
-        {
-            for (int col = 0; col < 8; col++)
-            {
-                var piece = board[row, col];
-                pieceImages[row, col].Source = Images.GetImage(piece);
-            }
-        }
+        for (int r = 0; r < 8; r++)
+            for (int c = 0; c < 8; c++)
+                pieceImages[r, c].Source = Images.GetImage(board[r, c]);
     }
 
-    // Deuxieme fonction appelée au lancement de l'app, avant qu'on voit l'échiquier
     private void AddTapGesture()
     {
         var tap = new TapGestureRecognizer();
@@ -121,22 +108,26 @@ public partial class ChessGame : ContentPage
         BoardGrid.GestureRecognizers.Add(tap);
     }
 
-
-    // Premiere fonction appelée dès qu'on touche l'écran, avec les coordonées en parametre
     private void OnBoardTapped(object sender, TappedEventArgs e)
     {
         if (isThinking || IsMenuOnScreen()) return;
 
+        // Si on n'est pas sur la position live, revenir au live avant d'autoriser un coup
+        if (viewPly != history.Count - 1)
+        {
+            viewPly = history.Count - 1;
+            DrawBoard(history[viewPly].Board);
+            UpdateSelection();
+            UpdateNavButtons();
+            return;
+        }
+
         var touchPoint = e.GetPosition(BoardGrid) ?? new Point(0, 0);
         var squareSize = BoardGrid.Width / 8;
         int row = (int)(touchPoint.Y / squareSize);
-
-        // si row=8, on est en dehors de l'échiquier, mettre row=7, ça arrive si touchPoint.Y = 360,XX
+        int col = (int)(touchPoint.X / squareSize);
         if (row > 7) row = 7;
-
-        int col = (int)(touchPoint.X / squareSize); 
         if (col > 7) col = 7;
-
         var pos = new Position(row, col);
 
         if (selectedPos == null) OnFromPositionSelected(pos);
@@ -145,12 +136,11 @@ public partial class ChessGame : ContentPage
 
     private void OnFromPositionSelected(Position pos)
     {
-        // On regarde la liste des moves pour cette piece sur cette case
-        var moves = gameState.LegalMovesForPiece(pos);
-        if (moves.Any())
+        var movesForPiece = gameState.LegalMovesForPiece(pos);
+        if (movesForPiece.Any())
         {
             selectedPos = pos;
-            CacheMoves(moves);
+            CacheMoves(movesForPiece);
             ShowHighlights();
         }
     }
@@ -163,70 +153,57 @@ public partial class ChessGame : ContentPage
         if (moveCache.TryGetValue(pos, out var move))
         {
             if (move.Type == MoveType.PawnPromotion)
-            {
                 HandlePromotion(move.FromPos, move.ToPos);
-            }
             else
-            {
                 HandleMove(move);
-            }
         }
     }
 
-    private void CacheMoves(IEnumerable<Move> moves)
+    private void CacheMoves(IEnumerable<Move> legal)
     {
         moveCache.Clear();
-        foreach (var move in moves)
-        {
-            moveCache[move.ToPos] = move;
-        }
+        foreach (var m in legal)
+            moveCache[m.ToPos] = m;
     }
 
     private void ShowHighlights()
     {
-        var color = new Color(0.49f, 1f, 0.49f, 0.6f); // #7DFF7D semi-transparent
+        var color = new Color(0.49f, 1f, 0.49f, 0.6f);
         foreach (var to in moveCache.Keys)
-        {
             highlights[to.Row, to.Column].BackgroundColor = color;
-        }
     }
 
     private void HideHighlights()
     {
         foreach (var to in moveCache.Keys)
-        {
             highlights[to.Row, to.Column].BackgroundColor = Colors.Transparent;
-        }
     }
 
     private void HandleMove(Move move)
     {
-
-
         bool whiteToMove = gameState.CurrentPlayer == Player.White;
-
         string san = ToSanSimple(gameState, move);
 
         gameState.MakeMove(move);
         DrawBoard(gameState.Board);
 
-        // Ajoute au flux linéaire (les retours à la ligne se feront automatiquement par le wrap)
+        history.Add(Clone(gameState));
+        viewPly = history.Count - 1;
+
         if (whiteToMove)
         {
-            int num = (_plyCount / 2) + 1;
-            _movesBuffer.Append(num).Append(". ").Append(san).Append(' ');
+            int turn = (plyCount / 2) + 1;
+            moves.Add(new MoveItem { Ply = plyCount + 1, Text = $"{turn}. {san}" });
         }
         else
         {
-            _movesBuffer.Append(san).Append(' ');
+            moves.Add(new MoveItem { Ply = plyCount + 1, Text = san });
         }
-        _plyCount++;
+        plyCount++;
 
-        // MAJ du label + scroll en bas
-        MovesBlock.Text = _movesBuffer.ToString();
-        MainThread.BeginInvokeOnMainThread(() =>
-            MovesScroll.ScrollToAsync(MovesBlock, ScrollToPosition.End, true)
-        );
+        ScrollToCurrent();
+        UpdateSelection();
+        UpdateNavButtons();
 
         if (gameState.IsGameOver())
             ShowGameOver();
@@ -235,29 +212,80 @@ public partial class ChessGame : ContentPage
             _ = PlayAiMoveAsync();
     }
 
+    private void ScrollToCurrent()
+    {
+        if (moves.Count == 0) return;
+        var last = moves[^1];
+        MovesView.ScrollTo(last, position: ScrollToPosition.Center, animate: true);
+        MovesView.SelectedItem = last;
+    }
 
+    private void UpdateNavButtons()
+    {
+        PrevBtn.IsEnabled = viewPly > 0;
+        NextBtn.IsEnabled = viewPly < history.Count - 1;
+    }
+
+    private void OnPrevMoveClicked(object sender, EventArgs e)
+    {
+        if (viewPly <= 0) return;
+        viewPly--;
+        ApplyViewPly();
+    }
+
+    private void OnNextMoveClicked(object sender, EventArgs e)
+    {
+        if (viewPly >= history.Count - 1) return;
+        viewPly++;
+        ApplyViewPly();
+    }
+
+    private void OnMoveSelected(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.FirstOrDefault() is MoveItem mi)
+        {
+            if (mi.Ply >= 0 && mi.Ply < history.Count)
+            {
+                viewPly = mi.Ply;
+                ApplyViewPly();
+            }
+        }
+    }
+
+    private void ApplyViewPly()
+    {
+        var state = history[viewPly];
+        DrawBoard(state.Board);
+        UpdateSelection();
+        UpdateNavButtons();
+    }
+
+    private void UpdateSelection()
+    {
+        if (viewPly == 0)
+        {
+            MovesView.SelectedItem = null;
+            return;
+        }
+        var item = moves.FirstOrDefault(m => m.Ply == viewPly);
+        if (item != null)
+        {
+            MovesView.SelectedItem = item;
+            MovesView.ScrollTo(item, position: ScrollToPosition.Center, animate: true);
+        }
+    }
 
     private void HandlePromotion(Position from, Position to)
     {
         pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
         pieceImages[from.Row, from.Column].Source = null;
 
-        // Crée le menu de promotion MAUI
-        PromotionMenu promMenu = new PromotionMenu(gameState.CurrentPlayer);
-
-        // Affiche le menu dans ton conteneur (MenuContainer est un ContentView sur ton plateau)
-        MenuContainer.Content = promMenu;
-
-        // Quand l'utilisateur sélectionne une pièce
-        promMenu.PieceSelected += type =>
+        PromotionMenu menu = new(gameState.CurrentPlayer);
+        MenuContainer.Content = menu;
+        menu.PieceSelected += type =>
         {
-            // Supprime le menu après sélection
             MenuContainer.Content = null;
-
-            // Crée un mouvement de promotion avec la pièce choisie
             Move promMove = new PawnPromotion(from, to, type);
-
-            // Joue le coup de promotion
             HandleMove(promMove);
         };
     }
@@ -267,11 +295,9 @@ public partial class ChessGame : ContentPage
         try
         {
             isThinking = true;
-            DisableInput(); // BoardGrid.InputTransparent = true; etc.
-
-            var engine = new MiniMaxEngine();          // (voir section 2)
-            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: searchDepth, timeMs: (int)thinkingTime.TotalMilliseconds)); // simple
-
+            DisableInput();
+            var engine = new MiniMaxEngine();
+            var best = await Task.Run(() => engine.FindBestMove(gameState, depth: searchDepth, timeMs: (int)thinkingTime.TotalMilliseconds));
             if (best != null)
                 HandleMove(best);
         }
@@ -285,19 +311,13 @@ public partial class ChessGame : ContentPage
     private void DisableInput() => BoardGrid.InputTransparent = true;
     private void EnableInput() => BoardGrid.InputTransparent = false;
 
-
     private void ShowGameOver()
     {
-        // Crée le menu Game Over MAUI
-        GameOverMenu gameOverMenu = new GameOverMenu(gameState);
-
-        // Affiche le menu dans ton conteneur MenuContainer
-        MenuContainer.Content = gameOverMenu;
-
-        // Gestion du clic sur un des boutons du menu
-        gameOverMenu.OptionSelected += option =>
+        GameOverMenu menu = new(gameState);
+        MenuContainer.Content = menu;
+        menu.OptionSelected += opt =>
         {
-            if (option == Option.Restart)
+            if (opt == Option.Restart)
             {
                 MenuContainer.Content = null;
                 RestartGame();
@@ -306,7 +326,6 @@ public partial class ChessGame : ContentPage
     }
 
     private bool IsMenuOnScreen() => MenuContainer.Content != null;
-
 
     private void RestartGame()
     {
@@ -317,14 +336,16 @@ public partial class ChessGame : ContentPage
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
 
-        _plyCount = 0;
+        history.Clear();
+        history.Add(Clone(gameState));
+        viewPly = 0;
+
+        moves.Clear();
         plyCount = 0;
-        moveLines.Clear();
-        _movesBuffer.Clear();
 
-        MovesBlock.Text = string.Empty;
+        UpdateNavButtons();
+        UpdateSelection();
     }
-
 
     private static string PieceLetterEn(PieceType t) => t switch
     {
@@ -336,7 +357,6 @@ public partial class ChessGame : ContentPage
         _ => ""
     };
 
-
     private static string SquareName(Position p)
     {
         char file = (char)('a' + p.Column);
@@ -344,15 +364,12 @@ public partial class ChessGame : ContentPage
         return $"{file}{rank}";
     }
 
-    
-    // Cherche d’autres pièces du même type/couleur pouvant aussi aller sur 'move.ToPos'
     private List<Position> FindConflicts(GameState state, Move move, PieceType type)
     {
         var board = state.Board;
         var color = board[move.FromPos].Color;
         var target = move.ToPos;
         var list = new List<Position>();
-
         for (int r = 0; r < 8; r++)
             for (int c = 0; c < 8; c++)
             {
@@ -360,7 +377,6 @@ public partial class ChessGame : ContentPage
                 if (p == null) continue;
                 if (p.Type != type || p.Color != color) continue;
                 if (r == move.FromPos.Row && c == move.FromPos.Column) continue;
-
                 var pos = new Position(r, c);
                 var legal = state.LegalMovesForPiece(pos);
                 if (legal.Any(m => m.ToPos == target))
@@ -369,20 +385,19 @@ public partial class ChessGame : ContentPage
         return list;
     }
 
-    // Exécute le coup sur une copie pour analyser échec/mat
-    private GameState Simulate(GameState stateBefore, Move move)
+    private GameState Simulate(GameState before, Move move)
     {
-        var copy = new GameState(stateBefore.CurrentPlayer, stateBefore.Board.Copy());
+        var copy = new GameState(before.CurrentPlayer, before.Board.Copy());
         copy.MakeMove(move);
         return copy;
     }
 
     private string CheckSuffix(GameState after)
     {
-        var toMove = after.CurrentPlayer;                 // camp qui joue après le coup
+        var toMove = after.CurrentPlayer;
         bool inCheck = after.Board.IsInCheck(toMove);
-        if (after.IsGameOver() && inCheck) return "#";    // mat
-        if (inCheck) return "+";                          // échec
+        if (after.IsGameOver() && inCheck) return "#";
+        if (inCheck) return "+";
         return "";
     }
 
@@ -393,7 +408,6 @@ public partial class ChessGame : ContentPage
         var to = move.ToPos;
         var piece = board[from];
 
-        // Roque (roi bouge de 2 colonnes)
         if (piece.Type == PieceType.King && Math.Abs(to.Column - from.Column) == 2)
         {
             var sanCastle = to.Column > from.Column ? "O-O" : "O-O-O";
@@ -405,7 +419,6 @@ public partial class ChessGame : ContentPage
 
         string dest = SquareName(to);
 
-        // --- Désambiguïsation minimale (file, rang, ou les deux) ---
         string pieceLetter = piece.Type == PieceType.Pawn ? "" : PieceLetterEn(piece.Type);
         string disamb = "";
         if (piece.Type != PieceType.Pawn)
@@ -417,19 +430,16 @@ public partial class ChessGame : ContentPage
                 bool shareRank = conflicts.Any(p => p.Row == from.Row);
                 char fileFrom = (char)('a' + from.Column);
                 int rankFrom = 8 - from.Row;
-
-                if (!shareFile) disamb = fileFrom.ToString();      // Rdf5
-                else if (!shareRank) disamb = rankFrom.ToString();      // R4f5
-                else disamb = $"{fileFrom}{rankFrom}";  // Rd4f5
+                if (!shareFile) disamb = fileFrom.ToString();
+                else if (!shareRank) disamb = rankFrom.ToString();
+                else disamb = $"{fileFrom}{rankFrom}";
             }
         }
 
-        // Corps (pions qui prennent : exd5)
         string core = piece.Type == PieceType.Pawn
             ? (isCapture ? $"{(char)('a' + from.Column)}x{dest}" : dest)
             : $"{pieceLetter}{disamb}{(isCapture ? "x" : "")}{dest}";
 
-        // Promotion (on lit la pièce promue après simulation)
         if (move.Type == MoveType.PawnPromotion)
         {
             var after = Simulate(before, move);
@@ -438,7 +448,6 @@ public partial class ChessGame : ContentPage
             core += "=" + (string.IsNullOrEmpty(letter) ? "Q" : letter);
         }
 
-        // Échec / mat
         return core + CheckSuffix(Simulate(before, move));
     }
 }
