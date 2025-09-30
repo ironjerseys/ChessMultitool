@@ -25,7 +25,8 @@
         <!-- Row 2 : move navigation -->
         <Grid Grid.Row="2"
               ColumnDefinitions="Auto,*,Auto"
-              Padding="12,4,12,0"
+              Padding="20,4,20,0"
+              ColumnSpacing="12"
               VerticalOptions="Start">
 
             <Button x:Name="PrevBtn"
@@ -37,27 +38,34 @@
 
             <CollectionView x:Name="MovesView"
                             Grid.Column="1"
-                            HeightRequest="60"
+                            HeightRequest="48"
+                            Margin="8,0"
                             SelectionMode="Single"
                             SelectionChanged="OnMoveSelected"
                             HorizontalScrollBarVisibility="Never">
                 <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="12" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Frame Padding="8,6"
-                               HasShadow="False"
-                               CornerRadius="8"
-                               BackgroundColor="{DynamicResource GlobalControlBackgroundColor}"
-                               BorderColor="#666"
-                               WidthRequest="96">
-                            <Label Text="{Binding Text}"
+                        <Grid Padding="0,6" Margin="4,0">
+                            <Label x:Name="MoveLabel"
+                                   Text="{Binding Text}"
                                    FontSize="15"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
                                    TextColor="{DynamicResource GlobalTextColor}" />
-                        </Frame>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState Name="Normal" />
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
