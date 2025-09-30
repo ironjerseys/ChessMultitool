@@ -23,8 +23,11 @@ public partial class ChessGame : ContentPage
     private int plyCount = 0;
 
     private bool vsAi = true;
-    private Player aiPlays = Player.Black;     // l'IA joue Noir
+    private Player aiPlays = Player.Black; // recalculé selon humanColor
+    private Player humanColor = Player.White;
+    private bool firstAIMovePending = false;
     private bool isThinking = false;
+    private bool isFlipped = false; // nouveau : orientation UI
 
     private int searchDepth = 3;
     private TimeSpan thinkingTime = TimeSpan.FromSeconds(2);
@@ -35,23 +38,54 @@ public partial class ChessGame : ContentPage
         public string Text { get; init; } = ""; // ex: "1. e4" ou "e5"
     }
 
-    public ChessGame()
+    // Constructeur de base privé (initialisation commune)
+    private void BaseInit()
     {
         InitializeComponent();
         InitBoardGridSizeSync();
         CreateGrids();
         gameState = new GameState(Player.White, Board.Initial());
         history.Add(Clone(gameState));
+        isFlipped = humanColor == Player.Black; // orientation
         DrawBoard(gameState.Board);
         MovesView.ItemsSource = moves;
         AddTapGesture();
         UpdateNavButtons();
     }
 
+    public ChessGame()
+    {
+        BaseInit();
+    }
+
     public ChessGame(int searchDepth, TimeSpan thinkingTime) : this()
     {
         this.searchDepth = searchDepth;
         this.thinkingTime = thinkingTime;
+    }
+
+    public ChessGame(Player humanColor, int searchDepth = 3, TimeSpan? thinkingTime = null)
+    {
+        this.humanColor = humanColor;
+        this.searchDepth = searchDepth;
+        if (thinkingTime.HasValue) this.thinkingTime = thinkingTime.Value;
+        BaseInit();
+        aiPlays = (humanColor == Player.White) ? Player.Black : Player.White;
+        if (aiPlays == Player.White)
+        {
+            // L'IA doit jouer en premier après affichage
+            firstAIMovePending = true;
+        }
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        if (firstAIMovePending)
+        {
+            firstAIMovePending = false;
+            await PlayAiMoveAsync();
+        }
     }
 
     private static GameState Clone(GameState s) => new GameState(s.CurrentPlayer, s.Board.Copy());
@@ -94,11 +128,28 @@ public partial class ChessGame : ContentPage
         }
     }
 
+    // Mapping board -> UI coordinates selon orientation
+    private (int uiR, int uiC) ToUi(int boardR, int boardC)
+        => isFlipped ? (7 - boardR, 7 - boardC) : (boardR, boardC);
+
+    private Position FromUi(int uiR, int uiC)
+        => isFlipped ? new Position(7 - uiR, 7 - uiC) : new Position(uiR, uiC);
+
     private void DrawBoard(Board board)
     {
+        // Effacer sources d'abord (sécurité si orientation change)
         for (int r = 0; r < 8; r++)
             for (int c = 0; c < 8; c++)
-                pieceImages[r, c].Source = Images.GetImage(board[r, c]);
+                pieceImages[r, c].Source = null;
+
+        for (int br = 0; br < 8; br++)
+        {
+            for (int bc = 0; bc < 8; bc++)
+            {
+                var (uiR, uiC) = ToUi(br, bc);
+                pieceImages[uiR, uiC].Source = Images.GetImage(board[br, bc]);
+            }
+        }
     }
 
     private void AddTapGesture()
@@ -122,13 +173,17 @@ public partial class ChessGame : ContentPage
             return;
         }
 
+        // Bloquer les taps si ce n'est pas le tour du joueur humain
+        if (vsAi && gameState.CurrentPlayer != humanColor) return;
+
         var touchPoint = e.GetPosition(BoardGrid) ?? new Point(0, 0);
         var squareSize = BoardGrid.Width / 8;
-        int row = (int)(touchPoint.Y / squareSize);
-        int col = (int)(touchPoint.X / squareSize);
-        if (row > 7) row = 7;
-        if (col > 7) col = 7;
-        var pos = new Position(row, col);
+        int uiRow = (int)(touchPoint.Y / squareSize);
+        int uiCol = (int)(touchPoint.X / squareSize);
+        if (uiRow > 7) uiRow = 7;
+        if (uiCol > 7) uiCol = 7;
+
+        var pos = FromUi(uiRow, uiCol);
 
         if (selectedPos == null) OnFromPositionSelected(pos);
         else OnToPositionSelected(pos);
@@ -170,13 +225,19 @@ public partial class ChessGame : ContentPage
     {
         var color = new Color(0.49f, 1f, 0.49f, 0.6f);
         foreach (var to in moveCache.Keys)
-            highlights[to.Row, to.Column].BackgroundColor = color;
+        {
+            var (uiR, uiC) = ToUi(to.Row, to.Column);
+            highlights[uiR, uiC].BackgroundColor = color;
+        }
     }
 
     private void HideHighlights()
     {
         foreach (var to in moveCache.Keys)
-            highlights[to.Row, to.Column].BackgroundColor = Colors.Transparent;
+        {
+            var (uiR, uiC) = ToUi(to.Row, to.Column);
+            highlights[uiR, uiC].BackgroundColor = Colors.Transparent;
+        }
     }
 
     private void HandleMove(Move move)
@@ -277,8 +338,11 @@ public partial class ChessGame : ContentPage
 
     private void HandlePromotion(Position from, Position to)
     {
-        pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
-        pieceImages[from.Row, from.Column].Source = null;
+        // Mise à jour visuelle provisoire (optionnel)
+        var (uiFromR, uiFromC) = ToUi(from.Row, from.Column);
+        var (uiToR, uiToC) = ToUi(to.Row, to.Column);
+        pieceImages[uiToR, uiToC].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
+        pieceImages[uiFromR, uiFromC].Source = null;
 
         PromotionMenu menu = new(gameState.CurrentPlayer);
         MenuContainer.Content = menu;
@@ -334,15 +398,20 @@ public partial class ChessGame : ContentPage
         moveCache.Clear();
 
         gameState = new GameState(Player.White, Board.Initial());
-        DrawBoard(gameState.Board);
-
         history.Clear();
         history.Add(Clone(gameState));
         viewPly = 0;
-
         moves.Clear();
         plyCount = 0;
-
+        aiPlays = (humanColor == Player.White) ? Player.Black : Player.White;
+        isFlipped = humanColor == Player.Black;
+        DrawBoard(gameState.Board);
+        firstAIMovePending = aiPlays == Player.White;
+        if (firstAIMovePending)
+        {
+            _ = PlayAiMoveAsync();
+            firstAIMovePending = false;
+        }
         UpdateNavButtons();
         UpdateSelection();
     }
@@ -356,13 +425,6 @@ public partial class ChessGame : ContentPage
         PieceType.Knight => "N",
         _ => ""
     };
-
-    private static string SquareName(Position p)
-    {
-        char file = (char)('a' + p.Column);
-        int rank = 8 - p.Row;
-        return $"{file}{rank}";
-    }
 
     private List<Position> FindConflicts(GameState state, Move move, PieceType type)
     {
@@ -379,8 +441,7 @@ public partial class ChessGame : ContentPage
                 if (r == move.FromPos.Row && c == move.FromPos.Column) continue;
                 var pos = new Position(r, c);
                 var legal = state.LegalMovesForPiece(pos);
-                if (legal.Any(m => m.ToPos == target))
-                    list.Add(pos);
+                if (legal.Any(m => m.ToPos == target)) list.Add(pos);
             }
         return list;
     }
@@ -417,7 +478,9 @@ public partial class ChessGame : ContentPage
         bool isEnPassant = move.Type == MoveType.EnPassant;
         bool isCapture = board[to] != null || isEnPassant;
 
-        string dest = SquareName(to);
+        char file = (char)('a' + to.Column);
+        int rank = 8 - to.Row;
+        string dest = $"{file}{rank}";
 
         string pieceLetter = piece.Type == PieceType.Pawn ? "" : PieceLetterEn(piece.Type);
         string disamb = "";
