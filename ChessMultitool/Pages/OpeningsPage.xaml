@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="ChessMultitool.OpeningsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Openings">
+
+    <Grid Padding="0" RowSpacing="20" RowDefinitions="100,Auto,Auto,*">
+
+        <!-- ROW 0 : Header fixe (100) avec les 2 Pickers -->
+        <Grid Grid.Row="0" RowDefinitions="Auto,12,Auto" Margin="20,0">
+            <Picker x:Name="openingsPicker"
+              HeightRequest="44"
+              TextColor="{DynamicResource GlobalTextColor}"
+              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
+              SelectedIndexChanged="OnOpeningChanged" />
+            <BoxView Grid.Row="1" HeightRequest="12" Opacity="0"/>
+            <Picker x:Name="variationsPicker"
+              Grid.Row="2"
+              HeightRequest="44"
+              TextColor="{DynamicResource GlobalTextColor}"
+              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
+              SelectedIndexChanged="OnVariationChanged" />
+        </Grid>
+
+        <!-- ROW 1 : Plateau -->
+        <Grid Grid.Row="1" x:Name="BoardGrid"
+          HorizontalOptions="FillAndExpand">
+            <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" ZIndex="0" />
+            <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
+            <Grid x:Name="PieceGrid"     RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
+        </Grid>
+
+        <!-- ROW 2 : Coup affiché -->
+        <Label Grid.Row="2" x:Name="moveLabel"
+           FontSize="20" HorizontalOptions="Center" />
+
+        <!-- ROW 3 : Navigation -->
+        <HorizontalStackLayout Grid.Row="3" HorizontalOptions="Center">
+            <Button Text="Previous" Clicked="OnPreviousClicked" Margin="0,0,150,0" HeightRequest="50"/>
+            <Button Text="Next" Clicked="OnNextClicked" Margin="0,0,0,0" HeightRequest="50"/>
+        </HorizontalStackLayout>
+
+    </Grid>
+</ContentPage>

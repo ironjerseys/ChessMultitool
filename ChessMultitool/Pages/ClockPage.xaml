@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    x:Class="ChessMultitool.ClockPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Chess Clock">
+
+    <ContentPage.Content>
+        <!-- Grid avec 3 lignes : la 1ère et la 3ème sont les pendules (hautes), la 2ème est la barre de réglage -->
+        <Grid RowDefinitions="*,Auto,*"
+              ColumnDefinitions="*"
+              VerticalOptions="FillAndExpand"
+              HorizontalOptions="FillAndExpand">
+
+            <!-- Zone du haut (Blanc) -->
+            <Border 
+                Grid.Row="0"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnWhiteTapped" />
+                </Border.GestureRecognizers>
+
+                <Label x:Name="WhiteTimeLabel"
+                       Rotation="180"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="FillAndExpand"
+                       VerticalOptions="FillAndExpand"
+                       FontSize="48"
+                       FontAttributes="Bold"
+                       TextColor="Black" />
+            </Border>
+
+            <!-- Barre du milieu, "Auto" en hauteur -->
+            <HorizontalStackLayout Grid.Row="1" Spacing="10" Padding="10" HorizontalOptions="Center" VerticalOptions="Center">
+
+                <Label Text="Minutes:" VerticalOptions="Center" />
+                <Entry x:Name="MinutesEntry" WidthRequest="30" Keyboard="Numeric" HorizontalOptions="Center" />
+
+                <Label Text="Inc (sec):" VerticalOptions="Center" />
+                <Entry x:Name="IncrementEntry" WidthRequest="30" Keyboard="Numeric" Placeholder="0/1/2..." HorizontalOptions="Center" />
+
+                <Button Text="Set Time" Clicked="OnSetTimeClicked" />
+            </HorizontalStackLayout>
+
+            <!-- Zone du bas (Noir) -->
+            <Border
+                Grid.Row="2"
+                StrokeThickness="0">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBlackTapped" />
+                </Border.GestureRecognizers>
+
+                <!-- Rotation de 180° -->
+                <Label x:Name="BlackTimeLabel"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="FillAndExpand"
+                       VerticalOptions="FillAndExpand"
+                       FontSize="48"
+                       FontAttributes="Bold"
+                       TextColor="Black" />
+            </Border>
+
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

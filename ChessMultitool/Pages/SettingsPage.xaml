@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChessMultitool.SettingsPage"
+             Title="Settings">
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Label Text="Settings" FontSize="24"  HorizontalOptions="Center" FontAttributes="Bold" Margin="0,0,0,50"/>
+        
+        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label Text="Dark Mode:" VerticalOptions="Center" />
+            <Switch x:Name="ThemeSwitch" Toggled="OnThemeToggled" IsToggled="True" />
+        </HorizontalStackLayout>
+
+        <Label Text="Board Theme:" FontAttributes="Bold" />
+        <Picker x:Name="BoardPicker" Title="Select board" SelectedIndexChanged="OnBoardChanged" />
+
+        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label Text="Vibration (moves):" VerticalOptions="Center" />
+            <Switch x:Name="VibrationSwitch" Toggled="OnVibrationToggled" IsToggled="True" />
+        </HorizontalStackLayout>
+
+        <!-- New: toggle AI thinking highlight (red pulse on considered piece) -->
+        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label Text="Show AI thinking highlight:" VerticalOptions="Center" />
+            <Switch x:Name="AiConsiderSwitch" Toggled="OnAiConsiderToggled" IsToggled="True" />
+        </HorizontalStackLayout>
+
+        <!-- New: toggle evaluation bar -->
+        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+            <Label Text="Show evaluation bar:" VerticalOptions="Center" />
+            <Switch x:Name="EvalBarSwitch" Toggled="OnEvalBarToggled" IsToggled="True" />
+        </HorizontalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

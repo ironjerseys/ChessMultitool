@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    x:Class="ChessMultitool.ChessGame"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Chess">
+
+    <Grid Padding="0" RowSpacing="6"
+          RowDefinitions="100,Auto,Auto,Auto,Auto">
+
+        <!-- Row 0 : Header fixe (100) -->
+        <Grid Grid.Row="0" Padding="12,6" RowSpacing="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" x:Name="GameOverBanner" IsVisible="False" VerticalOptions="Start">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <VerticalStackLayout Grid.Column="0" Spacing="2" HorizontalOptions="Start" VerticalOptions="Center">
+                    <Label x:Name="WinnerText" FontSize="16" HorizontalTextAlignment="Start" TextColor="{DynamicResource GlobalTextColor}" />
+                    <Label x:Name="ReasonText" FontSize="16" HorizontalTextAlignment="Start" TextColor="{DynamicResource GlobalTextColor}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="1" Text="Restart" Clicked="OnRestartClicked" HorizontalOptions="End" VerticalOptions="Center" WidthRequest="120" />
+            </Grid>
+            <VerticalStackLayout Grid.Row="1" Padding="8,0" Spacing="2" x:Name="EvalBarContainer" VerticalOptions="End">
+                <Label x:Name="EvalLabel" Text="0.00" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" TextColor="{DynamicResource GlobalTextColor}"/>
+                <Grid x:Name="EvalBarGrid" HeightRequest="12" ColumnDefinitions="*,*">
+                    <BoxView Grid.Column="0" Color="White"/>
+                    <BoxView Grid.Column="1" Color="Black"/>
+                </Grid>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Row 1 : board -->
+        <Grid Grid.Row="1" VerticalOptions="Start" HorizontalOptions="Center" Margin="0">
+            <Grid x:Name="BoardGrid" HorizontalOptions="FillAndExpand" HeightRequest="320">
+                <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" InputTransparent="True" ZIndex="0" />
+                <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
+                <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
+                <ContentView x:Name="MenuContainer" BackgroundColor="Transparent" ZIndex="3" />
+            </Grid>
+        </Grid>
+
+        <!-- Row 2 : Flip board button -->
+        <Grid Grid.Row="2" Padding="0" HorizontalOptions="Center" Margin="0,2,0,0">
+            <Button Text="Flip board" Clicked="OnFlipBoardClicked" WidthRequest="130" Padding="8,4" />
+        </Grid>
+
+        <!-- Row 3 : Captured pieces and material diff (tighter) -->
+        <Grid Grid.Row="3" Padding="8,0" ColumnDefinitions="*,*" ColumnSpacing="6" VerticalOptions="Start" Margin="0,2,0,0">
+            <Grid Grid.Column="0" ColumnDefinitions="*,Auto" ColumnSpacing="4" VerticalOptions="Center">
+                <ScrollView Grid.Column="0" Orientation="Horizontal" HorizontalOptions="FillAndExpand" HeightRequest="26">
+                    <HorizontalStackLayout x:Name="WhiteCapturesPanel" Spacing="2" VerticalOptions="Center" />
+                </ScrollView>
+                <Label Grid.Column="1" x:Name="WhiteAdvantageLabel" FontAttributes="Bold" FontSize="13" VerticalTextAlignment="Center" TextColor="{DynamicResource GlobalTextColor}" />
+            </Grid>
+            <Grid Grid.Column="1" ColumnDefinitions="Auto,*" ColumnSpacing="4" VerticalOptions="Center">
+                <Label Grid.Column="0" x:Name="BlackAdvantageLabel" FontAttributes="Bold" FontSize="13" VerticalTextAlignment="Center" TextColor="{DynamicResource GlobalTextColor}" />
+                <ScrollView Grid.Column="1" Orientation="Horizontal" HorizontalOptions="FillAndExpand" FlowDirection="RightToLeft" HeightRequest="26">
+                    <HorizontalStackLayout x:Name="BlackCapturesPanel" Spacing="2" VerticalOptions="Center" />
+                </ScrollView>
+            </Grid>
+        </Grid>
+
+        <!-- Row 4 : move navigation (raised) -->
+        <Grid Grid.Row="4" Margin="8,4" ColumnDefinitions="Auto,*,Auto" Padding="8,0" ColumnSpacing="6" VerticalOptions="Start">
+            <Button x:Name="PrevBtn" Text="&lt;" WidthRequest="42" HeightRequest="38" Clicked="OnPrevMoveClicked" HorizontalOptions="Center" VerticalOptions="Center" />
+            <CollectionView x:Name="MovesView" Grid.Column="1" HeightRequest="38" SelectionMode="Single" SelectionChanged="OnMoveSelected" HorizontalScrollBarVisibility="Never">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="6" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="0" Margin="0">
+                            <Label x:Name="MoveLabel" Text="{Binding Text}" FontSize="13" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="{DynamicResource GlobalTextColor}" />
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                    </VisualState>
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+            <Button x:Name="NextBtn" Grid.Column="2" Text=">" WidthRequest="42" HeightRequest="38" Clicked="OnNextMoveClicked" HorizontalOptions="Center" VerticalOptions="Center" />
+        </Grid>
+    </Grid>
+</ContentPage>

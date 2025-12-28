@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="ChessMultitool.StatsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ChessMultitool.Pages"
+    Title="Chess Stats">
+
+    <Grid RowDefinitions="*, Auto">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20" Spacing="24">
+
+                <!-- Titre principal -->
+                <Label Text="Chess.com Statistics" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+
+                <!-- Champ Username -->
+                <Entry x:Name="UsernameEntry"
+                       Placeholder="Username (e.g., MagnusCarlsen)"
+                       Text="MagnusCarlsen"
+                       FontSize="16"
+                       TextColor="{DynamicResource GlobalTextColor}"
+                       PlaceholderColor="{DynamicResource GlobalTextColor}"
+                       HorizontalOptions="FillAndExpand" />
+
+                <!-- Bouton -->
+                <Button Text="Load Current Month Stats"
+                        Clicked="OnLoadStatsClicked"
+                        FontSize="16"
+                        BackgroundColor="#d18b47"
+                        TextColor="White"
+                        HorizontalOptions="FillAndExpand" />
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator x:Name="BusyIndicator"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   HorizontalOptions="Center" />
+
+                <!-- Label Erreur -->
+                <Label x:Name="ErrorLabel"
+                       TextColor="Red"
+                       FontSize="14"
+                       IsVisible="False"
+                       HorizontalOptions="Center" />
+
+                <!-- Stats Container -->
+                <VerticalStackLayout x:Name="StatsContainer"
+                                     Spacing="24"
+                                     IsVisible="False">
+
+                    <!-- Nombre de parties -->
+                    <Label x:Name="NumGamesLabel"
+                           FontSize="20"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" />
+
+                    <!-- Ratings sur une ligne -->
+                    <Label Text="Ratings" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="40">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="Bullet" FontAttributes="Bold" />
+                            <Label x:Name="BulletEloLabel" FontSize="20" TextColor="#d18b47" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="Blitz" FontAttributes="Bold" />
+                            <Label x:Name="BlitzEloLabel" FontSize="20" TextColor="#d18b47" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="Rapid" FontAttributes="Bold" />
+                            <Label x:Name="RapidEloLabel" FontSize="20" TextColor="#d18b47" FontAttributes="Bold" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <!-- Color Winrate -->
+                    <Label Text="Color Winrate" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label x:Name="WhiteStatsLabel" FontSize="18" HorizontalOptions="Center" />
+                        <Label x:Name="BlackStatsLabel" FontSize="18" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Opening Winrate -->
+                    <Label Text="Opening Winrate" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label x:Name="E4Label" FontSize="18" HorizontalOptions="Center" />
+                        <Label x:Name="D4Label" FontSize="18" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Castling -->
+                    <Label Text="Castling" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label x:Name="SameSideLabel" FontSize="18" HorizontalOptions="Center" />
+                        <Label x:Name="OppositeSideLabel" FontSize="18" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Longest/Shortest Game -->
+                    <Label Text="Game Length" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label x:Name="LongestGameLabel" FontSize="18" HorizontalOptions="Center" />
+                        <Label x:Name="ShortestGameLabel" FontSize="18" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Moyenne de coups par pièce (sur une ligne) -->
+                    <Label Text="Average Moves per Piece" FontAttributes="Bold" FontSize="22" HorizontalOptions="Center" />
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♙" FontSize="24" />
+                            <Label x:Name="AvgPawnMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♘" FontSize="24" />
+                            <Label x:Name="AvgKnightMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♗" FontSize="24" />
+                            <Label x:Name="AvgBishopMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♖" FontSize="24" />
+                            <Label x:Name="AvgRookMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♕" FontSize="24" />
+                            <Label x:Name="AvgQueenMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout HorizontalOptions="Center">
+                            <Label Text="♔" FontSize="24" />
+                            <Label x:Name="AvgKingMovesLabel" FontSize="18" TextColor="#d18b47" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Banniere fixée en bas, hors scroll -->
+        <!--<Grid Grid.Row="1" BackgroundColor="Transparent" Padding="0">
+            <local:AdBanner />
+        </Grid>-->
+        
+    </Grid>
+</ContentPage>

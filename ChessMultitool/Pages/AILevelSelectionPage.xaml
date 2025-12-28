@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChessMultitool.AILevelSelectionPage"
+             Title="Chess Trainer">
+  <ScrollView>
+    <VerticalStackLayout Padding="20" Spacing="15">
+      <Label Text="Game Setup" FontSize="24" HorizontalOptions="Center" FontAttributes="Bold" />
+
+      <!-- Sélection couleur joueur -->
+      <HorizontalStackLayout Spacing="16" Margin="0,10,0,0" VerticalOptions="Start" HorizontalOptions="Center">
+        <Label Text="Your Color:" VerticalTextAlignment="Center" FontAttributes="Bold" />
+        <Button x:Name="WhiteBtn" WidthRequest="40" HeightRequest="40" CornerRadius="20" Clicked="OnWhiteClicked" />
+        <Button x:Name="BlackBtn" WidthRequest="40" HeightRequest="40" CornerRadius="20" Clicked="OnBlackClicked" />
+      </HorizontalStackLayout>
+
+      <!-- Opening selection -->
+      <Label Text="Opening (optional)" FontSize="18" Margin="0,20,0,0" />
+      <Picker x:Name="OpeningPicker" Title="Any (no restriction)" SelectedIndexChanged="OnOpeningChanged" />
+
+      <Label Text="Variation (optional)" FontSize="18" />
+      <Picker x:Name="VariationPicker" Title="Any (no restriction)" SelectedIndexChanged="OnVariationChanged" />
+
+      <Button Text="Start Game" HorizontalOptions="Center" Clicked="OnStartClicked" WidthRequest="240" />
+
+    </VerticalStackLayout>
+  </ScrollView>
+</ContentPage>

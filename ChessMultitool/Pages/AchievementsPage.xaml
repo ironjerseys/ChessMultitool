@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ChessMultitool.AchievementsPage"
+             Title="Achievements">
+  <ScrollView>
+    <VerticalStackLayout Padding="16" Spacing="16">
+      <Label Text="Achievements" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+
+      <!-- Quick wins against AI -->
+      <Label Text="Quick Wins vs AI" FontAttributes="Bold" FontSize="18" />
+      <CollectionView x:Name="QuickWinsList">
+        <CollectionView.ItemsLayout>
+          <GridItemsLayout Orientation="Vertical" Span="2" />
+        </CollectionView.ItemsLayout>
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
+              <Frame.Triggers>
+                <DataTrigger TargetType="Frame" Binding="{Binding Achieved}" Value="True">
+                  <Setter Property="BackgroundColor" Value="#008000" />
+                  <Setter Property="BorderColor" Value="#2ECC71" />
+                </DataTrigger>
+              </Frame.Triggers>
+              <Grid>
+                <Label Text="{Binding Name}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+              </Grid>
+            </Frame>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+
+      <!-- AI winrate by rating -->
+      <Label Text="AI winrate by rating" FontAttributes="Bold" FontSize="18" />
+      <CollectionView x:Name="AiList">
+        <CollectionView.ItemsLayout>
+          <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+        </CollectionView.ItemsLayout>
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
+              <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                <Label Text="{Binding LevelText}" FontSize="16" Grid.Row="0" Grid.Column="0" />
+                <Label Text="{Binding CountText}" FontSize="14" Grid.Row="0" Grid.Column="1" HorizontalTextAlignment="End" />
+                <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                  <ProgressBar Progress="{Binding Rate}" HeightRequest="6" VerticalOptions="Center" />
+                  <Label Grid.Column="1" Text="{Binding RateText}" FontSize="13" VerticalOptions="Center" />
+                </Grid>
+              </Grid>
+            </Frame>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+
+      <!-- Wins WITH openings -->
+      <Label Text="Openings" FontAttributes="Bold" FontSize="18" />
+      <CollectionView x:Name="WithList">
+        <CollectionView.ItemsLayout>
+          <GridItemsLayout Orientation="Vertical" Span="2" />
+        </CollectionView.ItemsLayout>
+        <CollectionView.ItemTemplate>
+          <DataTemplate>
+            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
+              <Frame.Triggers>
+                <DataTrigger TargetType="Frame" Binding="{Binding Achieved}" Value="True">
+                  <Setter Property="BackgroundColor" Value="#E6F5EA" />
+                  <Setter Property="BorderColor" Value="#2ECC71" />
+                </DataTrigger>
+              </Frame.Triggers>
+              <Label Text="{Binding Name}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Frame>
+          </DataTemplate>
+        </CollectionView.ItemTemplate>
+      </CollectionView>
+
+      <!-- AgainstList removed logically, kept bound to null in code-behind -->
+
+    </VerticalStackLayout>
+  </ScrollView>
+</ContentPage>

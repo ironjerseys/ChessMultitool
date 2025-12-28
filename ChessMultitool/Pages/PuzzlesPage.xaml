@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    x:Class="ChessMultitool.PuzzlesPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ChessMultitool"
+    Title="Puzzles">
+
+    <Grid Padding="0" RowSpacing="10" RowDefinitions="100,Auto,Auto">
+        <!-- Header like Game: shows side to move -->
+        <Grid Grid.Row="0" Padding="12,6" RowSpacing="2">
+            <Label x:Name="TurnLabel"
+                   Text=""
+                   FontSize="16"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center"
+                   TextColor="{DynamicResource GlobalTextColor}" />
+        </Grid>
+
+        <!-- Board centered like in Game.xaml -->
+        <Grid Grid.Row="1" VerticalOptions="Start" HorizontalOptions="Center" Margin="0">
+            <Grid x:Name="BoardGrid" HorizontalOptions="FillAndExpand" HeightRequest="320">
+                <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" InputTransparent="True" ZIndex="0" />
+                <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
+                <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
+                <Grid x:Name="OverlayGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="3" />
+                <!-- Promotion selection overlay -->
+                <Grid x:Name="PromotionContainer" IsVisible="False" BackgroundColor="#88000000" ZIndex="4" RowSpacing="0" ColumnSpacing="0">
+                    <Border StrokeThickness="1" Stroke="{DynamicResource GlobalTextColor}" BackgroundColor="{DynamicResource GlobalControlBackgroundColor}" Padding="8" HorizontalOptions="Center" VerticalOptions="Center" >
+                        <local:PromotionMenu x:Name="PromotionMenuView" />
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Bottom controls -->
+        <HorizontalStackLayout Grid.Row="2" Spacing="10" Padding="12" HorizontalOptions="Center">
+            <!-- Move navigation within current puzzle -->
+            <Button x:Name="PrevMoveBtn" Text="Previous" Clicked="OnPrevMoveClicked" />
+            <Button x:Name="NextMoveBtn" Text="Next" Clicked="OnNextMoveClicked" />
+            <Button x:Name="HintBtn" Text="Hint" Clicked="OnHintClicked" />
+            <Button x:Name="RetryBtn" Text="Retry" Clicked="OnRetry" IsVisible="False" />
+            <!-- Next puzzle (enabled once solved) -->
+            <Button x:Name="NextBtn" Text="Next puzzle" Clicked="OnNextPuzzle" IsVisible="False" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentPage>

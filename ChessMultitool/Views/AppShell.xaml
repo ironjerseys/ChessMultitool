@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ChessMultitool.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ChessMultitool"
+    Shell.FlyoutBehavior="Disabled"
+    Title="ChessMultitool">
+
+    <TabBar>
+        <ShellContent Title="Play" Icon="BottomBarIcons/explorer.png" ContentTemplate="{DataTemplate local:AILevelSelectionPage}" />
+
+        <ShellContent Title="Stats" Icon="BottomBarIcons/stats.png" ContentTemplate="{DataTemplate local:StatsPage}" />
+
+        <ShellContent Title="Puzzles" Icon="BottomBarIcons/puzzles.png" ContentTemplate="{DataTemplate local:PuzzlesPage}" />
+
+        <ShellContent Title="Tools" Icon="BottomBarIcons/tools.png" ContentTemplate="{DataTemplate local:ToolsPage}" />
+
+        <ShellContent Title="Settings" Icon="BottomBarIcons/settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
+    </TabBar>
+</Shell>
