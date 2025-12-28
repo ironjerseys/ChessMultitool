@@ -1,5 +1,4 @@
 name: SonarCloud
-
 on:
   push:
     branches:
@@ -13,20 +12,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.0.x'
+          fetch-depth: 0 # recommandé pour SonarCloud (blame, PR analysis, etc.)
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'zulu'
+          java-version: 17
+          distribution: zulu
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
@@ -50,10 +50,33 @@ jobs:
           New-Item -Path "${{ runner.temp }}\scanner" -ItemType Directory -Force | Out-Null
           dotnet tool update dotnet-sonarscanner --tool-path "${{ runner.temp }}\scanner"
 
-      - name: Install required workloads
+      - name: Debug - list solutions/projects
         shell: powershell
         run: |
-          dotnet workload restore
+          Write-Host "Workspace: $env:GITHUB_WORKSPACE"
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.sln | ForEach-Object { Write-Host "SLN: $($_.FullName)" }
+          Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj | ForEach-Object { Write-Host "CSPROJ: $($_.FullName)" }
+
+      - name: Locate build target
+        shell: powershell
+        run: |
+          $solution = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.sln | Select-Object -First 1
+          if ($solution) {
+            "BUILD_TARGET=$($solution.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Using solution: $($solution.FullName)"
+            exit 0
+          }
+
+          $project = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj | Select-Object -First 1
+          if (-not $project) { throw "No .sln or .csproj found in repo." }
+
+          "BUILD_TARGET=$($project.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Using project: $($project.FullName)"
+
+      - name: Restore
+        shell: powershell
+        run: |
+          dotnet restore "$env:BUILD_TARGET"
 
       - name: Build and analyze
         env:
@@ -61,8 +84,9 @@ jobs:
         shell: powershell
         run: |
           $scanner = "${{ runner.temp }}\scanner\dotnet-sonarscanner"
-          $project = "ChessMultitool/ChessMultitool/ChessMultitool.csproj"
 
           & $scanner begin /k:"ironjerseys_ChessMultitool" /o:"jorisreynes" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.scanner.skipJreProvisioning=true
-          dotnet build $project -c Release
+
+          dotnet build "$env:BUILD_TARGET" -c Release --no-restore
+
           & $scanner end /d:sonar.token="$env:SONAR_TOKEN"
