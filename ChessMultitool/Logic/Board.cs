@@ -22,14 +22,19 @@ public class Board
         set { this[pos.Row, pos.Column] = value; }
     }
 
-    public Position GetPawnSkipPosition(Player player)
+    public Position? GetPawnSkipPosition(Player player)
     {
         return pawnSkipPositions[player];
     }
 
-    public void SetPawnSkipPosition(Player player, Position pos)
+    public void SetPawnSkipPosition(Player player, Position? pos)
     {
         pawnSkipPositions[player] = pos;
+    }
+
+    public void SetPiece(Position pos, Piece? piece)
+    {
+        this[pos] = piece;
     }
 
     public static Board Initial()
@@ -114,6 +119,9 @@ public class Board
         {
             copy[pos] = this[pos].Copy();
         }
+
+        copy.SetPawnSkipPosition(Player.White, GetPawnSkipPosition(Player.White));
+        copy.SetPawnSkipPosition(Player.Black, GetPawnSkipPosition(Player.Black));
 
         return copy;
     }
@@ -263,6 +271,7 @@ public class Board
         {
             return false;
         }
+        Position sp = skipPos;
 
         Position[] pawnPositions = player switch
         {
@@ -271,6 +280,6 @@ public class Board
             _ => Array.Empty<Position>()
         };
 
-        return HasPawnInPosition(player, pawnPositions, skipPos);
+        return HasPawnInPosition(player, pawnPositions, sp);
     }
 }

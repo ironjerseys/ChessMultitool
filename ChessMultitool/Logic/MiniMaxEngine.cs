@@ -49,11 +49,13 @@ public class MiniMaxEngine
     {
         var sw = Stopwatch.StartNew();
 
+        var searchState = new GameState(state.CurrentPlayer, state.Board.Copy());
+
         long nodesVisited = 0;
         long generatedMovesTotal = 0;
         long leafEvaluations = 0;
 
-        var rootMoves = GenerateAllLegalMoves(state);
+        var rootMoves = GenerateAllLegalMoves(searchState);
         if (rootMoves.Count == 0)
         {
             onStats?.Invoke(generatedMovesTotal, nodesVisited, leafEvaluations);
@@ -61,7 +63,7 @@ public class MiniMaxEngine
         }
 
         // Move ordering initial : tactiques d'abord
-        OrderMoves(state, rootMoves);
+        OrderMoves(searchState, rootMoves);
 
         Move? bestSoFar = null;
         int bestScoreSoFar = -INF;
@@ -84,11 +86,13 @@ public class MiniMaxEngine
 
                 onConsider?.Invoke(move);
 
-                var next = Copy(state);
-                next.MakeMove(move);
+                //var next = Copy(searchState);
+                //next.MakeMove(move);
+
+                searchState.MakeMoveFast(move, out var undo);
 
                 int score = -Search(
-                    next,
+                    searchState,
                     currentDepth - 1,
                     -beta,
                     -alpha,
@@ -98,6 +102,8 @@ public class MiniMaxEngine
                     ref generatedMovesTotal,
                     ref leafEvaluations,
                     onEvalUpdate);
+
+                searchState.UnmakeMoveFast(undo);
 
                 onEvaluated?.Invoke(move, score);
                 lastDepthScores[move] = score;
@@ -178,11 +184,13 @@ public class MiniMaxEngine
 
         foreach (var move in legalMoves)
         {
-            var nextState = Copy(currentState);
-            nextState.MakeMove(move);
+            //var nextState = Copy(currentState);
+            //nextState.MakeMove(move);
+
+            currentState.MakeMoveFast(move, out var undo);
 
             int score = -Search(
-                nextState,
+                currentState,
                 depthRemaining - 1,
                 -beta,
                 -alpha,
@@ -192,6 +200,8 @@ public class MiniMaxEngine
                 ref generatedMovesTotal,
                 ref leafEvaluations,
                 onEvalUpdate);
+
+            currentState.UnmakeMoveFast(undo);
 
             if (score >= beta)
                 return beta; // élagage beta
@@ -249,11 +259,13 @@ public class MiniMaxEngine
             if (!IsTacticalWithCheck(currentState, move))
                 continue;
 
-            var next = Copy(currentState);
-            next.MakeMove(move);
+            //var next = Copy(currentState);
+            //next.MakeMove(move);
+
+            currentState.MakeMoveFast(move, out var undo);
 
             int score = -Quiescence(
-                next,
+                currentState,
                 -beta,
                 -alpha,
                 qDepth - 1,
@@ -262,6 +274,8 @@ public class MiniMaxEngine
                 ref nodesVisited,
                 ref generatedMovesTotal,
                 ref leafEvaluations);
+
+            currentState.UnmakeMoveFast(undo);
 
             if (score >= beta)
                 return beta;
@@ -548,9 +562,17 @@ public class MiniMaxEngine
         if (IsPromotion(m) || IsCapture(state, m))
             return true;
 
-        var next = Copy(state);
-        next.MakeMove(m);
-        return next.Board.IsInCheck(next.CurrentPlayer);
+        //var next = Copy(state);
+        //next.MakeMove(m);
+
+        state.MakeMoveFast(m, out var undo);
+
+        bool givesCheck = state.Board.IsInCheck(state.CurrentPlayer); // camp au trait APRÈS le coup
+
+        state.UnmakeMoveFast(undo);
+
+
+        return givesCheck;
     }
 
     /// <summary>
@@ -566,10 +588,6 @@ public class MiniMaxEngine
         });
     }
 
-    private GameState Copy(GameState s)
-    {
-        return new GameState(s.CurrentPlayer, s.Board.Copy());
-    }
 
     private bool IsEndgame(int nonPawnWhite, int nonPawnBlack)
     {
