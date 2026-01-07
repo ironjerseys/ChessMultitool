@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ChessMultitool.SettingsPage"
@@ -21,10 +21,10 @@
         </HorizontalStackLayout>
 
         <!-- New: toggle AI thinking highlight (red pulse on considered piece) -->
-        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+        <!--<HorizontalStackLayout Spacing="10" VerticalOptions="Center">
             <Label Text="Show AI thinking highlight:" VerticalOptions="Center" />
             <Switch x:Name="AiConsiderSwitch" Toggled="OnAiConsiderToggled" IsToggled="True" />
-        </HorizontalStackLayout>
+        </HorizontalStackLayout>-->
 
         <!-- New: toggle evaluation bar -->
         <HorizontalStackLayout Spacing="10" VerticalOptions="Center">

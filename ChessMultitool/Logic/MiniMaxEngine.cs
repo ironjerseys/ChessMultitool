@@ -39,16 +39,16 @@ public class MiniMaxEngine
     /// profondeur complètement terminée.
     /// </summary>
     public Move? FindBestMove(
-        GameState state,
-        int depth = 3,
-        int timeMs = 2000,
-        Action<Move>? onConsider = null,
-        Action<Move, int>? onEvaluated = null,
-        Action<long, long, long>? onStats = null,
-        Action<int>? onEvalUpdate = null)
+    GameState state,
+    int depth = 3,
+    int timeMs = 2000,
+    Action<Move, int>? onEvaluated = null,
+    Action<long, long, long>? onStats = null,
+    Action<int>? onEvalUpdate = null)
     {
         var sw = Stopwatch.StartNew();
 
+        // Copie unique pour la recherche
         var searchState = new GameState(state.CurrentPlayer, state.Board.Copy());
 
         long nodesVisited = 0;
@@ -62,79 +62,110 @@ public class MiniMaxEngine
             return null;
         }
 
-        // Move ordering initial : tactiques d'abord
         OrderMoves(searchState, rootMoves);
 
         Move? bestSoFar = null;
         int bestScoreSoFar = -INF;
-        var lastDepthScores = new Dictionary<Move, int>();
-        bool timeUp = false;
+
+        // Important : Move comme clé => OK si ce sont les mêmes instances dans rootMoves.
+        var lastDepthScores = new Dictionary<Move, int>(rootMoves.Count);
 
         for (int currentDepth = 1; currentDepth <= depth; currentDepth++)
         {
+            if (sw.ElapsedMilliseconds >= timeMs)
+                break;
+
+            bool completedDepth = true;
+
             int alpha = -INF;
             int beta = INF;
             Move? bestAtThisDepth = null;
 
+            // Optionnel : pas obligatoire, mais plus propre
+            lastDepthScores.Clear();
+
             foreach (var move in rootMoves)
             {
-                if (sw.ElapsedMilliseconds > timeMs)
+                if (sw.ElapsedMilliseconds >= timeMs)
                 {
-                    timeUp = true;
+                    completedDepth = false;
                     break;
                 }
 
-                onConsider?.Invoke(move);
-
-                //var next = Copy(searchState);
-                //next.MakeMove(move);
-
                 searchState.MakeMoveFast(move, out var undo);
 
-                int score = -Search(
-                    searchState,
-                    currentDepth - 1,
-                    -beta,
-                    -alpha,
-                    sw,
-                    timeMs,
-                    ref nodesVisited,
-                    ref generatedMovesTotal,
-                    ref leafEvaluations,
-                    onEvalUpdate);
+                int score;
+                try
+                {
+                    // IMPORTANT :
+                    // - Si ta Search a encore un param onEvalUpdate, passe null pour éviter tout callback UI en récursif.
+                    // - Si tu as déjà supprimé ce param de Search, enlève simplement l’argument "onEvalUpdate: null".
+                    score = -Search(
+                        searchState,
+                        currentDepth - 1,
+                        -beta,
+                        -alpha,
+                        sw,
+                        timeMs,
+                        ref nodesVisited,
+                        ref generatedMovesTotal,
+                        ref leafEvaluations
+                    );
+                }
+                finally
+                {
+                    searchState.UnmakeMoveFast(undo);
+                }
 
-                searchState.UnmakeMoveFast(undo);
-
-                onEvaluated?.Invoke(move, score);
+                //onEvaluated?.Invoke(move, score);
                 lastDepthScores[move] = score;
 
                 if (score > alpha)
                 {
                     alpha = score;
                     bestAtThisDepth = move;
-                    onEvalUpdate?.Invoke(alpha);
+
+                    // Je recommande de NE PAS updater l’UI ici.
+                    // Si tu veux absolument, mets un throttle.
+                    // onEvalUpdate?.Invoke(alpha);
                 }
             }
 
-            if (bestAtThisDepth == null)
+            // Si on n’a pas fini cette profondeur, on NE la valide pas.
+            // On conserve bestSoFar (profondeur précédente complète).
+            if (!completedDepth || bestAtThisDepth == null)
+            {
+                // Cas extrême : aucune profondeur complète (rare). On prend quand même le meilleur partiel.
+                if (bestSoFar == null && bestAtThisDepth != null)
+                {
+                    bestSoFar = bestAtThisDepth;
+                    bestScoreSoFar = alpha;
+                }
                 break;
+            }
 
-            // Profondeur terminée : on valide ce résultat
+            // Profondeur complète => on valide
             bestSoFar = bestAtThisDepth;
             bestScoreSoFar = alpha;
 
-            // Réordonne les coups racine selon les scores de la dernière profondeur
-            rootMoves = rootMoves
-                .OrderByDescending(m => lastDepthScores.TryGetValue(m, out var sc) ? sc : int.MinValue)
-                .ToList();
-
-            if (timeUp)
-                break;
+            // Réordonnancement sans allocations LINQ (optionnel mais mieux)
+            rootMoves.Sort((a, b) =>
+            {
+                int sb = lastDepthScores.TryGetValue(b, out var vb) ? vb : int.MinValue;
+                int sa = lastDepthScores.TryGetValue(a, out var va) ? va : int.MinValue;
+                return sb.CompareTo(sa);
+            });
         }
 
         onStats?.Invoke(generatedMovesTotal, nodesVisited, leafEvaluations);
-        return bestSoFar ?? rootMoves.FirstOrDefault();
+
+        // Update UI une seule fois, à la fin (si tu en as besoin)
+        if (bestSoFar != null)
+            onEvalUpdate?.Invoke(bestScoreSoFar);
+
+        return bestSoFar ?? rootMoves[0];
     }
+
 
     /// <summary>
     /// Recherche récursive negamax avec élagage alpha-beta.
@@ -150,8 +181,7 @@ public class MiniMaxEngine
         int timeMs,
         ref long nodesVisited,
         ref long generatedMovesTotal,
-        ref long leafEvaluations,
-        Action<int>? onEvalUpdate)
+        ref long leafEvaluations)
     {
         nodesVisited++;
 
@@ -198,8 +228,7 @@ public class MiniMaxEngine
                 timeMs,
                 ref nodesVisited,
                 ref generatedMovesTotal,
-                ref leafEvaluations,
-                onEvalUpdate);
+                ref leafEvaluations);
 
             currentState.UnmakeMoveFast(undo);
 
@@ -209,7 +238,6 @@ public class MiniMaxEngine
             if (score > alpha)
             {
                 alpha = score;
-                onEvalUpdate?.Invoke(alpha);
             }
 
             if (stopwatch.ElapsedMilliseconds > timeMs)

@@ -1,4 +1,4 @@
-using ChessLogic;
+ï»¿using ChessLogic;
 using ChessMultitool.Logic;
 using System.Collections.ObjectModel;
 using Microsoft.Maui.Storage; // Preferences
@@ -11,76 +11,76 @@ namespace ChessMultitool;
 
 public partial class ChessGame : ContentPage
 {
-    /// <summary>Cache d'images des pièces par case [row, col].</summary>
+    /// <summary>Cache d'images des piÃ¨ces par case [row, col].</summary>
     private readonly Image[,] pieceImages = new Image[8, 8];
     /// <summary>Overlay pour surlignage des cases.</summary>
     private readonly BoxView[,] highlights = new BoxView[8, 8];
 
-    /// <summary>Cases actuellement surlignées (positions UI).</summary>
+    /// <summary>Cases actuellement surlignÃ©es (positions UI).</summary>
     private readonly HashSet<(int row, int col)> hightlightedCells = new();
 
-    /// <summary>Positions de départ et d'arrivée du dernier coup pour surlignage jaune.</summary>
+    /// <summary>Positions de dÃ©part et d'arrivÃ©e du dernier coup pour surlignage jaune.</summary>
     private Position? lastMoveFrom = null;
     private Position? lastMoveTo = null;
 
-    /// <summary>Cache des coups légaux depuis la case sélectionnée: destination -> coup.</summary>
+    /// <summary>Cache des coups lÃ©gaux depuis la case sÃ©lectionnÃ©e: destination -> coup.</summary>
     private readonly Dictionary<Position, Move> moveCache = new();
 
-    /// <summary>État courant de la partie.</summary>
+    /// <summary>Ã‰tat courant de la partie.</summary>
     private GameState gameState;
-    /// <summary>Case sélectionnée (origine) si le joueur a choisi une pièce.</summary>
+    /// <summary>Case sÃ©lectionnÃ©e (origine) si le joueur a choisi une piÃ¨ce.</summary>
     private Position selectedPos = null;
 
     /// <summary>Historique des GameState (ply 0 = position initiale).</summary>
     private readonly List<GameState> history = new();
     /// <summary>Liste observable des demi-coups en notation SAN simple pour l'UI.</summary>
     private readonly ObservableCollection<MoveItem> moves = new();
-    /// <summary>Ply actuellement visualisé (replay).</summary>
+    /// <summary>Ply actuellement visualisÃ© (replay).</summary>
     private int viewPly = 0;
-    /// <summary>Nombre de demi-coups réellement joués (courant live).</summary>
+    /// <summary>Nombre de demi-coups rÃ©ellement jouÃ©s (courant live).</summary>
     private int plyCount = 0;
 
     /// <summary>True si on joue contre l'IA.</summary>
     private bool vsAi = true;
-    /// <summary>Camp joué par l'IA.</summary>
-    private Player aiPlays = Player.Black; // recalculé selon humanColor
-    /// <summary>Camp joué par l'humain.</summary>
+    /// <summary>Camp jouÃ© par l'IA.</summary>
+    private Player aiPlays = Player.Black; // recalculÃ© selon humanColor
+    /// <summary>Camp jouÃ© par l'humain.</summary>
     private Player humanColor = Player.White;
-    /// <summary>Indique que l'IA doit jouer immédiatement après l'affichage initial.</summary>
+    /// <summary>Indique que l'IA doit jouer immÃ©diatement aprÃ¨s l'affichage initial.</summary>
     private bool firstAIMovePending = false;
     /// <summary>L'IA est en train de chercher un coup.</summary>
     private bool isThinking = false;
-    /// <summary>Orientation du plateau: true si le plateau est retourné (noirs en bas).</summary>
+    /// <summary>Orientation du plateau: true si le plateau est retournÃ© (noirs en bas).</summary>
     private bool isFlipped = false; // orientation UI
 
-    /// <summary>Temps maximum de réflexion de l'IA (détermine la difficulté).</summary>
+    /// <summary>Temps maximum de rÃ©flexion de l'IA (dÃ©termine la difficultÃ©).</summary>
     private TimeSpan thinkingTime = TimeSpan.FromSeconds(2);
 
     /// <summary>Activation vibration sur les coups humains.</summary>
     private bool vibrationEnabled = true;
 
-    /// <summary>Ligne d'ouverture optionnelle à suivre (liste de coups SAN numérotés).</summary>
+    /// <summary>Ligne d'ouverture optionnelle Ã  suivre (liste de coups SAN numÃ©rotÃ©s).</summary>
     private List<string> openingLine = null; // list of SAN-like strings with move numbers
     /// <summary>True si on utilise encore le livre d'ouverture.</summary>
     private bool useOpeningBook = false;
 
-    /// <summary>Pièces capturées par les Blancs (donc pièces noires). Utilisé pour affichage matériel.</summary>
+    /// <summary>PiÃ¨ces capturÃ©es par les Blancs (donc piÃ¨ces noires). UtilisÃ© pour affichage matÃ©riel.</summary>
     private readonly List<Piece> whiteCaptured = new();
-    /// <summary>Pièces capturées par les Noirs (donc pièces blanches).</summary>
+    /// <summary>PiÃ¨ces capturÃ©es par les Noirs (donc piÃ¨ces blanches).</summary>
     private readonly List<Piece> blackCaptured = new();
 
-    /// <summary>Bonus matériel lié aux promotions (valeur pièce promue - valeur pion).</summary>
+    /// <summary>Bonus matÃ©riel liÃ© aux promotions (valeur piÃ¨ce promue - valeur pion).</summary>
     private int whitePromotionBonus = 0;
     private int blackPromotionBonus = 0;
 
-    /// <summary>Item affiché dans la liste des coups.</summary>
+    /// <summary>Item affichÃ© dans la liste des coups.</summary>
     public class MoveItem
     {
-        public int Ply { get; init; } // 1..N (correspond à history index)
+        public int Ply { get; init; } // 1..N (correspond Ã  history index)
         public string Text { get; init; } = ""; // ex: "1. e4" ou "e5"
     }
 
-    /// <summary>Initialisation commune à tous les constructeurs (plateau, préférences, événements).</summary>
+    /// <summary>Initialisation commune Ã  tous les constructeurs (plateau, prÃ©fÃ©rences, Ã©vÃ©nements).</summary>
     private void BaseInit()
     {
         InitializeComponent();
@@ -89,7 +89,7 @@ public partial class ChessGame : ContentPage
         CreateGrids();
         gameState = new GameState(Player.White, Board.Initial());
         history.Add(Clone(gameState));
-        // Charge préférence de flip; par défaut: retourné si l'humain joue les noirs
+        // Charge prÃ©fÃ©rence de flip; par dÃ©faut: retournÃ© si l'humain joue les noirs
         isFlipped = Preferences.Get("pref_board_flipped", humanColor == Player.Black);
         DrawBoard(gameState.Board);
         MovesView.ItemsSource = moves;
@@ -99,9 +99,16 @@ public partial class ChessGame : ContentPage
 
         bool showEval = Preferences.Get("pref_eval_bar", true);
         EvalBarContainer.IsVisible = showEval;
+
+#if DEBUG
+        ShareLogsBtn.IsVisible = true;
+#else
+        ShareLogsBtn.IsVisible = false;
+#endif
+
     }
 
-    /// <summary>Constructeur par défaut (humain blanc contre IA noire).</summary>
+    /// <summary>Constructeur par dÃ©faut (humain blanc contre IA noire).</summary>
     public ChessGame()
     {
         BaseInit();
@@ -110,7 +117,7 @@ public partial class ChessGame : ContentPage
     private readonly string? selectedOpeningForGame;
     private readonly int? selectedAiRating;
 
-    /// <summary>Constructeur complet sans paramètre de profondeur (gérée en interne dans le moteur).</summary>
+    /// <summary>Constructeur complet sans paramÃ¨tre de profondeur (gÃ©rÃ©e en interne dans le moteur).</summary>
     public ChessGame(Player humanColor, TimeSpan? thinkingTime = null, List<string> openingLine = null, string? selectedOpeningName = null, int? aiRating = null)
     {
         this.humanColor = humanColor;
@@ -123,12 +130,12 @@ public partial class ChessGame : ContentPage
         aiPlays = (humanColor == Player.White) ? Player.Black : Player.White;
         if (aiPlays == Player.White)
         {
-            // L'IA doit jouer en premier après affichage
+            // L'IA doit jouer en premier aprÃ¨s affichage
             firstAIMovePending = true;
         }
     }
 
-    /// <summary>Quand la page apparaît, déclenche le premier coup IA si nécessaire.</summary>
+    /// <summary>Quand la page apparaÃ®t, dÃ©clenche le premier coup IA si nÃ©cessaire.</summary>
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -139,13 +146,13 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Clone indépendant du GameState (copie du plateau + joueur courant).</summary>
+    /// <summary>Clone indÃ©pendant du GameState (copie du plateau + joueur courant).</summary>
     private static GameState Clone(GameState stateToClone)
     {
         return new GameState(stateToClone.CurrentPlayer, stateToClone.Board.Copy());
     }
 
-    /// <summary>Synchronise la hauteur du grid pour conserver un plateau carré.</summary>
+    /// <summary>Synchronise la hauteur du grid pour conserver un plateau carrÃ©.</summary>
     private void InitBoardGridSizeSync()
     {
         BoardGrid.SizeChanged += (sender, args) =>
@@ -154,7 +161,7 @@ public partial class ChessGame : ContentPage
         };
     }
 
-    /// <summary>Crée les cellules UI (images pièces + box de surlignage).</summary>
+    /// <summary>CrÃ©e les cellules UI (images piÃ¨ces + box de surlignage).</summary>
     private void CreateGrids()
     {
         for (int index = 0; index < 8; index++)
@@ -184,7 +191,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Convertit des coordonnées plateau vers coordonnées UI selon orientation.</summary>
+    /// <summary>Convertit des coordonnÃ©es plateau vers coordonnÃ©es UI selon orientation.</summary>
     private (int uiR, int uiC) ToUi(int boardR, int boardC)
     {
         if (isFlipped)
@@ -197,7 +204,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Convertit des coordonnées UI vers plateau selon orientation.</summary>
+    /// <summary>Convertit des coordonnÃ©es UI vers plateau selon orientation.</summary>
     private Position FromUi(int uiRow, int uiColumn)
     {
         if (isFlipped)
@@ -210,7 +217,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Redessine toutes les pièces sur le plateau (en tenant compte du flip).</summary>
+    /// <summary>Redessine toutes les piÃ¨ces sur le plateau (en tenant compte du flip).</summary>
     private void DrawBoard(Board board)
     {
         for (int rowIndex = 0; rowIndex < 8; rowIndex++)
@@ -227,7 +234,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Ajoute un gesture tap sur le grid pour gérer la sélection de coups.</summary>
+    /// <summary>Ajoute un gesture tap sur le grid pour gÃ©rer la sÃ©lection de coups.</summary>
     private void AddTapGesture()
     {
         var tapRecognizer = new TapGestureRecognizer();
@@ -235,7 +242,7 @@ public partial class ChessGame : ContentPage
         BoardGrid.GestureRecognizers.Add(tapRecognizer);
     }
 
-    /// <summary>Gère un tap sur le plateau: sélection origine/destination ou navigation retour au live.</summary>
+    /// <summary>GÃ¨re un tap sur le plateau: sÃ©lection origine/destination ou navigation retour au live.</summary>
     private void OnBoardTapped(object sender, TappedEventArgs e)
     {
         if (isThinking || IsMenuOnScreen()) return;
@@ -271,7 +278,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Traite la sélection d'une case origine, met en cache ses coups si au trait.</summary>
+    /// <summary>Traite la sÃ©lection d'une case origine, met en cache ses coups si au trait.</summary>
     private void OnFromPositionSelected(Position position)
     {
         if (gameState.IsGameOver()) return;
@@ -284,7 +291,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Traite la sélection de la case destination: exécute coup ou promotion.</summary>
+    /// <summary>Traite la sÃ©lection de la case destination: exÃ©cute coup ou promotion.</summary>
     private void OnToPositionSelected(Position destination)
     {
         if (gameState.IsGameOver()) return;
@@ -300,7 +307,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Met en cache les coups légaux (destination -> Move) pour la pièce sélectionnée.</summary>
+    /// <summary>Met en cache les coups lÃ©gaux (destination -> Move) pour la piÃ¨ce sÃ©lectionnÃ©e.</summary>
     private void CacheMoves(IEnumerable<Move> legalMoves)
     {
         moveCache.Clear();
@@ -308,7 +315,7 @@ public partial class ChessGame : ContentPage
             moveCache[legalMove.ToPos] = legalMove;
     }
 
-    /// <summary>Affiche un surlignage sur les positions passées (avec couleur facultative).</summary>
+    /// <summary>Affiche un surlignage sur les positions passÃ©es (avec couleur facultative).</summary>
     private void ShowHighlights(IEnumerable<Position> targets, Color? color = null, bool track = true)
     {
         var chosenColor = color ?? new Color(0.49f, 1f, 0.49f, 0.6f);
@@ -323,7 +330,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Efface tous les surlignages temporaires (sauf dernier coup si non réinitialisé).</summary>
+    /// <summary>Efface tous les surlignages temporaires (sauf dernier coup si non rÃ©initialisÃ©).</summary>
     private void HideHighlights()
     {
         foreach (var (uiR, uiC) in hightlightedCells)
@@ -350,7 +357,7 @@ public partial class ChessGame : ContentPage
         lastMoveTo = null;
     }
 
-    /// <summary>Surligne en jaune les deux cases du coup joué (origine + destination).</summary>
+    /// <summary>Surligne en jaune les deux cases du coup jouÃ© (origine + destination).</summary>
     private void HighlightLastMove(Position from, Position to)
     {
         ClearLastMoveHighlight();
@@ -360,7 +367,7 @@ public partial class ChessGame : ContentPage
         lastMoveTo = to;
     }
 
-    /// <summary>Exécute un coup (ou promotion) et met à jour historique, surlignages, matériel, vibration, IA.</summary>
+    /// <summary>ExÃ©cute un coup (ou promotion) et met Ã  jour historique, surlignages, matÃ©riel, vibration, IA.</summary>
     private void HandleMove(Move move)
     {
         bool wasWhiteToMove = gameState.CurrentPlayer == Player.White;
@@ -415,7 +422,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Ajoute une pièce capturée aux listes de matériel (en passant inclus).</summary>
+    /// <summary>Ajoute une piÃ¨ce capturÃ©e aux listes de matÃ©riel (en passant inclus).</summary>
     private void TrackCaptureIfAny(Move move)
     {
         Piece capturedPiece = null;
@@ -438,7 +445,7 @@ public partial class ChessGame : ContentPage
             blackCaptured.Add(capturedPiece.Copy());
     }
 
-    /// <summary>Retourne la valeur matérielle simplifiée d'un type de pièce.</summary>
+    /// <summary>Retourne la valeur matÃ©rielle simplifiÃ©e d'un type de piÃ¨ce.</summary>
     private static int PieceValue(PieceType type) => type switch
     {
         PieceType.Pawn => 1,
@@ -449,13 +456,13 @@ public partial class ChessGame : ContentPage
         _ => 0
     };
 
-    /// <summary>Calcule le score matériel cumulé d'une liste de pièces.</summary>
+    /// <summary>Calcule le score matÃ©riel cumulÃ© d'une liste de piÃ¨ces.</summary>
     private int MaterialScore(IEnumerable<Piece> pieces)
     {
         return pieces.Sum(piece => PieceValue(piece.Type));
     }
 
-    /// <summary>Mise à jour de l'UI des pièces capturées et de l'avantage matériel.</summary>
+    /// <summary>Mise Ã  jour de l'UI des piÃ¨ces capturÃ©es et de l'avantage matÃ©riel.</summary>
     private void UpdateCapturesUI()
     {
         WhiteCapturesPanel.Children.Clear();
@@ -492,7 +499,7 @@ public partial class ChessGame : ContentPage
         BlackAdvantageLabel.Text = blackDiff > 0 ? $"+{blackDiff}" : string.Empty;
     }
 
-    /// <summary>Fait défiler la liste des coups jusqu'au dernier coup joué.</summary>
+    /// <summary>Fait dÃ©filer la liste des coups jusqu'au dernier coup jouÃ©.</summary>
     private void ScrollToCurrent()
     {
         if (moves.Count == 0) return;
@@ -501,14 +508,14 @@ public partial class ChessGame : ContentPage
         MovesView.SelectedItem = lastMoveItem;
     }
 
-    /// <summary>Met à jour l'état des boutons de navigation (précedent/suivant).</summary>
+    /// <summary>Met Ã  jour l'Ã©tat des boutons de navigation (prÃ©cedent/suivant).</summary>
     private void UpdateNavButtons()
     {
         PrevBtn.IsEnabled = viewPly > 0;
         NextBtn.IsEnabled = viewPly < history.Count - 1;
     }
 
-    /// <summary>Clique bouton coup précédent.</summary>
+    /// <summary>Clique bouton coup prÃ©cÃ©dent.</summary>
     private void OnPrevMoveClicked(object sender, EventArgs e)
     {
         if (viewPly <= 0) return; viewPly--; ApplyViewPly();
@@ -520,7 +527,7 @@ public partial class ChessGame : ContentPage
         if (viewPly >= history.Count - 1) return; viewPly++; ApplyViewPly();
     }
 
-    /// <summary>Sélection d'un coup dans la liste pour naviguer dans l'historique.</summary>
+    /// <summary>SÃ©lection d'un coup dans la liste pour naviguer dans l'historique.</summary>
     private void OnMoveSelected(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is MoveItem selectedItem)
@@ -542,7 +549,7 @@ public partial class ChessGame : ContentPage
         UpdateNavButtons();
     }
 
-    /// <summary>Met à jour la sélection visuelle dans la liste des coups selon viewPly.</summary>
+    /// <summary>Met Ã  jour la sÃ©lection visuelle dans la liste des coups selon viewPly.</summary>
     private void UpdateSelection()
     {
         if (viewPly == 0)
@@ -558,7 +565,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Affiche le menu de promotion et exécute la promotion choisie.</summary>
+    /// <summary>Affiche le menu de promotion et exÃ©cute la promotion choisie.</summary>
     private void HandlePromotion(Position from, Position to)
     {
         var (uiFromR, uiFromC) = ToUi(from.Row, from.Column);
@@ -576,59 +583,7 @@ public partial class ChessGame : ContentPage
         };
     }
 
-    private CancellationTokenSource? thinkingAnimCts;
-    private CancellationTokenSource? thinkingBgCts;
-
-    private BoxView? aiPulse;
-    private CancellationTokenSource? aiPulseCts;
-
-    private BoxView? aiConsiderPulse;
-    private CancellationTokenSource? aiConsiderCts;
-
-    /// <summary>Démarre l'animation de surlignage pulsé sur la case origine du coup en cours d'évaluation par l'IA.</summary>
-    private void StartAiConsiderPulse(Position from)
-    {
-        if (!Preferences.Get("pref_ai_consider_highlight", true)) return;
-        var (uiR, uiC) = ToUi(from.Row, from.Column);
-        if (aiConsiderPulse == null)
-        {
-            aiConsiderPulse = new BoxView
-            {
-                Color = Color.FromArgb("#ff0000"),
-                Opacity = 0,
-                InputTransparent = true,
-                IsVisible = true
-            };
-            HighlightGrid.Children.Add(aiConsiderPulse);
-        }
-        Grid.SetRow(aiConsiderPulse, uiR);
-        Grid.SetColumn(aiConsiderPulse, uiC);
-        aiConsiderPulse.IsVisible = true;
-
-        aiConsiderCts?.Cancel();
-        aiConsiderCts = new CancellationTokenSource();
-
-        var pulse = new Animation();
-        pulse.Add(0, 0.5, new Animation(v => aiConsiderPulse.Opacity = v, 0.10, 0.28));
-        pulse.Add(0.5, 1, new Animation(v => aiConsiderPulse.Opacity = v, 0.28, 0.10));
-        pulse.Commit(this, "AiConsiderPulse", rate: 16, length: 900, easing: Easing.SinInOut,
-            finished: (v, c) => { }, repeat: () => aiConsiderCts != null && !aiConsiderCts.IsCancellationRequested);
-    }
-
-    /// <summary>Stoppe l'animation de considération IA et masque le pulse.</summary>
-    private void StopAiConsiderPulse()
-    {
-        aiConsiderCts?.Cancel();
-        aiConsiderCts = null;
-        this.AbortAnimation("AiConsiderPulse");
-        if (aiConsiderPulse != null)
-        {
-            aiConsiderPulse.IsVisible = false;
-            aiConsiderPulse.Opacity = 0;
-        }
-    }
-
-    /// <summary>Détermine et joue le coup de l'IA (livre d'ouverture ou moteur), puis journalisation en Debug.</summary>
+    /// <summary>DÃ©termine et joue le coup de l'IA (livre d'ouverture ou moteur), puis journalisation en Debug.</summary>
     private async Task PlayAiMoveAsync()
     {
         try
@@ -663,18 +618,60 @@ public partial class ChessGame : ContentPage
             await Task.Run(() =>
             {
                 var rootPlayer = gameState.CurrentPlayer;
-                // Appel sans profondeur explicite: le moteur décide jusqu'où aller dans le temps imparti
+                // Appel sans profondeur explicite: le moteur dÃ©cide jusqu'oÃ¹ aller dans le temps imparti
                 bestMove = engine.FindBestMove(
                     gameState,
                     timeMs: (int)thinkingTime.TotalMilliseconds,
-                    onConsider: move => MainThread.BeginInvokeOnMainThread(() => StartAiConsiderPulse(move.FromPos)),
                     onEvaluated: (move, score) => evaluatedList.Add((move, score)),
                     onStats: (generated, nodes, leafs) => { generatedMovesTotal = generated; nodesVisited = nodes; leafEvaluations = leafs; },
                     onEvalUpdate: evaluationCp => MainThread.BeginInvokeOnMainThread(() => UpdateEvalBarFromScore(evaluationCp, rootPlayer))
                 );
             });
 
-            StopAiConsiderPulse();
+
+//#if DEBUG
+//            try
+//            {
+//                // Mets un "stateString" stable : si tu as dÃ©jÃ  StateString, utilise-le.
+//                // Exemple: var stateString = new StateString(gameState.CurrentPlayer, gameState.Board).ToString();
+//                var stateString = "(no stateString)"; // remplace par ton stateString / FEN
+
+//                var entry = new Services.AiDebugTraceEntry
+//                {
+//                    DurationMs = (long)(DateTime.UtcNow - thinkStart).TotalMilliseconds,
+//                    LegalRootCount = rootMoves.Count,
+//                    GeneratedMovesTotal = generatedMovesTotal,
+//                    NodesVisited = nodesVisited,
+//                    LeafEvaluations = leafEvaluations,
+
+//                    BestMoveUci = bestMove != null ? ToUci(bestMove) : null,
+//                    BestScoreCp = bestMove != null ? evaluatedList.FirstOrDefault(e => e.move == bestMove).score : null,
+
+//                    StateString = stateString,
+
+//                    TopRootMoves = evaluatedList
+//                        .OrderByDescending(x => x.score)
+//                        .Take(12)
+//                        .Select(x => (ToUci(x.move), x.score))
+//                        .ToList()
+//                };
+
+//                if (bestMove != null)
+//                {
+//                    var probe = Services.AiBlunderProbe.AnalyzeAfterBestMove(gameState, bestMove);
+//                    entry.AnyImmediateCaptureOnToSquare = probe.AnyImmediateCaptureOnToSquare;
+//                    entry.PawnCapturesQueen = probe.PawnCapturesQueen;
+//                    entry.ImmediateCapturesUci = probe.CapturesUci;
+//                }
+
+//                await Services.DebugFileLogger.AppendJsonLineAsync(entry);
+//            }
+//            catch
+//            {
+//                // debug-only: pas bloquant
+//            }
+//#endif
+
 
             if (bestMove != null)
             {
@@ -707,7 +704,7 @@ public partial class ChessGame : ContentPage
         return File(move.FromPos.Column) + Rank(move.FromPos.Row) + File(move.ToPos.Column) + Rank(move.ToPos.Row);
     }
 
-    /// <summary>Envoie la télémétrie IA (Debug) regroupant performances et scores sur les coups évalués.</summary>
+    /// <summary>Envoie la tÃ©lÃ©mÃ©trie IA (Debug) regroupant performances et scores sur les coups Ã©valuÃ©s.</summary>
     private async Task LogAiTelemetryAsync(DateTime startUtc, DateTime endUtc, int legalRootCount, List<(Move move, int score)> evaluated, Move? best,
         long generatedMovesTotal, long nodesVisited, long leafEvaluations)
     {
@@ -738,31 +735,31 @@ public partial class ChessGame : ContentPage
         return MenuContainer.Content != null;
     }
 
-    /// <summary>Désactive l'interaction directe avec le plateau (utilisé pendant réflexion IA).</summary>
+    /// <summary>DÃ©sactive l'interaction directe avec le plateau (utilisÃ© pendant rÃ©flexion IA).</summary>
     private void DisableInput()
     {
         BoardGrid.InputTransparent = true;
     }
 
-    /// <summary>Ré-active l'interaction directe avec le plateau.</summary>
+    /// <summary>RÃ©-active l'interaction directe avec le plateau.</summary>
     private void EnableInput()
     {
         BoardGrid.InputTransparent = false;
     }
 
-    /// <summary>Modifie l'état vibration sur coups humains.</summary>
+    /// <summary>Modifie l'Ã©tat vibration sur coups humains.</summary>
     public void SetVibrationEnabled(bool enabled)
     {
         vibrationEnabled = enabled;
     }
 
-    /// <summary>Affiche ou masque la barre d'évaluation.</summary>
+    /// <summary>Affiche ou masque la barre d'Ã©valuation.</summary>
     public void SetEvalBarVisible(bool visible)
     {
         EvalBarContainer.IsVisible = visible;
     }
 
-    /// <summary>Mise à jour de la barre d'évaluation (Score centipion -> ratio visuel White/Black).</summary>
+    /// <summary>Mise Ã  jour de la barre d'Ã©valuation (Score centipion -> ratio visuel White/Black).</summary>
     private void UpdateEvalBarFromScore(int scoreCp, Player perspective)
     {
         int whitePovCp = (perspective == Player.White) ? scoreCp : -scoreCp;
@@ -775,7 +772,7 @@ public partial class ChessGame : ContentPage
         EvalLabel.Text = (whitePovCp / 100.0).ToString("0.00");
     }
 
-    /// <summary>Tente de retourner un coup issu du livre d'ouverture à partir de la ligne fournie.</summary>
+    /// <summary>Tente de retourner un coup issu du livre d'ouverture Ã  partir de la ligne fournie.</summary>
     private Move GetBookMoveIfAvailable()
     {
         if (openingLine == null || openingLine.Count == 0) return null;
@@ -788,7 +785,7 @@ public partial class ChessGame : ContentPage
         return legals.FirstOrDefault(move => move.ToAlgebraic(gameState.Board) == alg);
     }
 
-    /// <summary>Normalise un coup d'ouverture texte (supprime numérotation, captures, ellipses).</summary>
+    /// <summary>Normalise un coup d'ouverture texte (supprime numÃ©rotation, captures, ellipses).</summary>
     private static string SanitizeOpeningMove(string fullMove)
     {
         var partsDot = fullMove.Split('.');
@@ -805,14 +802,14 @@ public partial class ChessGame : ContentPage
         return alg;
     }
 
-    /// <summary>Réinitialise l'UI de fin de partie et relance la partie.</summary>
+    /// <summary>RÃ©initialise l'UI de fin de partie et relance la partie.</summary>
     private void OnRestartClicked(object sender, EventArgs e)
     {
         GameOverBanner.IsVisible = false;
         RestartGame();
     }
 
-    /// <summary>Affiche l'overlay fin de partie et déclenche la mise à jour achievements.</summary>
+    /// <summary>Affiche l'overlay fin de partie et dÃ©clenche la mise Ã  jour achievements.</summary>
     private void ShowGameOver()
     {
         WinnerText.Text = GetWinnerText(gameState.Result.Winner);
@@ -821,7 +818,7 @@ public partial class ChessGame : ContentPage
         _ = UpdateAchievementsIfAnyAsync();
     }
 
-    /// <summary>Mise à jour des achievements (victoire rapide, victoire d'ouverture, stats par rating) si conditions remplies.</summary>
+    /// <summary>Mise Ã  jour des achievements (victoire rapide, victoire d'ouverture, stats par rating) si conditions remplies.</summary>
     private async Task UpdateAchievementsIfAnyAsync()
     {
         if (!vsAi || !gameState.IsGameOver() || gameState.Result == null) return;
@@ -850,7 +847,7 @@ public partial class ChessGame : ContentPage
         }
     }
 
-    /// <summary>Réinitialise entièrement la partie (matériel, historique, orientation, livre d'ouverture).</summary>
+    /// <summary>RÃ©initialise entiÃ¨rement la partie (matÃ©riel, historique, orientation, livre d'ouverture).</summary>
     private void RestartGame()
     {
         selectedPos = null;
@@ -883,7 +880,7 @@ public partial class ChessGame : ContentPage
         UpdateSelection();
     }
 
-    /// <summary>Texte de victoire pour le joueur gagnant (anglais conservé pour cohérence UI existante).</summary>
+    /// <summary>Texte de victoire pour le joueur gagnant (anglais conservÃ© pour cohÃ©rence UI existante).</summary>
     private string GetWinnerText(Player winner)
     {
         return winner switch
@@ -894,7 +891,7 @@ public partial class ChessGame : ContentPage
         };
     }
 
-    /// <summary>Texte de la raison de fin de partie (anglais pour cohérence UI).</summary>
+    /// <summary>Texte de la raison de fin de partie (anglais pour cohÃ©rence UI).</summary>
     private string GetReasonText(EndReason reason, Player currentPlayer)
     {
         return reason switch
@@ -908,7 +905,7 @@ public partial class ChessGame : ContentPage
         };
     }
 
-    /// <summary>Renvoie les positions de pièces du même type pouvant aller sur la même case (pour désambiguisation SAN).</summary>
+    /// <summary>Renvoie les positions de piÃ¨ces du mÃªme type pouvant aller sur la mÃªme case (pour dÃ©sambiguisation SAN).</summary>
     private List<Position> FindConflicts(GameState state, Move move, PieceType type)
     {
         var board = state.Board;
@@ -929,7 +926,7 @@ public partial class ChessGame : ContentPage
         return conflictList;
     }
 
-    /// <summary>Simule un coup sur une copie pour évaluer suffixes (+/#).</summary>
+    /// <summary>Simule un coup sur une copie pour Ã©valuer suffixes (+/#).</summary>
     private GameState Simulate(GameState before, Move move)
     {
         var copyState = new GameState(before.CurrentPlayer, before.Board.Copy());
@@ -937,7 +934,7 @@ public partial class ChessGame : ContentPage
         return copyState;
     }
 
-    /// <summary>Calcule le suffixe SAN (+ échec / # mat / vide sinon).</summary>
+    /// <summary>Calcule le suffixe SAN (+ Ã©chec / # mat / vide sinon).</summary>
     private string CheckSuffix(GameState after)
     {
         var toMove = after.CurrentPlayer;
@@ -947,7 +944,7 @@ public partial class ChessGame : ContentPage
         return string.Empty;
     }
 
-    /// <summary>Produit une notation SAN simplifiée du coup donné (sans info subtile de prise en passant etc.).</summary>
+    /// <summary>Produit une notation SAN simplifiÃ©e du coup donnÃ© (sans info subtile de prise en passant etc.).</summary>
     private string ToSanSimple(GameState before, Move move)
     {
         var board = before.Board;
@@ -1002,7 +999,7 @@ public partial class ChessGame : ContentPage
         return core + CheckSuffix(Simulate(before, move));
     }
 
-    /// <summary>Lettre SAN pour une pièce donnée (vide pour pion).</summary>
+    /// <summary>Lettre SAN pour une piÃ¨ce donnÃ©e (vide pour pion).</summary>
     private static string PieceLetterEn(PieceType type)
     {
         return type switch
@@ -1016,7 +1013,7 @@ public partial class ChessGame : ContentPage
         };
     }
 
-    /// <summary>Inverse l'orientation du plateau et réapplique les surlignages pertinents.</summary>
+    /// <summary>Inverse l'orientation du plateau et rÃ©applique les surlignages pertinents.</summary>
     private void OnFlipBoardClicked(object sender, EventArgs e)
     {
         isFlipped = !isFlipped;
@@ -1028,4 +1025,19 @@ public partial class ChessGame : ContentPage
             HighlightLastMove(lastMoveFrom, lastMoveTo);
         }
     }
+
+    private async void OnShareLogsClicked(object sender, EventArgs e)
+    {
+#if DEBUG
+        try
+        {
+            await DebugLogShareService.ShareAsync();
+        }
+        catch
+        {
+            // debug-only : silencieux
+        }
+#endif
+    }
+
 }

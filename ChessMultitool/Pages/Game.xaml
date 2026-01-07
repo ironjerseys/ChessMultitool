@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ContentPage
     x:Class="ChessMultitool.ChessGame"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -44,10 +44,25 @@
             </Grid>
         </Grid>
 
-        <!-- Row 2 : Flip board button -->
-        <Grid Grid.Row="2" Padding="0" HorizontalOptions="Center" Margin="0,2,0,0">
-            <Button Text="Flip board" Clicked="OnFlipBoardClicked" WidthRequest="130" Padding="8,4" />
+        <!-- Row 2 : Flip board + Share logs (debug) -->
+        <Grid Grid.Row="2" Padding="0" HorizontalOptions="Center" Margin="0,2,0,0"
+      ColumnDefinitions="Auto,Auto" ColumnSpacing="10">
+
+            <Button Grid.Column="0"
+            Text="Flip board"
+            Clicked="OnFlipBoardClicked"
+            WidthRequest="130"
+            Padding="8,4" />
+
+            <Button x:Name="ShareLogsBtn"
+            Grid.Column="1"
+            Text="Share logs"
+            Clicked="OnShareLogsClicked"
+            WidthRequest="130"
+            Padding="8,4"
+            IsVisible="False" />
         </Grid>
+
 
         <!-- Row 3 : Captured pieces and material diff (tighter) -->
         <Grid Grid.Row="3" Padding="8,0" ColumnDefinitions="*,*" ColumnSpacing="6" VerticalOptions="Start" Margin="0,2,0,0">

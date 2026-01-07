@@ -1,4 +1,4 @@
-using Microsoft.Maui.Controls;
+﻿using Microsoft.Maui.Controls;
 
 namespace ChessMultitool;
 
@@ -21,7 +21,6 @@ public partial class SettingsPage : ContentPage
         InitThemeSwitch();
         InitBoardPicker();
         InitVibrationSwitch();
-        InitAiConsiderSwitch();
     }
 
     private void InitThemeSwitch()
@@ -54,11 +53,6 @@ public partial class SettingsPage : ContentPage
         VibrationSwitch.IsToggled = vib;
     }
 
-    private void InitAiConsiderSwitch()
-    {
-        bool enabled = Preferences.Get("pref_ai_consider_highlight", true);
-        AiConsiderSwitch.IsToggled = enabled;
-    }
 
     private void OnBoardChanged(object sender, EventArgs e)
     {

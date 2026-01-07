@@ -1,26 +1,26 @@
-using ChessLogic;
+ï»¿using ChessLogic;
 using Newtonsoft.Json;
 
 namespace ChessMultitool;
 
 /// <summary>
 /// Page de configuration avant de lancer une partie contre l'IA.
-/// Permet de choisir la couleur du joueur humain et éventuellement une ouverture/variation.
-/// Le niveau de l'IA est unique: temps de réflexion fixe (modifiable ici si nécessaire).
+/// Permet de choisir la couleur du joueur humain et Ã©ventuellement une ouverture/variation.
+/// Le niveau de l'IA est unique: temps de rÃ©flexion fixe (modifiable ici si nÃ©cessaire).
 /// </summary>
 public partial class AILevelSelectionPage : ContentPage
 {
-    /// <summary>Couleur jouée par l'humain (blanc par défaut).</summary>
+    /// <summary>Couleur jouÃ©e par l'humain (blanc par dÃ©faut).</summary>
     private Player humanColor = Player.White;
 
-    /// <summary>Temps de réflexion fixe de l'IA pour chaque coup (détermine la difficulté).</summary>
-    private TimeSpan aiThinkingTime = TimeSpan.FromSeconds(4);
+    /// <summary>Temps de rÃ©flexion fixe de l'IA pour chaque coup (dÃ©termine la difficultÃ©).</summary>
+    private TimeSpan aiThinkingTime = TimeSpan.FromSeconds(2);
 
-    /// <summary>Données des ouvertures: ouverture -> variation -> liste de coups normalisés.</summary>
+    /// <summary>DonnÃ©es des ouvertures: ouverture -> variation -> liste de coups normalisÃ©s.</summary>
     private Dictionary<string, Dictionary<string, List<string>>> openings;
     /// <summary>Noms des ouvertures disponibles.</summary>
     private List<string> openingNames = new();
-    /// <summary>Variations pour l'ouverture actuellement sélectionnée.</summary>
+    /// <summary>Variations pour l'ouverture actuellement sÃ©lectionnÃ©e.</summary>
     private List<string> variationNames = new();
 
     private const string AnyOpeningLabel = "Any (no restriction)";
@@ -34,21 +34,21 @@ public partial class AILevelSelectionPage : ContentPage
         LoadOpenings();
     }
 
-    /// <summary>Click sélection Blanc.</summary>
+    /// <summary>Click sÃ©lection Blanc.</summary>
     private void OnWhiteClicked(object sender, EventArgs e)
     {
         humanColor = Player.White;
         UpdateColorButtons();
     }
 
-    /// <summary>Click sélection Noir.</summary>
+    /// <summary>Click sÃ©lection Noir.</summary>
     private void OnBlackClicked(object sender, EventArgs e)
     {
         humanColor = Player.Black;
         UpdateColorButtons();
     }
 
-    /// <summary>Met à jour l'état visuel des boutons de couleur.</summary>
+    /// <summary>Met Ã  jour l'Ã©tat visuel des boutons de couleur.</summary>
     private void UpdateColorButtons()
     {
         WhiteBtn.BackgroundColor = Colors.White;
@@ -62,7 +62,7 @@ public partial class AILevelSelectionPage : ContentPage
         BlackBtn.BorderColor = (humanColor == Player.Black) ? Colors.DeepSkyBlue : Colors.Gray;
     }
 
-    /// <summary>Charge la base d'ouvertures depuis le fichier JSON embarqué.</summary>
+    /// <summary>Charge la base d'ouvertures depuis le fichier JSON embarquÃ©.</summary>
     private async void LoadOpenings()
     {
         try
@@ -110,10 +110,10 @@ public partial class AILevelSelectionPage : ContentPage
         VariationPicker.SelectedIndex = 0;
     }
 
-    /// <summary>Variation changée (rien à faire, utilisé à la validation).</summary>
+    /// <summary>Variation changÃ©e (rien Ã  faire, utilisÃ© Ã  la validation).</summary>
     private void OnVariationChanged(object sender, EventArgs e) { }
 
-    /// <summary>Démarre la partie en construisant éventuellement la ligne d'ouverture choisie.</summary>
+    /// <summary>DÃ©marre la partie en construisant Ã©ventuellement la ligne d'ouverture choisie.</summary>
     private async void OnStartClicked(object sender, EventArgs e)
     {
         List<string> chosenLine = null;
@@ -155,7 +155,7 @@ public partial class AILevelSelectionPage : ContentPage
         await Navigation.PushAsync(new OpeningsPage());
     }
 
-    /// <summary>Ouvre la page des succès / achievements.</summary>
+    /// <summary>Ouvre la page des succÃ¨s / achievements.</summary>
     private async void OnAchievementsClicked(object sender, EventArgs e)
     {
         await Navigation.PushAsync(new AchievementsPage());
