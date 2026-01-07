@@ -1,8 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 	<application android:label="Chess" android:allowBackup="true" android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round" android:supportsRtl="true">
+		<meta-data
+	   android:name="com.google.android.gms.ads.APPLICATION_ID"
+	   android:value="ca-app-pub-6452917997330099~1639179442" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
+	<!-- Needed for haptic vibration on moves -->
 	<uses-permission android:name="android.permission.VIBRATE" />
 </manifest>
