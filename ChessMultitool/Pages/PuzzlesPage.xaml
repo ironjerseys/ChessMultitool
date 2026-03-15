@@ -9,12 +9,21 @@
     <Grid Padding="0" RowSpacing="10" RowDefinitions="100,Auto,Auto">
         <!-- Header like Game: shows side to move -->
         <Grid Grid.Row="0" Padding="12,6" RowSpacing="2">
-            <Label x:Name="TurnLabel"
-                   Text=""
-                   FontSize="16"
-                   HorizontalTextAlignment="Center"
-                   VerticalTextAlignment="Center"
-                   TextColor="{DynamicResource GlobalTextColor}" />
+            <VerticalStackLayout HorizontalOptions="FillAndExpand" VerticalOptions="Center" Spacing="2">
+                <Label x:Name="TurnLabel"
+                       Text=""
+                       FontSize="16"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       TextColor="{DynamicResource GlobalTextColor}" />
+                <!-- Rating label placed under the turn text -->
+                <Label x:Name="RatingLabel"
+                       Text=""
+                       FontSize="13"
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"
+                       TextColor="{DynamicResource GlobalTextColor}" />
+            </VerticalStackLayout>
         </Grid>
 
         <!-- Board centered like in Game.xaml -->

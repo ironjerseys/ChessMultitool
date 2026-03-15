@@ -1,3 +1,4 @@
+using System.Linq;
 using ChessLogic;
 using ChessMultitool.Models;
 using ChessMultitool.Services;
@@ -31,13 +32,61 @@ public partial class PuzzlesPage : ContentPage
 
     private int? lastFromUiR, lastFromUiC, lastToUiR, lastToUiC; // track UI coords to clear correctly after flip
 
+    // New: track whether user used a hint or made a wrong attempt on the current puzzle
+    private bool hintUsed = false;
+    private bool hadWrongAttempt = false;
+
+    // New: tuning for selection algorithm
+    private const int RatingStep = 50; // default step between puzzles when increasing/decreasing difficulty
+    private const int RecentHistorySize = 20; // avoid repeating last N puzzles
+    private const string RecentPrefsKey = "puzzles_recent_ids";
+    private List<string> recentPuzzleIds = new();
+
     public PuzzlesPage()
     {
         InitializeComponent();
         BoardGrid.SizeChanged += (s,e) => { BoardGrid.HeightRequest = BoardGrid.Width; };
         InitBoard();
         AddTapGesture();
+        LoadRecentFromPrefs();
         _ = LoadAsync();
+    }
+
+    private void LoadRecentFromPrefs()
+    {
+        try
+        {
+            var raw = Preferences.Get(RecentPrefsKey, string.Empty);
+            if (!string.IsNullOrWhiteSpace(raw))
+                recentPuzzleIds = raw.Split('|', StringSplitOptions.RemoveEmptyEntries).ToList();
+            else
+                recentPuzzleIds = new List<string>();
+        }
+        catch
+        {
+            recentPuzzleIds = new List<string>();
+        }
+    }
+
+    private void SaveRecentToPrefs()
+    {
+        try
+        {
+            var raw = string.Join('|', recentPuzzleIds);
+            Preferences.Set(RecentPrefsKey, raw);
+        }
+        catch { }
+    }
+
+    private void AddToRecent(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id)) return;
+        // keep most recent at front
+        recentPuzzleIds.Remove(id);
+        recentPuzzleIds.Insert(0, id);
+        if (recentPuzzleIds.Count > RecentHistorySize)
+            recentPuzzleIds.RemoveRange(RecentHistorySize, recentPuzzleIds.Count - RecentHistorySize);
+        SaveRecentToPrefs();
     }
 
     private void AddTapGesture()
@@ -90,11 +139,21 @@ public partial class PuzzlesPage : ContentPage
         ClearOverlay();
         PromotionContainer.IsVisible = false;
 
+        // reset per-puzzle tracking flags
+        hintUsed = false;
+        hadWrongAttempt = false;
+
         var p = puzzles[index];
         state = PuzzlesService.LoadPuzzlePosition(p);
         solution = PuzzlesService.GetSolutionMoves(p).ToList();
         isFlipped = state.CurrentPlayer == Player.Black; // initial orientation
         DrawBoard(state.Board); // show initial position first
+
+        // remember this puzzle in recent history to avoid immediate repeats
+        AddToRecent(p.Id);
+
+        // Set puzzle rating in the header
+        RatingLabel.Text = $"Rating: {p.Rating}";
 
         // After initial render, auto-play the first solution move (computer), then keep current flip logic
         if (solution.Count > 0)
@@ -345,27 +404,110 @@ public partial class PuzzlesPage : ContentPage
 
     private async void OnNextPuzzle(object sender, EventArgs e)
     {
-        if (playedCount != solution.Count) return; // only allow when solved
-        if (index < puzzles.Count - 1)
+        // Only allow next when puzzle is completed (existing guard)
+        if (playedCount != solution.Count) return;
+
+        // Determine whether the puzzle was "successfully" solved:
+        // success = completed without using hint and without any wrong attempts.
+        bool success = !hintUsed && !hadWrongAttempt;
+
+        // Choose next puzzle index based on result
+        SelectNextPuzzleBasedOnResult(success);
+
+        // persist index and load
+        Preferences.Set("puzzles_index", index);
+        LoadPuzzle();
+    }
+
+    // Select a next puzzle index:
+    // - success: pick a puzzle with rating >= current + RatingStep (closest above target) and not in recent history when possible
+    // - failure: pick a puzzle with rating <= current - RatingStep (closest below target) and not in recent history when possible
+    // Fallbacks exist if no candidate meets strict step + recent-exclusion criteria.
+    private void SelectNextPuzzleBasedOnResult(bool success)
+    {
+        if (puzzles == null || puzzles.Count == 0) return;
+
+        var currentRating = puzzles[index].Rating;
+
+        // target rating depending on result
+        int target = success ? currentRating + RatingStep : currentRating - RatingStep;
+
+        // candidate selection function: prefer puzzles not in recent history
+        (LichessPuzzle p, int i)? SelectClosest(int desired, bool preferHigher)
         {
-            index++;
-            Preferences.Set("puzzles_index", index);
-            LoadPuzzle();
+            // candidates respecting direction and existence
+            var candidates = puzzles
+                .Select((p, i) => (p, i))
+                .Where(x => preferHigher ? x.p.Rating >= desired : x.p.Rating <= desired)
+                .ToList();
+
+            if (candidates.Count == 0) return null;
+
+            // order by closeness to desired rating
+            var ordered = candidates
+                .OrderBy(x => Math.Abs(x.p.Rating - desired))
+                .ThenBy(x => Math.Abs(x.p.Rating - currentRating)) // tie-break by closeness to current
+                .ToList();
+
+            // try to pick one not in recent list first
+            var notRecent = ordered.FirstOrDefault(x => !recentPuzzleIds.Contains(x.p.Id));
+            if (notRecent.p != null) return notRecent;
+
+            // if all recent, return the top ordered anyway
+            return ordered.FirstOrDefault();
+        }
+
+        // attempt with target step
+        var candidate = success ? SelectClosest(target, preferHigher: true) : SelectClosest(target, preferHigher: false);
+
+        if (candidate != null && candidate.Value.p != null)
+        {
+            index = candidate.Value.i;
+            return;
+        }
+
+        // fallback 1: loosen the step requirement and search for closest strictly higher/lower (previous behavior)
+        if (success)
+        {
+            var cand = puzzles
+                .Select((p, i) => (p, i))
+                .Where(x => x.p.Rating > currentRating)
+                .OrderBy(x => x.p.Rating - currentRating)
+                .FirstOrDefault();
+
+            if (cand.p != null && !recentPuzzleIds.Contains(cand.p.Id))
+            {
+                index = cand.i; return;
+            }
+            if (cand.p != null)
+            {
+                index = cand.i; return;
+            }
+
+            // wrap to hardest if nothing found
+            index = puzzles.Select((p, i) => (p, i)).OrderByDescending(x => x.p.Rating).First().i;
+            return;
         }
         else
         {
-            // Try to extend cache, then wrap if still at the end
-            puzzles = await PuzzlesService.EnsurePuzzlesCachedAsync(puzzles.Count + 500);
-            if (index < puzzles.Count - 1)
+            var cand = puzzles
+                .Select((p, i) => (p, i))
+                .Where(x => x.p.Rating < currentRating)
+                .OrderByDescending(x => x.p.Rating)
+                .FirstOrDefault();
+
+            if (cand.p != null && !recentPuzzleIds.Contains(cand.p.Id))
             {
-                index++;
+                index = cand.i; return;
             }
-            else
+            if (cand.p != null)
             {
-                index = 0; // wrap to start
+                index = cand.i; return;
             }
-            Preferences.Set("puzzles_index", index);
-            LoadPuzzle();
+
+            // wrap to easiest if nothing found
+            index = puzzles.Select((p, i) => (p, i)).OrderBy(x => x.p.Rating).First().i;
+            return;
         }
     }
 
@@ -506,6 +648,9 @@ public partial class PuzzlesPage : ContentPage
 
     private void ShowWrongAttempt(Position fromSel, Position pos)
     {
+        // mark that user made a wrong attempt (affects next puzzle selection)
+        hadWrongAttempt = true;
+
         ClearOverlay();
         var piece = state.Board[fromSel];
         if (piece != null)
@@ -555,6 +700,10 @@ public partial class PuzzlesPage : ContentPage
     {
         if (PromotionContainer.IsVisible) return; // ignore during promotion choice
         if (solution.Count <= solPtr) return;
+
+        // Using a hint is equivalent to failing the puzzle for rating adjustment
+        hintUsed = true;
+
         var (from, to) = ParseUciPositions(solution[solPtr]);
         if (hintStage == 0)
         {
