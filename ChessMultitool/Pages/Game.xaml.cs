@@ -1,11 +1,7 @@
 ﻿using ChessLogic;
 using ChessMultitool.Logic;
 using System.Collections.ObjectModel;
-using Microsoft.Maui.Storage; // Preferences
-using Microsoft.Maui.Devices; // Vibration
 using ChessMultitool.Services;
-using System.Threading;
-using System.Linq;
 
 namespace ChessMultitool;
 
@@ -89,8 +85,10 @@ public partial class ChessGame : ContentPage
         CreateGrids();
         gameState = new GameState(Player.White, Board.Initial());
         history.Add(Clone(gameState));
-        // Charge préférence de flip; par défaut: retourné si l'humain joue les noirs
-        isFlipped = Preferences.Get("pref_board_flipped", humanColor == Player.Black);
+
+        // Flip retourné si l'humain joue les noirs
+        isFlipped = humanColor == Player.Black;
+
         DrawBoard(gameState.Board);
         MovesView.ItemsSource = moves;
         AddTapGesture();
@@ -1017,7 +1015,7 @@ public partial class ChessGame : ContentPage
     private void OnFlipBoardClicked(object sender, EventArgs e)
     {
         isFlipped = !isFlipped;
-        Preferences.Set("pref_board_flipped", isFlipped);
+        //Preferences.Set("pref_board_flipped", isFlipped);
         DrawBoard(gameState.Board);
         UpdateSelection();
         if (lastMoveFrom != null && lastMoveTo != null)
