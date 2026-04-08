@@ -14,7 +14,7 @@ jobs:
     defaults:
       run:
         shell: powershell
-        working-directory: ${{ github.workspace }}/ChessMultitool
+        working-directory: ${{ github.workspace }}
 
     steps:
       - name: Checkout
@@ -42,13 +42,17 @@ jobs:
           dotnet workload install android --skip-manifest-update
           try { dotnet workload install maui-android --skip-manifest-update } catch { Write-Host "maui-android skipped" }
 
-      - name: Restore
-        run: dotnet restore ChessMultitool.csproj
+      - name: Restore solution
+        run: dotnet restore ChessMultitool.sln
 
       - name: Sonar begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          if ([string]::IsNullOrWhiteSpace($env:SONAR_TOKEN)) {
+            throw "SONAR_TOKEN is empty or missing"
+          }
+
           dotnet sonarscanner begin `
             /k:"ironjerseys_ChessMultitool" `
             /o:"jorisreynes" `
@@ -60,8 +64,8 @@ jobs:
             throw "Sonar begin did not create .sonarqube\conf\SonarQubeAnalysisConfig.xml"
           }
 
-      - name: Build
-        run: dotnet build ChessMultitool.csproj -c Release --no-restore --no-incremental
+      - name: Build solution
+        run: dotnet build ChessMultitool.sln -c Release --no-restore --no-incremental
 
       - name: Sonar end
         env:
