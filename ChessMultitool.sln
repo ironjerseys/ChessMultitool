@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.13.35818.85
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11626.88 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessMultitool", "ChessMultitool\ChessMultitool.csproj", "{2A2D3953-EE78-48D0-AA2E-8FC3B3467828}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessMultitool.Tests", "ChessMultitool.Tests\ChessMultitool.Tests.csproj", "{46F57EBC-9C13-0F9D-68C2-23CFEE63A016}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +19,10 @@ Global
 		{2A2D3953-EE78-48D0-AA2E-8FC3B3467828}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A2D3953-EE78-48D0-AA2E-8FC3B3467828}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2A2D3953-EE78-48D0-AA2E-8FC3B3467828}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{46F57EBC-9C13-0F9D-68C2-23CFEE63A016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46F57EBC-9C13-0F9D-68C2-23CFEE63A016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46F57EBC-9C13-0F9D-68C2-23CFEE63A016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46F57EBC-9C13-0F9D-68C2-23CFEE63A016}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
