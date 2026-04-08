@@ -1,4 +1,5 @@
 name: SonarCloud
+
 on:
   push:
     branches: [ master ]
@@ -9,6 +10,11 @@ jobs:
   build:
     name: Build and analyze
     runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: powershell
+        working-directory: ${{ github.workspace }}
 
     steps:
       - name: Checkout
@@ -27,78 +33,41 @@ jobs:
         with:
           dotnet-version: "9.0.x"
 
-      - name: Show dotnet info
-        shell: powershell
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Install Android/Maui workloads
         run: |
-          dotnet --info
-
-      - name: Cache SonarCloud packages
-        uses: actions/cache@v4
-        with:
-          path: ~\sonar\cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Cache SonarCloud scanner
-        id: cache-sonar-scanner
-        uses: actions/cache@v4
-        with:
-          path: ${{ runner.temp }}\scanner
-          key: ${{ runner.os }}-sonar-scanner
-          restore-keys: ${{ runner.os }}-sonar-scanner
-
-      - name: Install SonarCloud scanner
-        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
-        run: |
-          New-Item -Path "${{ runner.temp }}\scanner" -ItemType Directory -Force | Out-Null
-          dotnet tool update dotnet-sonarscanner --tool-path "${{ runner.temp }}\scanner"
-
-      - name: Locate build target (.sln preferred)
-        shell: powershell
-        run: |
-          $solution = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.sln | Select-Object -First 1
-          if ($solution) {
-            "BUILD_TARGET=$($solution.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
-            Write-Host "Using solution: $($solution.FullName)"
-            exit 0
-          }
-
-          $project = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Recurse -Filter *.csproj | Select-Object -First 1
-          if (-not $project) { throw "No .sln or .csproj found in repo." }
-
-          "BUILD_TARGET=$($project.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Write-Host "Using project: $($project.FullName)"
-
-      - name: Install Android/Maui workloads (required for net9.0-android)
-        shell: powershell
-        run: |
-          # Option 1: restore workloads based on the project
           dotnet workload restore
+          dotnet workload install android --skip-manifest-update
+          try { dotnet workload install maui-android --skip-manifest-update } catch { Write-Host "maui-android skipped" }
 
-          # Option 2 (safety): ensure android / maui-android are present
-          # (ignore errors if a workload name isn't available on this SDK)
-          try { dotnet workload install android --skip-manifest-update } catch { Write-Host "android workload install skipped/failed: $($_.Exception.Message)" }
-          try { dotnet workload install maui-android --skip-manifest-update } catch { Write-Host "maui-android workload install skipped/failed: $($_.Exception.Message)" }
+      - name: Restore solution
+        run: dotnet restore ChessMultitool.sln
 
-      - name: Restore
-        shell: powershell
-        run: |
-          dotnet restore "$env:BUILD_TARGET"
-
-      - name: Build and analyze (SonarCloud)
+      - name: Sonar begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
         run: |
-          $scanner = "${{ runner.temp }}\scanner\dotnet-sonarscanner"
+          if ([string]::IsNullOrWhiteSpace($env:SONAR_TOKEN)) {
+            throw "SONAR_TOKEN is empty or missing"
+          }
 
-          & $scanner begin `
+          dotnet sonarscanner begin `
             /k:"ironjerseys_ChessMultitool" `
             /o:"jorisreynes" `
+            /d:sonar.host.url="https://sonarcloud.io" `
             /d:sonar.token="$env:SONAR_TOKEN" `
             /d:sonar.scanner.skipJreProvisioning=true
 
-          dotnet build "$env:BUILD_TARGET" -c Release --no-restore
+          if (-not (Test-Path ".sonarqube\conf\SonarQubeAnalysisConfig.xml")) {
+            throw "Sonar begin did not create .sonarqube\conf\SonarQubeAnalysisConfig.xml"
+          }
 
-          & $scanner end /d:sonar.token="$env:SONAR_TOKEN"
+      - name: Build solution
+        run: dotnet build ChessMultitool.sln -c Release --no-restore --no-incremental
+
+      - name: Sonar end
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
