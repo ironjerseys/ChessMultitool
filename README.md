@@ -15,6 +15,9 @@ Le dossier `ChessMultitool.Tests` contient des tests orientés moteur d'échecs 
 
 ```bash
 dotnet test ChessMultitool.Tests/ChessMultitool.Tests.csproj -c Release --logger "console;verbosity=detailed"
+
+# Génère le coverage OpenCover (compatible SonarCloud)
+dotnet test ChessMultitool.Tests/ChessMultitool.Tests.csproj -c Release /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:IncludeTestAssembly=true /p:CoverletOutput=ChessMultitool.Tests/TestResults/coverage.opencover.xml
 ```
 
 Le test de performance est conçu pour rester stable en CI (assertions minimales), tout en affichant des métriques exploitables pour suivre l'évolution du moteur.
