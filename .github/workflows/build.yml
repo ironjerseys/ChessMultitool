@@ -80,8 +80,10 @@ jobs:
           dotnet test .\ChessMultitool.Tests\ChessMultitool.Tests.csproj `
             -c Release `
             --no-build `
-            --collect:"XPlat Code Coverage" `
-            --settings .\ChessMultitool.Tests\coverlet.runsettings `
+            /p:CollectCoverage=true `
+            /p:CoverletOutputFormat=opencover `
+            /p:IncludeTestAssembly=true `
+            /p:CoverletOutput=.\ChessMultitool.Tests\TestResults\coverage.opencover.xml `
             --results-directory .\ChessMultitool.Tests\TestResults
 
       - name: Sonar end
