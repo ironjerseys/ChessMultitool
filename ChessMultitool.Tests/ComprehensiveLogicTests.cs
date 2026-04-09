@@ -184,14 +184,16 @@ public class ComprehensiveLogicTests
     [Fact]
     public void GameState_MakeMove_DetectsThreefoldRepetition()
     {
-        var state = Fen.FromFen("8/8/8/8/8/8/N7/k1K5 w - - 0 1");
+        // k at a8 (0,0), black rook at g2 (6,6), white king at c1 (7,2). Black to move.
+        // Rook oscillates g2-f2 while the white king shuffles c1-d1.
+        var state = Fen.FromFen("k7/8/8/8/8/8/6r1/2K5 b - - 0 1");
 
         for (var i = 0; i < 2; i++)
         {
-            state.MakeMove(new NormalMove(new Position(6, 0), new Position(4, 1))); // Na2-b4
-            state.MakeMove(new NormalMove(new Position(7, 0), new Position(6, 0))); // Ka1-a2
-            state.MakeMove(new NormalMove(new Position(4, 1), new Position(6, 0))); // Nb4-a2
-            state.MakeMove(new NormalMove(new Position(6, 0), new Position(7, 0))); // Ka2-a1
+            state.MakeMove(new NormalMove(new Position(6, 6), new Position(6, 5))); // Rg2-f2
+            state.MakeMove(new NormalMove(new Position(7, 2), new Position(7, 3))); // Kc1-d1
+            state.MakeMove(new NormalMove(new Position(6, 5), new Position(6, 6))); // Rf2-g2
+            state.MakeMove(new NormalMove(new Position(7, 3), new Position(7, 2))); // Kd1-c1
         }
 
         Assert.True(state.IsGameOver());
@@ -202,9 +204,9 @@ public class ComprehensiveLogicTests
     public void Position_OperatorsAndSquareColor_WorkAsExpected()
     {
         var pos = new Position(4, 4);
-        var shifted = pos + Direction.NorthWest;
+        var shifted = pos + Direction.North;
 
-        Assert.Equal(new Position(3, 3), shifted);
+        Assert.Equal(new Position(3, 4), shifted);
         Assert.Equal(Player.White, pos.SquareColor());
         Assert.Equal(Player.Black, shifted.SquareColor());
         Assert.True(pos != shifted);
