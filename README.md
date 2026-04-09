@@ -15,6 +15,9 @@ Le dossier `ChessMultitool.Tests` contient des tests orientés moteur d'échecs 
 
 ```bash
 dotnet test ChessMultitool.Tests/ChessMultitool.Tests.csproj -c Release --logger "console;verbosity=detailed"
+
+# Génère aussi le coverage (cobertura + opencover) avec include de l'assembly de tests
+dotnet test ChessMultitool.Tests/ChessMultitool.Tests.csproj -c Release --collect:"XPlat Code Coverage" --settings ChessMultitool.Tests/coverlet.runsettings
 ```
 
 Le test de performance est conçu pour rester stable en CI (assertions minimales), tout en affichant des métriques exploitables pour suivre l'évolution du moteur.
