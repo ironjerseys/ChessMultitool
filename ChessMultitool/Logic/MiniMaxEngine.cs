@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace ChessLogic;
 
@@ -7,7 +7,7 @@ public class MiniMaxEngine
     private const int INF = 1_000_000;
     private const int QUIESCENCE_MAX_DEPTH = 4;
 
-    // Valeurs de base des pièces (centi-pions)
+    // ── Valeurs des pièces (centi-pions) ─────────────────────────────────────
     private static readonly Dictionary<PieceType, int> PieceValues = new()
     {
         { PieceType.Pawn,   100 },
@@ -18,11 +18,9 @@ public class MiniMaxEngine
         { PieceType.King,     0 },
     };
 
-
-    // Option : tables de pièces simples (à affiner)
+    // ── Table de valeurs positionnelles pour les pions ────────────────────────
     static readonly int[,] PawnTableWhite = new int[8, 8]
     {
-        // rank 8 -> 1 (index 0 = rang 0 de ton array, à adapter à ton sens de l’échiquier)
         { 0,   0,   0,   0,   0,   0,   0,   0 },
         { 5,  10,  10, -10, -10,  10,  10,   5 },
         { 5,  10,  20,  20,  20,  20,  10,   5 },
@@ -33,27 +31,103 @@ public class MiniMaxEngine
         { 0,   0,   0,   0,   0,   0,   0,   0 },
     };
 
+    // ── Table de transposition ────────────────────────────────────────────────
+    private const int    TT_SIZE    = 1 << 20; // ~1 million d'entrées ≈ 16 Mo
+    private const byte   BOUND_UPPER = 0;       // score est une borne supérieure (fail-low)
+    private const byte   BOUND_LOWER = 1;       // score est une borne inférieure (fail-high / beta cutoff)
+    private const byte   BOUND_EXACT = 2;       // score exact
+
+    private struct TTEntry
+    {
+        public ulong Hash;
+        public int   Score;
+        public byte  Depth;
+        public byte  Bound;
+    }
+
+    private readonly TTEntry[] _tt = new TTEntry[TT_SIZE];
+
+    private void TTStore(ulong hash, int score, int depth, byte bound)
+    {
+        // Ne pas stocker les scores de mat (dépendants du ply)
+        if (Math.Abs(score) > INF - 1000) return;
+
+        int idx = (int)(hash & (TT_SIZE - 1));
+        ref TTEntry entry = ref _tt[idx];
+
+        // Stratégie : conserver l'entrée si elle est à une plus grande profondeur
+        // (sauf si c'est une position différente)
+        if (entry.Hash == hash && entry.Depth > depth) return;
+
+        entry.Hash  = hash;
+        entry.Score = score;
+        entry.Depth = (byte)Math.Min(depth, 255);
+        entry.Bound = bound;
+    }
+
+    private bool TTProbe(ulong hash, int depth, int alpha, int beta, out int score)
+    {
+        score = 0;
+        int idx = (int)(hash & (TT_SIZE - 1));
+        ref TTEntry entry = ref _tt[idx];
+
+        if (entry.Hash != hash || entry.Depth < depth) return false;
+
+        score = entry.Score;
+        if (entry.Bound == BOUND_EXACT) return true;
+        if (entry.Bound == BOUND_LOWER && score >= beta)  return true;
+        if (entry.Bound == BOUND_UPPER && score <= alpha) return true;
+        return false;
+    }
+
+    // ── Killer Moves (2 par ply, jusqu'à 64 plies) ───────────────────────────
+    private const int MAX_PLY = 64;
+    private readonly Move?[,] _killers = new Move?[MAX_PLY, 2];
+
+    private void StoreKiller(int ply, Move move)
+    {
+        if (ply >= MAX_PLY) return;
+        if (!SameMove(_killers[ply, 0], move))
+        {
+            _killers[ply, 1] = _killers[ply, 0];
+            _killers[ply, 0] = move;
+        }
+    }
+
+    private bool IsKiller(int ply, Move move)
+    {
+        if (ply >= MAX_PLY) return false;
+        return SameMove(_killers[ply, 0], move) || SameMove(_killers[ply, 1], move);
+    }
+
+    private static bool SameMove(Move? a, Move? b)
+    {
+        if (a == null || b == null) return false;
+        return a.FromPos == b.FromPos && a.ToPos == b.ToPos && a.Type == b.Type;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
     /// <summary>
     /// Approfondissement itératif : de la profondeur 1 à depth,
     /// limité par timeMs. Retourne le meilleur coup trouvé à la dernière
     /// profondeur complètement terminée.
     /// </summary>
     public Move? FindBestMove(
-    GameState state,
-    int depth = 3,
-    int timeMs = 2000,
-    Action<Move, int>? onEvaluated = null,
-    Action<long, long, long>? onStats = null,
-    Action<int>? onEvalUpdate = null)
+        GameState state,
+        int depth = 8,
+        int timeMs = 2000,
+        Action<Move, int>? onEvaluated = null,
+        Action<long, long, long>? onStats = null,
+        Action<int>? onEvalUpdate = null)
     {
         var sw = Stopwatch.StartNew();
 
-        // Copie unique pour la recherche
         var searchState = new GameState(state.CurrentPlayer, state.Board.Copy());
 
-        long nodesVisited = 0;
+        long nodesVisited       = 0;
         long generatedMovesTotal = 0;
-        long leafEvaluations = 0;
+        long leafEvaluations    = 0;
 
         var rootMoves = GenerateAllLegalMoves(searchState);
         if (rootMoves.Count == 0)
@@ -62,26 +136,24 @@ public class MiniMaxEngine
             return null;
         }
 
-        OrderMoves(searchState, rootMoves);
+        OrderMoves(searchState, rootMoves, 0);
 
-        Move? bestSoFar = null;
-        int bestScoreSoFar = -INF;
+        // Réinitialiser les killers pour cette nouvelle recherche
+        Array.Clear(_killers, 0, _killers.Length);
 
-        // Important : Move comme clé => OK si ce sont les mêmes instances dans rootMoves.
-        var lastDepthScores = new Dictionary<Move, int>(rootMoves.Count);
+        Move? bestSoFar       = null;
+        int   bestScoreSoFar  = -INF;
+        var   lastDepthScores = new Dictionary<Move, int>(rootMoves.Count);
 
         for (int currentDepth = 1; currentDepth <= depth; currentDepth++)
         {
-            if (sw.ElapsedMilliseconds >= timeMs)
-                break;
+            if (sw.ElapsedMilliseconds >= timeMs) break;
 
             bool completedDepth = true;
-
-            int alpha = -INF;
-            int beta = INF;
+            int  alpha          = -INF;
+            int  beta           = INF;
             Move? bestAtThisDepth = null;
 
-            // Optionnel : pas obligatoire, mais plus propre
             lastDepthScores.Clear();
 
             foreach (var move in rootMoves)
@@ -97,19 +169,14 @@ public class MiniMaxEngine
                 int score;
                 try
                 {
-                    // IMPORTANT :
-                    // - Si ta Search a encore un param onEvalUpdate, passe null pour éviter tout callback UI en récursif.
-                    // - Si tu as déjà supprimé ce param de Search, enlève simplement l’argument "onEvalUpdate: null".
                     score = -Search(
                         searchState,
                         currentDepth - 1,
-                        -beta,
-                        -alpha,
-                        sw,
-                        timeMs,
-                        ref nodesVisited,
-                        ref generatedMovesTotal,
-                        ref leafEvaluations
+                        -beta, -alpha,
+                        ply: 1,
+                        allowNullMove: true,
+                        sw, timeMs,
+                        ref nodesVisited, ref generatedMovesTotal, ref leafEvaluations
                     );
                 }
                 finally
@@ -117,38 +184,29 @@ public class MiniMaxEngine
                     searchState.UnmakeMoveFast(undo);
                 }
 
-                //onEvaluated?.Invoke(move, score);
                 lastDepthScores[move] = score;
 
                 if (score > alpha)
                 {
-                    alpha = score;
-                    bestAtThisDepth = move;
-
-                    // Je recommande de NE PAS updater l’UI ici.
-                    // Si tu veux absolument, mets un throttle.
-                    // onEvalUpdate?.Invoke(alpha);
+                    alpha             = score;
+                    bestAtThisDepth   = move;
                 }
             }
 
-            // Si on n’a pas fini cette profondeur, on NE la valide pas.
-            // On conserve bestSoFar (profondeur précédente complète).
             if (!completedDepth || bestAtThisDepth == null)
             {
-                // Cas extrême : aucune profondeur complète (rare). On prend quand même le meilleur partiel.
                 if (bestSoFar == null && bestAtThisDepth != null)
                 {
-                    bestSoFar = bestAtThisDepth;
+                    bestSoFar      = bestAtThisDepth;
                     bestScoreSoFar = alpha;
                 }
                 break;
             }
 
-            // Profondeur complète => on valide
-            bestSoFar = bestAtThisDepth;
+            bestSoFar      = bestAtThisDepth;
             bestScoreSoFar = alpha;
 
-            // Réordonnancement sans allocations LINQ (optionnel mais mieux)
+            // Réordonner les coups racine selon les scores de cette profondeur
             rootMoves.Sort((a, b) =>
             {
                 int sb = lastDepthScores.TryGetValue(b, out var vb) ? vb : int.MinValue;
@@ -159,468 +217,404 @@ public class MiniMaxEngine
 
         onStats?.Invoke(generatedMovesTotal, nodesVisited, leafEvaluations);
 
-        // Update UI une seule fois, à la fin (si tu en as besoin)
         if (bestSoFar != null)
             onEvalUpdate?.Invoke(bestScoreSoFar);
 
         return bestSoFar ?? rootMoves[0];
     }
 
-
     /// <summary>
-    /// Recherche récursive negamax avec élagage alpha-beta.
-    /// Quand depthRemaining <= 0 on bascule en quiescence.
-    /// Si le temps est dépassé, on renvoie une évaluation statique.
+    /// Recherche récursive negamax avec alpha-beta, table de transposition,
+    /// killer moves et null move pruning.
     /// </summary>
     private int Search(
         GameState currentState,
         int depthRemaining,
-        int alpha,
-        int beta,
-        Stopwatch stopwatch,
-        int timeMs,
-        ref long nodesVisited,
-        ref long generatedMovesTotal,
-        ref long leafEvaluations)
+        int alpha, int beta,
+        int ply,
+        bool allowNullMove,
+        Stopwatch stopwatch, int timeMs,
+        ref long nodesVisited, ref long generatedMovesTotal, ref long leafEvaluations)
     {
         nodesVisited++;
 
-        // Limite de temps : pas de quiescence, on s'arrête net ici
         if (stopwatch.ElapsedMilliseconds > timeMs)
             return Evaluate(currentState);
 
-        // Profondeur principale épuisée → quiescence
+        // ── Table de transposition : probe ────────────────────────────────────
+        ulong hash = currentState.ZobristHash;
+        if (TTProbe(hash, depthRemaining, alpha, beta, out int ttScore))
+            return ttScore;
+
+        // ── Profondeur épuisée → quiescence ───────────────────────────────────
         if (depthRemaining <= 0)
         {
             return Quiescence(
-                currentState,
-                alpha,
-                beta,
-                QUIESCENCE_MAX_DEPTH,
-                stopwatch,
-                timeMs,
-                ref nodesVisited,
-                ref generatedMovesTotal,
-                ref leafEvaluations);
+                currentState, alpha, beta,
+                QUIESCENCE_MAX_DEPTH, ply,
+                stopwatch, timeMs,
+                ref nodesVisited, ref generatedMovesTotal, ref leafEvaluations);
         }
 
+        bool inCheck = currentState.Board.IsInCheck(currentState.CurrentPlayer);
+
+        // ── Null Move Pruning ─────────────────────────────────────────────────
+        // Conditions : pas en échec, pas deux null moves de suite, profondeur ≥ 3,
+        // pas en finale (risque de zugzwang).
+        if (allowNullMove
+            && !inCheck
+            && depthRemaining >= 3
+            && !IsEndgameBoard(currentState))
+        {
+            const int R = 2; // réduction de profondeur
+            currentState.MakeNullMove(out var nullUndo);
+
+            int nullScore = -Search(
+                currentState,
+                depthRemaining - 1 - R,
+                -beta, -beta + 1,
+                ply + 1,
+                allowNullMove: false,
+                stopwatch, timeMs,
+                ref nodesVisited, ref generatedMovesTotal, ref leafEvaluations);
+
+            currentState.UnmakeNullMove(nullUndo);
+
+            if (nullScore >= beta)
+            {
+                TTStore(hash, beta, depthRemaining, BOUND_LOWER);
+                return beta;
+            }
+        }
+
+        // ── Génération et tri des coups ───────────────────────────────────────
         var legalMoves = GenerateAllLegalMoves(currentState);
         generatedMovesTotal += legalMoves.Count;
 
-        if (legalMoves.Count == 0)
-            return TerminalScore(currentState);
+        if (legalMoves.Count == 0) return TerminalScore(currentState);
 
-        OrderMoves(currentState, legalMoves);
+        OrderMoves(currentState, legalMoves, ply);
+
+        byte bound = BOUND_UPPER;
 
         foreach (var move in legalMoves)
         {
-            //var nextState = Copy(currentState);
-            //nextState.MakeMove(move);
-
             currentState.MakeMoveFast(move, out var undo);
 
             int score = -Search(
                 currentState,
                 depthRemaining - 1,
-                -beta,
-                -alpha,
-                stopwatch,
-                timeMs,
-                ref nodesVisited,
-                ref generatedMovesTotal,
-                ref leafEvaluations);
+                -beta, -alpha,
+                ply + 1,
+                allowNullMove: true,
+                stopwatch, timeMs,
+                ref nodesVisited, ref generatedMovesTotal, ref leafEvaluations);
 
             currentState.UnmakeMoveFast(undo);
 
             if (score >= beta)
-                return beta; // élagage beta
+            {
+                // Coupure beta : stocker comme killer si c'est un coup silencieux
+                if (!IsCapture(currentState, move) && !IsPromotion(move))
+                    StoreKiller(ply, move);
+
+                TTStore(hash, score, depthRemaining, BOUND_LOWER);
+                return beta;
+            }
 
             if (score > alpha)
             {
                 alpha = score;
+                bound = BOUND_EXACT;
             }
 
-            if (stopwatch.ElapsedMilliseconds > timeMs)
-                break;
+            if (stopwatch.ElapsedMilliseconds > timeMs) break;
         }
 
+        TTStore(hash, alpha, depthRemaining, bound);
         return alpha;
     }
 
     /// <summary>
-    /// Recherche de quiétude : stand-pat puis prolongation
-    /// uniquement sur coups tactiques (captures / promotions / échecs).
+    /// Recherche de quiétude : stand-pat puis prolongation sur coups tactiques.
     /// </summary>
     private int Quiescence(
         GameState currentState,
-        int alpha,
-        int beta,
+        int alpha, int beta,
         int qDepth,
-        Stopwatch stopwatch,
-        int timeMs,
-        ref long nodesVisited,
-        ref long generatedMovesTotal,
-        ref long leafEvaluations)
+        int ply,
+        Stopwatch stopwatch, int timeMs,
+        ref long nodesVisited, ref long generatedMovesTotal, ref long leafEvaluations)
     {
         nodesVisited++;
 
-        // Sécurité temps / profondeur
         if (stopwatch.ElapsedMilliseconds > timeMs || qDepth <= 0)
             return Evaluate(currentState);
 
         leafEvaluations++;
         int standPat = Evaluate(currentState);
 
-        // Si on n'est pas en échec et que le stand-pat dépasse beta, cutoff
         bool inCheck = currentState.Board.IsInCheck(currentState.CurrentPlayer);
-        if (!inCheck && standPat >= beta)
-            return beta;
-
-        if (standPat > alpha)
-            alpha = standPat;
+        if (!inCheck && standPat >= beta) return beta;
+        if (standPat > alpha) alpha = standPat;
 
         var allMoves = GenerateAllLegalMoves(currentState);
         generatedMovesTotal += allMoves.Count;
 
+        // Position terminale (mat / pat) détectée en quiescence
+        if (allMoves.Count == 0) return TerminalScore(currentState);
+
         foreach (var move in allMoves)
         {
-            if (!IsTacticalWithCheck(currentState, move))
-                continue;
-
-            //var next = Copy(currentState);
-            //next.MakeMove(move);
+            if (!IsTacticalWithCheck(currentState, move)) continue;
 
             currentState.MakeMoveFast(move, out var undo);
 
             int score = -Quiescence(
-                currentState,
-                -beta,
-                -alpha,
-                qDepth - 1,
-                stopwatch,
-                timeMs,
-                ref nodesVisited,
-                ref generatedMovesTotal,
-                ref leafEvaluations);
+                currentState, -beta, -alpha,
+                qDepth - 1, ply + 1,
+                stopwatch, timeMs,
+                ref nodesVisited, ref generatedMovesTotal, ref leafEvaluations);
 
             currentState.UnmakeMoveFast(undo);
 
-            if (score >= beta)
-                return beta;
-
-            if (score > alpha)
-                alpha = score;
+            if (score >= beta) return beta;
+            if (score > alpha) alpha = score;
         }
 
         return alpha;
     }
 
-    /// <summary>
-    /// Score terminal pour mat / pat.
-    /// </summary>
+    /// <summary>Score terminal pour mat / pat.</summary>
     private int TerminalScore(GameState s)
     {
-        var toMove = s.CurrentPlayer;
-        bool inCheck = s.Board.IsInCheck(toMove);
-        if (inCheck)
-            return -INF + 1000; // mat contre le camp au trait
-        return 0; // pat
+        bool inCheck = s.Board.IsInCheck(s.CurrentPlayer);
+        return inCheck ? -INF + 1000 : 0;
     }
 
     /// <summary>
-    /// Évalue la position : matériel + quelques bonus positionnels simples,
-    /// puis renvoie le score du point de vue du camp au trait (negamax).
+    /// Évalue la position : matériel + bonus positionnels.
+    /// Retourne le score du point de vue du camp au trait (negamax).
     /// </summary>
     private int Evaluate(GameState state)
     {
-        int materialWhite = 0;
-        int materialBlack = 0;
-
-        int nonPawnMaterialWhite = 0;
-        int nonPawnMaterialBlack = 0;
+        int materialWhite = 0, materialBlack = 0;
+        int nonPawnMaterialWhite = 0, nonPawnMaterialBlack = 0;
 
         Position? whiteKingPosition = null;
         Position? blackKingPosition = null;
 
-        // Nombre de pions par colonne (fichier)
         int[] whitePawnsByFile = new int[8];
         int[] blackPawnsByFile = new int[8];
 
-        // Parcours du plateau une seule fois
         for (int rowIndex = 0; rowIndex < 8; rowIndex++)
         {
             for (int columnIndex = 0; columnIndex < 8; columnIndex++)
             {
                 var piece = state.Board[rowIndex, columnIndex];
-                if (piece == null)
-                {
-                    continue;
-                }
+                if (piece == null) continue;
 
                 int pieceBaseValue = PieceValues[piece.Type];
 
-                // Matériel brut + suivi du matériel "non-pion" pour détecter la finale
                 if (piece.Color == Player.White)
                 {
                     materialWhite += pieceBaseValue;
-
                     if (piece.Type != PieceType.Pawn && piece.Type != PieceType.King)
-                    {
                         nonPawnMaterialWhite += pieceBaseValue;
-                    }
                 }
                 else
                 {
                     materialBlack += pieceBaseValue;
-
                     if (piece.Type != PieceType.Pawn && piece.Type != PieceType.King)
-                    {
                         nonPawnMaterialBlack += pieceBaseValue;
-                    }
                 }
 
-                // Bonus / pénalités positionnelles simples
                 switch (piece.Type)
                 {
                     case PieceType.Pawn:
                         if (piece.Color == Player.White)
                         {
                             whitePawnsByFile[columnIndex]++;
-                            // Table de valeurs par case pour les pions blancs
                             materialWhite += PawnTableWhite[rowIndex, columnIndex];
                         }
                         else
                         {
                             blackPawnsByFile[columnIndex]++;
-                            // On "miroire" verticalement la table pour les noirs
                             materialBlack += PawnTableWhite[7 - rowIndex, columnIndex];
                         }
                         break;
 
                     case PieceType.Knight:
-                        bool knightIsCentral =
-                            rowIndex >= 2 && rowIndex <= 5 &&
-                            columnIndex >= 2 && columnIndex <= 5;
-
-                        if (knightIsCentral)
+                        if (rowIndex >= 2 && rowIndex <= 5 && columnIndex >= 2 && columnIndex <= 5)
                         {
-                            const int knightCentralBonus = 10;
-                            if (piece.Color == Player.White)
-                            {
-                                materialWhite += knightCentralBonus;
-                            }
-                            else
-                            {
-                                materialBlack += knightCentralBonus;
-                            }
+                            if (piece.Color == Player.White) materialWhite += 10;
+                            else materialBlack += 10;
                         }
                         break;
 
                     case PieceType.Bishop:
-                        bool bishopIsCentral =
-                            rowIndex >= 2 && rowIndex <= 5 &&
-                            columnIndex >= 2 && columnIndex <= 5;
-
-                        if (bishopIsCentral)
+                        if (rowIndex >= 2 && rowIndex <= 5 && columnIndex >= 2 && columnIndex <= 5)
                         {
-                            const int bishopCentralBonus = 8;
-                            if (piece.Color == Player.White)
-                            {
-                                materialWhite += bishopCentralBonus;
-                            }
-                            else
-                            {
-                                materialBlack += bishopCentralBonus;
-                            }
+                            if (piece.Color == Player.White) materialWhite += 8;
+                            else materialBlack += 8;
                         }
                         break;
 
                     case PieceType.Rook:
-                        bool rookOnCentralFile = (columnIndex == 3 || columnIndex == 4);
-                        if (rookOnCentralFile)
+                        if (columnIndex == 3 || columnIndex == 4)
                         {
-                            const int rookCentralFileBonus = 5;
-                            if (piece.Color == Player.White)
-                            {
-                                materialWhite += rookCentralFileBonus;
-                            }
-                            else
-                            {
-                                materialBlack += rookCentralFileBonus;
-                            }
+                            if (piece.Color == Player.White) materialWhite += 5;
+                            else materialBlack += 5;
                         }
                         break;
 
                     case PieceType.King:
-                        if (piece.Color == Player.White)
-                        {
-                            whiteKingPosition = new Position(rowIndex, columnIndex);
-                        }
-                        else
-                        {
-                            blackKingPosition = new Position(rowIndex, columnIndex);
-                        }
+                        if (piece.Color == Player.White) whiteKingPosition = new Position(rowIndex, columnIndex);
+                        else blackKingPosition = new Position(rowIndex, columnIndex);
                         break;
                 }
             }
         }
 
-        // Score matériel + petits bonus
         int positionScore = materialWhite - materialBlack;
-
-        // Détection simple de la finale (basée sur le matériel non-pion)
         bool isEndgamePhase = IsEndgame(nonPawnMaterialWhite, nonPawnMaterialBlack);
 
-        // Heuristiques roi (sécurité en milieu de jeu, activité en finale)
-        if (whiteKingPosition is Position whiteKingSquare &&
-            blackKingPosition is Position blackKingSquare)
+        if (whiteKingPosition is Position wk && blackKingPosition is Position bk)
         {
-            bool whiteKingCentral =
-                whiteKingSquare.Row >= 2 && whiteKingSquare.Row <= 5 &&
-                whiteKingSquare.Column >= 2 && whiteKingSquare.Column <= 5;
-
-            bool blackKingCentral =
-                blackKingSquare.Row >= 2 && blackKingSquare.Row <= 5 &&
-                blackKingSquare.Column >= 2 && blackKingSquare.Column <= 5;
+            bool wkCentral = wk.Row >= 2 && wk.Row <= 5 && wk.Column >= 2 && wk.Column <= 5;
+            bool bkCentral = bk.Row >= 2 && bk.Row <= 5 && bk.Column >= 2 && bk.Column <= 5;
 
             if (isEndgamePhase)
             {
-                // En finale : roi central = bon
-                const int kingActivityBonus = 20;
-                if (whiteKingCentral)
-                {
-                    positionScore += kingActivityBonus;
-                }
-                if (blackKingCentral)
-                {
-                    positionScore -= kingActivityBonus;
-                }
+                if (wkCentral) positionScore += 20;
+                if (bkCentral) positionScore -= 20;
             }
             else
             {
-                // Milieu de jeu : roi trop central = dangereux
-                const int kingCenterPenalty = 30;
-                if (whiteKingCentral)
-                {
-                    positionScore -= kingCenterPenalty;
-                }
-                if (blackKingCentral)
-                {
-                    positionScore += kingCenterPenalty;
-                }
+                if (wkCentral) positionScore -= 30;
+                if (bkCentral) positionScore += 30;
             }
         }
 
-        // Structure de pions très simple : pions doublés
         for (int fileIndex = 0; fileIndex < 8; fileIndex++)
         {
-            int whitePawnCountOnFile = whitePawnsByFile[fileIndex];
-            int blackPawnCountOnFile = blackPawnsByFile[fileIndex];
-
-            if (whitePawnCountOnFile > 1)
-            {
-                const int doubledPawnPenalty = 10;
-                positionScore -= doubledPawnPenalty * (whitePawnCountOnFile - 1);
-            }
-
-            if (blackPawnCountOnFile > 1)
-            {
-                const int doubledPawnPenalty = 10;
-                positionScore += doubledPawnPenalty * (blackPawnCountOnFile - 1);
-            }
+            if (whitePawnsByFile[fileIndex] > 1) positionScore -= 10 * (whitePawnsByFile[fileIndex] - 1);
+            if (blackPawnsByFile[fileIndex] > 1) positionScore += 10 * (blackPawnsByFile[fileIndex] - 1);
         }
 
-        // Negamax : score du point de vue du camp au trait
-        return state.CurrentPlayer == Player.White
-            ? positionScore
-            : -positionScore;
+        return state.CurrentPlayer == Player.White ? positionScore : -positionScore;
     }
 
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
-
-    private int CountMovesForColor(GameState baseState, Player color)
+    /// <summary>Détecte si le plateau est en phase de finale (peu de matériel).</summary>
+    private bool IsEndgameBoard(GameState state)
     {
-        int count = 0;
-
+        int nonPawnMaterial = 0;
         for (int r = 0; r < 8; r++)
+        for (int c = 0; c < 8; c++)
         {
-            for (int c = 0; c < 8; c++)
-            {
-                var p = baseState.Board[r, c];
-                if (p == null || p.Color != color) continue;
-
-                var moves = baseState.LegalMovesForPiece(new Position(r, c));
-                count += moves.Count(); // <-- avec les parenthèses
-            }
+            var piece = state.Board[r, c];
+            if (piece != null && piece.Type != PieceType.Pawn && piece.Type != PieceType.King)
+                nonPawnMaterial += PieceValues[piece.Type];
         }
-
-        return count;
+        return nonPawnMaterial <= 2 * PieceValues[PieceType.Rook];
     }
 
+    /// <summary>
+    /// Génère tous les coups légaux pour le camp au trait.
+    /// Version rapide : la légalité est vérifiée via MakeMoveFast/IsInCheck/UnmakeMoveFast
+    /// (O(2-4 copies de pièces) au lieu de Board.Copy() qui copie 32+ pièces par coup).
+    /// Seul le roque utilise encore l'ancien chemin (vérification "ne pas passer par un échec").
+    /// </summary>
     private List<Move> GenerateAllLegalMoves(GameState s)
     {
         var list = new List<Move>(64);
+        var player = s.CurrentPlayer;
+
         for (int r = 0; r < 8; r++)
+        for (int c = 0; c < 8; c++)
         {
-            for (int c = 0; c < 8; c++)
+            var piece = s.Board[r, c];
+            if (piece == null || piece.Color != player) continue;
+
+            var pos = new Position(r, c);
+
+            foreach (var move in piece.GetMoves(pos, s.Board))
             {
-                var p = s.Board[r, c];
-                if (p == null || p.Color != s.CurrentPlayer) continue;
-                list.AddRange(s.LegalMovesForPiece(new Position(r, c)));
+                bool legal;
+
+                if (move.Type == MoveType.CastleKS || move.Type == MoveType.CastleQS)
+                {
+                    // Le roque nécessite une vérification spéciale (roi ne doit pas
+                    // passer par une case en échec) → chemin original avec Board.Copy().
+                    legal = move.IsLegal(s.Board);
+                }
+                else
+                {
+                    // Vérification rapide : joue le coup, teste si le roi est en échec,
+                    // puis annule. Évite la copie complète du plateau.
+                    s.MakeMoveFast(move, out var undo);
+                    legal = !s.Board.IsInCheck(player);
+                    s.UnmakeMoveFast(undo);
+                }
+
+                if (legal) list.Add(move);
             }
         }
+
         return list;
     }
 
     private static bool IsCapture(GameState s, Move m)
-    {
-        return s.Board[m.ToPos] != null || m.Type == MoveType.EnPassant;
-    }
+        => s.Board[m.ToPos] != null || m.Type == MoveType.EnPassant;
 
     private static bool IsPromotion(Move m)
-    {
-        return m.Type == MoveType.PawnPromotion;
-    }
+        => m.Type == MoveType.PawnPromotion;
 
-    /// <summary>
-    /// "Tactique" au sens quiescence : capture, promotion, ou coup qui donne échec.
-    /// </summary>
+    /// <summary>Coup "tactique" pour la quiescence : capture, promotion ou coup qui donne échec.</summary>
     private bool IsTacticalWithCheck(GameState state, Move m)
     {
-        if (IsPromotion(m) || IsCapture(state, m))
-            return true;
-
-        //var next = Copy(state);
-        //next.MakeMove(m);
+        if (IsPromotion(m) || IsCapture(state, m)) return true;
 
         state.MakeMoveFast(m, out var undo);
-
-        bool givesCheck = state.Board.IsInCheck(state.CurrentPlayer); // camp au trait APRÈS le coup
-
+        bool givesCheck = state.Board.IsInCheck(state.CurrentPlayer);
         state.UnmakeMoveFast(undo);
-
 
         return givesCheck;
     }
 
     /// <summary>
-    /// Tri des coups : promotions puis captures, sinon neutres.
+    /// Tri des coups :
+    ///   1. Promotions (10 000)
+    ///   2. Captures, triées MVV-LVA (1 000 + valeur_victime × 10 − valeur_attaquant)
+    ///   3. Killer moves (900)
+    ///   4. Coups silencieux (0)
     /// </summary>
-    private void OrderMoves(GameState s, List<Move> moves)
+    private void OrderMoves(GameState s, List<Move> moves, int ply)
     {
-        moves.Sort((a, b) =>
-        {
-            int sa = (IsPromotion(a) ? 2 : IsCapture(s, a) ? 1 : 0);
-            int sb = (IsPromotion(b) ? 2 : IsCapture(s, b) ? 1 : 0);
-            return sb.CompareTo(sa);
-        });
+        moves.Sort((a, b) => MoveScore(s, b, ply).CompareTo(MoveScore(s, a, ply)));
     }
 
+    private int MoveScore(GameState s, Move m, int ply)
+    {
+        if (IsPromotion(m)) return 10_000;
+
+        if (IsCapture(s, m))
+        {
+            int victimValue = m.Type == MoveType.EnPassant
+                ? PieceValues[PieceType.Pawn]
+                : (s.Board[m.ToPos] != null ? PieceValues[s.Board[m.ToPos].Type] : 0);
+            int attackerValue = s.Board[m.FromPos] != null ? PieceValues[s.Board[m.FromPos].Type] : 0;
+            // MVV-LVA : prioriser les captures de haute valeur faites par des pièces de faible valeur
+            return 1_000 + victimValue * 10 - attackerValue;
+        }
+
+        if (IsKiller(ply, m)) return 900;
+
+        return 0;
+    }
 
     private bool IsEndgame(int nonPawnWhite, int nonPawnBlack)
-    {
-        int total = nonPawnWhite + nonPawnBlack;
-        return total <= 2 * PieceValues[PieceType.Rook]; // heuristique : <= valeur 2 tours
-    }
-
+        => nonPawnWhite + nonPawnBlack <= 2 * PieceValues[PieceType.Rook];
 }
