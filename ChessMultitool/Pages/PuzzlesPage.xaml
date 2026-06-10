@@ -4,53 +4,132 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ChessMultitool"
+    BackgroundColor="#111111"
+    Shell.NavBarIsVisible="False"
     Title="Puzzles">
 
-    <Grid Padding="0" RowSpacing="10" RowDefinitions="100,Auto,Auto">
-        <!-- Header like Game: shows side to move -->
-        <Grid Grid.Row="0" Padding="12,6" RowSpacing="2">
-            <VerticalStackLayout HorizontalOptions="FillAndExpand" VerticalOptions="Center" Spacing="2">
-                <Label x:Name="TurnLabel"
-                       Text=""
-                       FontSize="16"
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"
-                       TextColor="{DynamicResource GlobalTextColor}" />
-                <!-- Rating label placed under the turn text -->
-                <Label x:Name="RatingLabel"
-                       Text=""
-                       FontSize="13"
-                       HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"
-                       TextColor="{DynamicResource GlobalTextColor}" />
-            </VerticalStackLayout>
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12" ColumnDefinitions="*,Auto,*">
+
+            <Border Grid.Column="0"
+                    BackgroundColor="#1E1E1E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="13,8"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                <HorizontalStackLayout Spacing="7" VerticalOptions="Center">
+                    <BoxView x:Name="SideDot"
+                             WidthRequest="9" HeightRequest="9"
+                             CornerRadius="4.5"
+                             Color="#EEEEEE"
+                             VerticalOptions="Center" />
+                    <Label x:Name="TurnLabel"
+                           Text="White to move"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#CCCCCC"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="PUZZLES"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" />
+
+            <HorizontalStackLayout Grid.Column="2"
+                                   Spacing="8"
+                                   HorizontalOptions="End"
+                                   VerticalOptions="Center">
+                <Border BackgroundColor="#1E1E1E"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 20"
+                        Padding="13,8"
+                        VerticalOptions="Center">
+                    <HorizontalStackLayout Spacing="5" VerticalOptions="Center">
+                        <Label Text="★" FontSize="13" TextColor="#C8963E" VerticalTextAlignment="Center" />
+                        <Label x:Name="RatingLabel" Text="—" FontSize="14" FontAttributes="Bold"
+                               TextColor="#CCCCCC" VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Analysis board (free move, no AI) -->
+                <Border BackgroundColor="#1E1E1E"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 20"
+                        Padding="11,8"
+                        VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAnalysisClicked" />
+                    </Border.GestureRecognizers>
+                    <Label Text="🔍" FontSize="14" TextColor="#C8963E" VerticalTextAlignment="Center" />
+                </Border>
+            </HorizontalStackLayout>
         </Grid>
 
-        <!-- Board centered like in Game.xaml -->
-        <Grid Grid.Row="1" VerticalOptions="Start" HorizontalOptions="Center" Margin="0">
-            <Grid x:Name="BoardGrid" HorizontalOptions="FillAndExpand" HeightRequest="320">
-                <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" InputTransparent="True" ZIndex="0" />
-                <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
-                <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
-                <Grid x:Name="OverlayGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="3" />
-                <!-- Promotion selection overlay -->
-                <Grid x:Name="PromotionContainer" IsVisible="False" BackgroundColor="#88000000" ZIndex="4" RowSpacing="0" ColumnSpacing="0">
-                    <Border StrokeThickness="1" Stroke="{DynamicResource GlobalTextColor}" BackgroundColor="{DynamicResource GlobalControlBackgroundColor}" Padding="8" HorizontalOptions="Center" VerticalOptions="Center" >
-                        <local:PromotionMenu x:Name="PromotionMenuView" />
-                    </Border>
+        <!-- ── Board area ── -->
+        <Grid Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Fill" Padding="12,0">
+            <Border BackgroundColor="#0A0A0A" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="0">
+                <Grid x:Name="BoardGrid" HorizontalOptions="Fill" HeightRequest="360">
+                    <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill"
+                           InputTransparent="True" ZIndex="0" />
+                    <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="1" />
+                    <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="2" />
+                    <Grid x:Name="OverlayGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="3" />
+                    <Grid x:Name="PromotionContainer" IsVisible="False"
+                          BackgroundColor="#CC000000" ZIndex="4" RowSpacing="0" ColumnSpacing="0">
+                        <local:PromotionMenu x:Name="PromotionMenuView"
+                                             HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Grid>
                 </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ── Bottom bar: always 3 fixed buttons, no layout shift ── -->
+        <Grid Grid.Row="2" Padding="16,14,16,20" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+
+            <!-- Prev move -->
+            <Button x:Name="PrevMoveBtn" Grid.Column="0" Text="←" Clicked="OnPrevMoveClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+            <!-- Next move (replay) -->
+            <Button x:Name="NextMoveBtn" Grid.Column="1" Text="→" Clicked="OnNextMoveClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+            <!-- Dynamic third button: Hint / Retry / Next — same cell, one visible at a time -->
+            <Grid Grid.Column="2" HeightRequest="48">
+
+                <!-- Hint (default) -->
+                <Button x:Name="HintBtn" Text="💡" Clicked="OnHintClicked"
+                        BackgroundColor="#1E1E1E" TextColor="#C8963E"
+                        FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+                <!-- Retry (shown after a wrong attempt) -->
+                <Button x:Name="RetryBtn" Text="↺" Clicked="OnRetry" IsVisible="False"
+                        BackgroundColor="#EF3B3B" TextColor="White"
+                        FontSize="22" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+                <!-- Next puzzle (shown once solved) -->
+                <Button x:Name="NextBtn" Text="Next →" Clicked="OnNextPuzzle" IsVisible="False"
+                        BackgroundColor="#1C2B1C" TextColor="#6BCB77"
+                        BorderColor="#6BCB77" BorderWidth="1"
+                        FontSize="13" FontAttributes="Bold"
+                        CornerRadius="12" HeightRequest="48" Padding="0" />
+
             </Grid>
         </Grid>
 
-        <!-- Bottom controls -->
-        <HorizontalStackLayout Grid.Row="2" Spacing="10" Padding="12" HorizontalOptions="Center">
-            <!-- Move navigation within current puzzle -->
-            <Button x:Name="PrevMoveBtn" Text="Previous" Clicked="OnPrevMoveClicked" />
-            <Button x:Name="NextMoveBtn" Text="Next" Clicked="OnNextMoveClicked" />
-            <Button x:Name="HintBtn" Text="Hint" Clicked="OnHintClicked" />
-            <Button x:Name="RetryBtn" Text="Retry" Clicked="OnRetry" IsVisible="False" />
-            <!-- Next puzzle (enabled once solved) -->
-            <Button x:Name="NextBtn" Text="Next puzzle" Clicked="OnNextPuzzle" IsVisible="False" />
-        </HorizontalStackLayout>
     </Grid>
 </ContentPage>

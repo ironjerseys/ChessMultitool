@@ -29,6 +29,12 @@ public partial class OpeningsPage : ContentPage
         LoadOpenings();
     }
 
+    /// <summary>Retour à la page précédente (header sans barre de navigation).</summary>
+    async void OnBackClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
+    }
+
     #region Board setup
     void InitBoard()
     {
@@ -132,7 +138,7 @@ public partial class OpeningsPage : ContentPage
     {
         gameState = new GameState(Player.White, Board.Initial());
         DrawBoard(gameState.Board);
-        moveLabel.Text = string.Empty;
+        moveLabel.Text = "—";
     }
 
     void RebuildPosition()

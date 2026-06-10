@@ -5,17 +5,22 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:ChessMultitool"
     Shell.FlyoutBehavior="Disabled"
+    Shell.TabBarBackgroundColor="#0D0D0D"
+    Shell.TabBarForegroundColor="#C8963E"
+    Shell.TabBarUnselectedColor="#444444"
+    Shell.TabBarTitleColor="#C8963E"
+    BackgroundColor="#111111"
     Title="ChessMultitool">
 
     <TabBar>
-        <ShellContent Title="Play" Icon="BottomBarIcons/explorer.png" ContentTemplate="{DataTemplate local:AILevelSelectionPage}" />
+        <ShellContent Title="Play" Icon="BottomBarIcons/explorer.png" Route="PlayPage" ContentTemplate="{DataTemplate local:AILevelSelectionPage}" />
 
-        <ShellContent Title="Stats" Icon="BottomBarIcons/stats.png" ContentTemplate="{DataTemplate local:StatsPage}" />
+        <ShellContent Title="Puzzles" Icon="BottomBarIcons/puzzles.png" Route="PuzzlesPage" ContentTemplate="{DataTemplate local:PuzzlesPage}" />
 
-        <ShellContent Title="Puzzles" Icon="BottomBarIcons/puzzles.png" ContentTemplate="{DataTemplate local:PuzzlesPage}" />
+        <ShellContent Title="Library" Icon="BottomBarIcons/library.png" Route="PuzzleListPage" ContentTemplate="{DataTemplate local:PuzzleListPage}" />
 
-        <ShellContent Title="Tools" Icon="BottomBarIcons/tools.png" ContentTemplate="{DataTemplate local:ToolsPage}" />
+        <ShellContent Title="Tools" Icon="BottomBarIcons/tools.png" Route="ToolsPage" ContentTemplate="{DataTemplate local:ToolsPage}" />
 
-        <ShellContent Title="Settings" Icon="BottomBarIcons/settings.png" ContentTemplate="{DataTemplate local:SettingsPage}" />
+        <ShellContent Title="Settings" Icon="BottomBarIcons/settings.png" Route="SettingsPage" ContentTemplate="{DataTemplate local:SettingsPage}" />
     </TabBar>
 </Shell>

@@ -3,43 +3,108 @@
     x:Class="ChessMultitool.OpeningsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#111111"
+    Shell.NavBarIsVisible="False"
     Title="Openings">
 
-    <Grid Padding="0" RowSpacing="20" RowDefinitions="100,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
 
-        <!-- ROW 0 : Header fixe (100) avec les 2 Pickers -->
-        <Grid Grid.Row="0" RowDefinitions="Auto,12,Auto" Margin="20,0">
-            <Picker x:Name="openingsPicker"
-              HeightRequest="44"
-              TextColor="{DynamicResource GlobalTextColor}"
-              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
-              SelectedIndexChanged="OnOpeningChanged" />
-            <BoxView Grid.Row="1" HeightRequest="12" Opacity="0"/>
-            <Picker x:Name="variationsPicker"
-              Grid.Row="2"
-              HeightRequest="44"
-              TextColor="{DynamicResource GlobalTextColor}"
-              BackgroundColor="{DynamicResource GlobalBackgroundColor}"
-              SelectedIndexChanged="OnVariationChanged" />
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12" ColumnDefinitions="*,Auto,*">
+            <Border Grid.Column="0"
+                    BackgroundColor="#1E1E1E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="13,8"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackClicked" />
+                </Border.GestureRecognizers>
+                <Label Text="←" FontSize="14" FontAttributes="Bold" TextColor="#CCCCCC" VerticalTextAlignment="Center" />
+            </Border>
+
+            <Label Grid.Column="1"
+                   Text="OPENINGS"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" />
         </Grid>
 
-        <!-- ROW 1 : Plateau -->
-        <Grid Grid.Row="1" x:Name="BoardGrid"
-          HorizontalOptions="FillAndExpand">
-            <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill" ZIndex="0" />
-            <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="1" />
-            <Grid x:Name="PieceGrid"     RowSpacing="0" ColumnSpacing="0" BackgroundColor="Transparent" ZIndex="2" />
+        <!-- ── Opening / variation selection ── -->
+        <VerticalStackLayout Grid.Row="1" Padding="16,0,16,4" Spacing="10">
+            <Border BackgroundColor="#1A1A1A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="14,2">
+                <Picker x:Name="openingsPicker"
+                        Title="Opening"
+                        FontSize="14"
+                        TextColor="#CCCCCC"
+                        TitleColor="#777777"
+                        BackgroundColor="Transparent"
+                        SelectedIndexChanged="OnOpeningChanged" />
+            </Border>
+            <Border BackgroundColor="#1A1A1A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="14,2">
+                <Picker x:Name="variationsPicker"
+                        Title="Variation"
+                        FontSize="14"
+                        TextColor="#CCCCCC"
+                        TitleColor="#777777"
+                        BackgroundColor="Transparent"
+                        SelectedIndexChanged="OnVariationChanged" />
+            </Border>
+        </VerticalStackLayout>
+
+        <!-- ── Board + current move ── -->
+        <Grid Grid.Row="2" RowDefinitions="*,Auto" Padding="12,0">
+            <Border Grid.Row="0"
+                    BackgroundColor="#0A0A0A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="0"
+                    VerticalOptions="Center">
+                <Grid x:Name="BoardGrid" HorizontalOptions="Fill" HeightRequest="360">
+                    <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill"
+                           InputTransparent="True" ZIndex="0" />
+                    <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="1" />
+                    <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="2" />
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1"
+                    BackgroundColor="#1E1E1E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="14,7"
+                    HorizontalOptions="Center"
+                    Margin="0,12,0,0">
+                <Label x:Name="moveLabel"
+                       Text="—"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="#C8963E"
+                       HorizontalTextAlignment="Center" />
+            </Border>
         </Grid>
 
-        <!-- ROW 2 : Coup affiché -->
-        <Label Grid.Row="2" x:Name="moveLabel"
-           FontSize="20" HorizontalOptions="Center" />
-
-        <!-- ROW 3 : Navigation -->
-        <HorizontalStackLayout Grid.Row="3" HorizontalOptions="Center">
-            <Button Text="Previous" Clicked="OnPreviousClicked" Margin="0,0,150,0" HeightRequest="50"/>
-            <Button Text="Next" Clicked="OnNextClicked" Margin="0,0,0,0" HeightRequest="50"/>
-        </HorizontalStackLayout>
+        <!-- ── Navigation ── -->
+        <Grid Grid.Row="3" Padding="16,14,16,20" ColumnDefinitions="*,*" ColumnSpacing="8">
+            <Button Grid.Column="0" Text="←" Clicked="OnPreviousClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+            <Button Grid.Column="1" Text="→" Clicked="OnNextClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+        </Grid>
 
     </Grid>
 </ContentPage>

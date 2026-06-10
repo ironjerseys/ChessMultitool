@@ -33,9 +33,12 @@ public partial class AchievementsPage : ContentPage
             openingRows.Add(new Row { Name = name, Achieved = count > 0 });
         }
         WithList.ItemsSource = openingRows.OrderBy(r => r.Name).ToList();
+    }
 
-        // Optionally hide AI section if present in XAML
-        try { AiList.IsVisible = false; } catch { }
+    /// <summary>Retour à la page précédente (header sans barre de navigation).</summary>
+    private async void OnBackClicked(object sender, EventArgs e)
+    {
+        await Navigation.PopAsync();
     }
 
     public class Row

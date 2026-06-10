@@ -1,72 +1,57 @@
-﻿using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls;
 
 namespace ChessMultitool;
 
 public partial class SettingsPage : ContentPage
 {
-    // Mapping Nom lisible -> Fichier image
-    private readonly Dictionary<string, string> boardMap = new()
-    {
-        { "Brown", "board_brown.png" },
-        { "Green", "board_green.png" },
-        { "Blue",  "board_blue.png" },
-        { "Gray",  "board_gray.png" },
-        { "Purple","board_purple.png" },
-        { "Black & White", "board_black_white.png" },
-    };
+    private readonly Dictionary<string, Border> themeMap = new();
 
     public SettingsPage()
     {
         InitializeComponent();
-        InitThemeSwitch();
-        InitBoardPicker();
+        themeMap["board_brown.png"]       = ThemeBrown;
+        themeMap["board_green.png"]       = ThemeGreen;
+        themeMap["board_blue.png"]        = ThemeBlue;
+        themeMap["board_wood.png"]        = ThemeWood;
+        themeMap["board_gray.png"]        = ThemeGray;
+        themeMap["board_black_white.png"] = ThemeClassic;
+        themeMap["board_purple.png"]      = ThemePurple;
+
         InitVibrationSwitch();
+        InitEvalBarSwitch();
     }
 
-    private void InitThemeSwitch()
+    protected override void OnAppearing()
     {
-        bool dark = Preferences.Get("pref_theme_dark", true);
-        ThemeSwitch.IsToggled = dark;
-        ApplyTheme(dark); // ensure resources reflect preference immediately
-    }
-
-    private void InitBoardPicker()
-    {
-        BoardPicker.ItemsSource = boardMap.Keys.ToList();
-
-        if (Application.Current.Resources.TryGetValue("BoardImageSource", out var val) && val is string currentFile)
-        {
-            var match = boardMap.FirstOrDefault(kv => kv.Value == currentFile).Key;
-            if (!string.IsNullOrEmpty(match))
-            {
-                BoardPicker.SelectedItem = match;
-                return;
-            }
-        }
-        BoardPicker.SelectedItem = boardMap.Keys.First();
-        Application.Current.Resources["BoardImageSource"] = boardMap[(string)BoardPicker.SelectedItem];
+        base.OnAppearing();
+        var current = Preferences.Get("pref_board_image", "board_brown.png");
+        HighlightSelected(current);
     }
 
     private void InitVibrationSwitch()
     {
-        bool vib = Preferences.Get("pref_vibration_moves", true);
-        VibrationSwitch.IsToggled = vib;
+        VibrationSwitch.IsToggled = Preferences.Get("pref_vibration_moves", true);
     }
 
-
-    private void OnBoardChanged(object sender, EventArgs e)
+    private void InitEvalBarSwitch()
     {
-        if (BoardPicker.SelectedItem is string display && boardMap.TryGetValue(display, out var file))
-        {
-            Application.Current.Resources["BoardImageSource"] = file;
-            App.SaveBoard(file);
-        }
+        EvalBarSwitch.IsToggled = Preferences.Get("pref_eval_bar", true);
     }
 
-    private void OnThemeToggled(object sender, ToggledEventArgs e)
+    private void OnThemeTapped(object? sender, TappedEventArgs e)
     {
-        ApplyTheme(e.Value);
-        App.SaveTheme(e.Value);
+        if (e.Parameter is not string file) return;
+        Application.Current.Resources["BoardImageSource"] = file;
+        App.SaveBoard(file);
+        HighlightSelected(file);
+    }
+
+    private void HighlightSelected(string theme)
+    {
+        foreach (var kvp in themeMap)
+            kvp.Value.Stroke = kvp.Key == theme
+                ? Color.FromArgb("#C8963E")
+                : Colors.Transparent;
     }
 
     private void OnVibrationToggled(object sender, ToggledEventArgs e)
@@ -78,11 +63,6 @@ public partial class SettingsPage : ContentPage
         }
     }
 
-    private void OnAiConsiderToggled(object sender, ToggledEventArgs e)
-    {
-        Preferences.Set("pref_ai_consider_highlight", e.Value);
-    }
-
     private void OnEvalBarToggled(object sender, ToggledEventArgs e)
     {
         Preferences.Set("pref_eval_bar", e.Value);
@@ -90,12 +70,5 @@ public partial class SettingsPage : ContentPage
         {
             game.SetEvalBarVisible(e.Value);
         }
-    }
-
-    private void ApplyTheme(bool dark)
-    {
-        Application.Current.Resources["GlobalBackgroundColor"] = dark ? Color.FromArgb("#333333") : Color.FromArgb("#FFFFFF");
-        Application.Current.Resources["GlobalTextColor"] = dark ? Color.FromArgb("#FFFFFF") : Color.FromArgb("#000000");
-        Application.Current.Resources["GlobalControlBackgroundColor"] = dark ? Color.FromArgb("#444444") : Color.FromArgb("#FFFFFF");
     }
 }
