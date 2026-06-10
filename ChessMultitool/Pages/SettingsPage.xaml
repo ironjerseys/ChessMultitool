@@ -1,35 +1,135 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ChessMultitool.SettingsPage"
+             BackgroundColor="#111111"
+             Shell.NavBarIsVisible="False"
              Title="Settings">
-    <VerticalStackLayout Padding="20" Spacing="15">
 
-        <Label Text="Settings" FontSize="24"  HorizontalOptions="Center" FontAttributes="Bold" Margin="0,0,0,50"/>
-        
-        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-            <Label Text="Dark Mode:" VerticalOptions="Center" />
-            <Switch x:Name="ThemeSwitch" Toggled="OnThemeToggled" IsToggled="True" />
-        </HorizontalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="20,52,20,24" Spacing="0">
 
-        <Label Text="Board Theme:" FontAttributes="Bold" />
-        <Picker x:Name="BoardPicker" Title="Select board" SelectedIndexChanged="OnBoardChanged" />
+            <!-- Page title -->
+            <Label Text="SETTINGS"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   Margin="0,0,0,32" />
 
-        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-            <Label Text="Vibration (moves):" VerticalOptions="Center" />
-            <Switch x:Name="VibrationSwitch" Toggled="OnVibrationToggled" IsToggled="True" />
-        </HorizontalStackLayout>
+            <!-- ── Board theme ── -->
+            <Label Text="BOARD COLOR"
+                   FontSize="10"
+                   FontAttributes="Bold"
+                   CharacterSpacing="2"
+                   TextColor="#444444"
+                   Margin="0,0,0,12" />
 
-        <!-- New: toggle AI thinking highlight (red pulse on considered piece) -->
-        <!--<HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-            <Label Text="Show AI thinking highlight:" VerticalOptions="Center" />
-            <Switch x:Name="AiConsiderSwitch" Toggled="OnAiConsiderToggled" IsToggled="True" />
-        </HorizontalStackLayout>-->
+            <!-- 3-column grid of board themes -->
+            <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto"
+                  ColumnSpacing="10" RowSpacing="10"
+                  Margin="0,0,0,32">
 
-        <!-- New: toggle evaluation bar -->
-        <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-            <Label Text="Show evaluation bar:" VerticalOptions="Center" />
-            <Switch x:Name="EvalBarSwitch" Toggled="OnEvalBarToggled" IsToggled="True" />
-        </HorizontalStackLayout>
-    </VerticalStackLayout>
+                <!-- Row 0 -->
+                <Border x:Name="ThemeBrown"   Grid.Row="0" Grid.Column="0" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_brown.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_brown.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Brown" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="ThemeGreen"   Grid.Row="0" Grid.Column="1" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_green.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_green.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Green" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="ThemeBlue"    Grid.Row="0" Grid.Column="2" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_blue.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_blue.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Blue" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Row 1 -->
+                <Border x:Name="ThemeWood"    Grid.Row="1" Grid.Column="0" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_wood.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_wood.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Wood" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="ThemeGray"    Grid.Row="1" Grid.Column="1" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_gray.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_gray.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Gray" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="ThemeClassic" Grid.Row="1" Grid.Column="2" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_black_white.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_black_white.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Classic" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Row 2 -->
+                <Border x:Name="ThemePurple"  Grid.Row="2" Grid.Column="0" StrokeShape="RoundRectangle 10" StrokeThickness="2" Stroke="Transparent" Padding="0">
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnThemeTapped" CommandParameter="board_purple.png"/></Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="0">
+                        <Image Source="board_purple.png" Aspect="AspectFill" HeightRequest="72"/>
+                        <Label Text="Purple" TextColor="#888888" FontSize="11" HorizontalTextAlignment="Center" Padding="0,6,0,6"/>
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+
+            <!-- ── Game preferences ── -->
+            <Label Text="GAME"
+                   FontSize="10"
+                   FontAttributes="Bold"
+                   CharacterSpacing="2"
+                   TextColor="#444444"
+                   Margin="0,0,0,12" />
+
+            <Border BackgroundColor="#1A1A1A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 14"
+                    Padding="16,4">
+                <VerticalStackLayout Spacing="0">
+
+                    <Grid ColumnDefinitions="*,Auto" HeightRequest="54">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="1">
+                            <Label Text="Vibration" FontSize="14" TextColor="#EEEEEE" />
+                            <Label Text="Haptic feedback on moves" FontSize="11" TextColor="#777777" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="VibrationSwitch" Grid.Column="1"
+                                Toggled="OnVibrationToggled" IsToggled="True"
+                                VerticalOptions="Center" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="#252525" />
+
+                    <Grid ColumnDefinitions="*,Auto" HeightRequest="54">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="1">
+                            <Label Text="Evaluation bar" FontSize="14" TextColor="#EEEEEE" />
+                            <Label Text="Show engine evaluation during games" FontSize="11" TextColor="#777777" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="EvalBarSwitch" Grid.Column="1"
+                                Toggled="OnEvalBarToggled" IsToggled="True"
+                                VerticalOptions="Center" />
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

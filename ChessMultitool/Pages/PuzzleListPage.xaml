@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    x:Class="ChessMultitool.PuzzleListPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#111111"
+    Shell.NavBarIsVisible="False"
+    Title="Library">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
+
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0"
+                   Text="LIBRARY"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   VerticalTextAlignment="Center" />
+            <Label x:Name="PageCountLabel"
+                   Grid.Column="1"
+                   Text=""
+                   FontSize="12"
+                   TextColor="#666666"
+                   VerticalTextAlignment="Center" />
+        </Grid>
+
+        <!-- ── Filters ── -->
+        <Grid Grid.Row="1" Padding="16,0,16,12" ColumnDefinitions="*,*" ColumnSpacing="8">
+            <Border Grid.Column="0"
+                    BackgroundColor="#1A1A1A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,0">
+                <Picker x:Name="ThemeFilterPicker"
+                        Title="Theme"
+                        FontSize="13"
+                        TextColor="#CCCCCC"
+                        TitleColor="#777777"
+                        BackgroundColor="Transparent"
+                        SelectedIndexChanged="OnFilterChanged" />
+            </Border>
+            <Border Grid.Column="1"
+                    BackgroundColor="#1A1A1A"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="12,0">
+                <Picker x:Name="RatingFilterPicker"
+                        Title="Rating"
+                        FontSize="13"
+                        TextColor="#CCCCCC"
+                        TitleColor="#777777"
+                        BackgroundColor="Transparent"
+                        SelectedIndexChanged="OnFilterChanged" />
+            </Border>
+        </Grid>
+
+        <!-- ── Loading indicator ── -->
+        <VerticalStackLayout x:Name="LoadingView"
+                             Grid.Row="2"
+                             VerticalOptions="Center"
+                             HorizontalOptions="Center"
+                             Spacing="12">
+            <ActivityIndicator IsRunning="True" Color="#C8963E" WidthRequest="32" HeightRequest="32" />
+            <Label Text="Loading puzzles…" TextColor="#555555" FontSize="13" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+
+        <!-- ── Puzzle list ── -->
+        <CollectionView x:Name="PuzzleList"
+                        Grid.Row="2"
+                        IsVisible="False"
+                        BackgroundColor="Transparent"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="16,4,16,4">
+                        <Border BackgroundColor="#1A1A1A"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"
+                                Padding="14,11">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPuzzleTapped"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <!-- Rating badge -->
+                                <Border Grid.Column="0"
+                                        BackgroundColor="#252525"
+                                        StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 6"
+                                        Padding="8,4"
+                                        VerticalOptions="Center">
+                                    <Label Text="{Binding RatingDisplay}"
+                                           TextColor="#C8963E"
+                                           FontSize="12"
+                                           FontAttributes="Bold" />
+                                </Border>
+                                <!-- Themes -->
+                                <Label Grid.Column="1"
+                                       Text="{Binding ThemesDisplay}"
+                                       TextColor="#777777"
+                                       FontSize="11"
+                                       VerticalTextAlignment="Center"
+                                       Margin="10,0,0,0"
+                                       LineBreakMode="TailTruncation" />
+                                <!-- Current indicator -->
+                                <Label Grid.Column="2"
+                                       Text="▶"
+                                       TextColor="#C8963E"
+                                       FontSize="10"
+                                       IsVisible="{Binding IsCurrent}"
+                                       VerticalTextAlignment="Center"
+                                       Margin="8,0,0,0" />
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- ── Pagination ── -->
+        <Grid Grid.Row="3" Padding="16,10,16,24" ColumnDefinitions="*,Auto,*" HeightRequest="64">
+            <Button x:Name="PrevPageBtn"
+                    Grid.Column="0"
+                    Text="← Prev"
+                    Clicked="OnPrevPage"
+                    BackgroundColor="#1E1E1E"
+                    TextColor="#AAAAAA"
+                    FontSize="12"
+                    CornerRadius="12"
+                    HeightRequest="44"
+                    WidthRequest="80"
+                    HorizontalOptions="Start"
+                    Padding="0" />
+
+            <Label x:Name="PageLabel"
+                   Grid.Column="1"
+                   Text=""
+                   FontSize="12"
+                   TextColor="#555555"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" />
+
+            <Button x:Name="NextPageBtn"
+                    Grid.Column="2"
+                    Text="Next →"
+                    Clicked="OnNextPage"
+                    BackgroundColor="#1E1E1E"
+                    TextColor="#AAAAAA"
+                    FontSize="12"
+                    CornerRadius="12"
+                    HeightRequest="44"
+                    WidthRequest="80"
+                    HorizontalOptions="End"
+                    Padding="0" />
+        </Grid>
+
+    </Grid>
+</ContentPage>

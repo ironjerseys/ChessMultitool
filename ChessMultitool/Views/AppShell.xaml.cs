@@ -1,4 +1,4 @@
-﻿namespace ChessMultitool
+namespace ChessMultitool
 {
     public partial class AppShell : Shell
     {
@@ -8,6 +8,7 @@
 
             Routing.RegisterRoute(nameof(AILevelSelectionPage), typeof(AILevelSelectionPage));
             Routing.RegisterRoute(nameof(AchievementsPage), typeof(AchievementsPage));
+            Routing.RegisterRoute(nameof(StatsPage), typeof(StatsPage));
         }
     }
 }

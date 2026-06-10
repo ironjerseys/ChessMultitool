@@ -3,22 +3,120 @@
     x:Class="ChessMultitool.ToolsPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#111111"
+    Shell.NavBarIsVisible="False"
     Title="Tools">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16" >
-					
-			<Label Text="Tools" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-			
-            <Label Text="Learn openings" FontSize="20" HorizontalTextAlignment="Center" FontAttributes="Bold" Margin="0,70,0,0" />
-            <Button Text="Openings Book"  FontAttributes="Bold" Clicked="OnOpenOpeningsClicked" />
-			
-			<Label Text="Discover your achievements" FontSize="20" HorizontalOptions="Center" FontAttributes="Bold" Margin="0,20,0,0" />
-			<Button Text="Achievements"  FontAttributes="Bold" Clicked="OnOpenAchievementsClicked" />
-			
-			<Label Text="Launch clock" FontSize="20" HorizontalOptions="Center" FontAttributes="Bold" Margin="0,20,0,0" />
-			<Button Text="Clock"  FontAttributes="Bold" Clicked="OnOpenClockClicked" />
-			
+        <VerticalStackLayout Padding="20,52,20,24" Spacing="0">
+
+            <!-- Page title -->
+            <Label Text="TOOLS"
+                   FontSize="11"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   Margin="0,0,0,24" />
+
+            <Label Text="Toolbox"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#EEEEEE" />
+            <Label Text="Everything you need around the board."
+                   FontSize="13"
+                   TextColor="#777777"
+                   Margin="0,4,0,28" />
+
+            <!-- ── Tool cards ── -->
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto"
+                  ColumnSpacing="12" RowSpacing="12">
+
+                <!-- Openings -->
+                <Border Grid.Row="0" Grid.Column="0"
+                        BackgroundColor="#1A1A1A"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOpenOpeningsClicked" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="♞" FontSize="30" TextColor="#C8963E" />
+                        <Label Text="Openings"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#EEEEEE" />
+                        <Label Text="Browse the openings book and its main lines."
+                               FontSize="11"
+                               TextColor="#777777" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Achievements -->
+                <Border Grid.Row="0" Grid.Column="1"
+                        BackgroundColor="#1A1A1A"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOpenAchievementsClicked" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="★" FontSize="30" TextColor="#C8963E" />
+                        <Label Text="Achievements"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#EEEEEE" />
+                        <Label Text="Track your milestones and unlocked badges."
+                               FontSize="11"
+                               TextColor="#777777" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Clock -->
+                <Border Grid.Row="1" Grid.Column="0"
+                        BackgroundColor="#1A1A1A"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOpenClockClicked" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="⏱" FontSize="30" TextColor="#C8963E" />
+                        <Label Text="Clock"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#EEEEEE" />
+                        <Label Text="Chess clock for over-the-board games."
+                               FontSize="11"
+                               TextColor="#777777" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Stats -->
+                <Border Grid.Row="1" Grid.Column="1"
+                        BackgroundColor="#1A1A1A"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16"
+                        Padding="16,20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnOpenStatsClicked" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="▦" FontSize="30" TextColor="#C8963E" />
+                        <Label Text="Stats"
+                               FontSize="15"
+                               FontAttributes="Bold"
+                               TextColor="#EEEEEE" />
+                        <Label Text="Your games, results and progress over time."
+                               FontSize="11"
+                               TextColor="#777777" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </Grid>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

@@ -2,79 +2,157 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ChessMultitool.AchievementsPage"
+             BackgroundColor="#111111"
+             Shell.NavBarIsVisible="False"
              Title="Achievements">
-  <ScrollView>
-    <VerticalStackLayout Padding="16" Spacing="16">
-      <Label Text="Achievements" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center" />
 
-      <!-- Quick wins against AI -->
-      <Label Text="Quick Wins vs AI" FontAttributes="Bold" FontSize="18" />
-      <CollectionView x:Name="QuickWinsList">
-        <CollectionView.ItemsLayout>
-          <GridItemsLayout Orientation="Vertical" Span="2" />
-        </CollectionView.ItemsLayout>
-        <CollectionView.ItemTemplate>
-          <DataTemplate>
-            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
-              <Frame.Triggers>
-                <DataTrigger TargetType="Frame" Binding="{Binding Achieved}" Value="True">
-                  <Setter Property="BackgroundColor" Value="#008000" />
-                  <Setter Property="BorderColor" Value="#2ECC71" />
-                </DataTrigger>
-              </Frame.Triggers>
-              <Grid>
-                <Label Text="{Binding Name}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-              </Grid>
-            </Frame>
-          </DataTemplate>
-        </CollectionView.ItemTemplate>
-      </CollectionView>
+    <Grid RowDefinitions="Auto,*" RowSpacing="0">
 
-      <!-- AI winrate by rating -->
-      <Label Text="AI winrate by rating" FontAttributes="Bold" FontSize="18" />
-      <CollectionView x:Name="AiList">
-        <CollectionView.ItemsLayout>
-          <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
-        </CollectionView.ItemsLayout>
-        <CollectionView.ItemTemplate>
-          <DataTemplate>
-            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
-              <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-                <Label Text="{Binding LevelText}" FontSize="16" Grid.Row="0" Grid.Column="0" />
-                <Label Text="{Binding CountText}" FontSize="14" Grid.Row="0" Grid.Column="1" HorizontalTextAlignment="End" />
-                <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto" Margin="0,6,0,0">
-                  <ProgressBar Progress="{Binding Rate}" HeightRequest="6" VerticalOptions="Center" />
-                  <Label Grid.Column="1" Text="{Binding RateText}" FontSize="13" VerticalOptions="Center" />
-                </Grid>
-              </Grid>
-            </Frame>
-          </DataTemplate>
-        </CollectionView.ItemTemplate>
-      </CollectionView>
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12" ColumnDefinitions="*,Auto,*">
+            <Border Grid.Column="0"
+                    BackgroundColor="#1E1E1E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="13,8"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackClicked" />
+                </Border.GestureRecognizers>
+                <Label Text="←" FontSize="14" FontAttributes="Bold" TextColor="#CCCCCC" VerticalTextAlignment="Center" />
+            </Border>
 
-      <!-- Wins WITH openings -->
-      <Label Text="Openings" FontAttributes="Bold" FontSize="18" />
-      <CollectionView x:Name="WithList">
-        <CollectionView.ItemsLayout>
-          <GridItemsLayout Orientation="Vertical" Span="2" />
-        </CollectionView.ItemsLayout>
-        <CollectionView.ItemTemplate>
-          <DataTemplate>
-            <Frame CornerRadius="10" Padding="10" Margin="4" HasShadow="True" BorderColor="#E0E0E0" BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
-              <Frame.Triggers>
-                <DataTrigger TargetType="Frame" Binding="{Binding Achieved}" Value="True">
-                  <Setter Property="BackgroundColor" Value="#E6F5EA" />
-                  <Setter Property="BorderColor" Value="#2ECC71" />
-                </DataTrigger>
-              </Frame.Triggers>
-              <Label Text="{Binding Name}" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
-            </Frame>
-          </DataTemplate>
-        </CollectionView.ItemTemplate>
-      </CollectionView>
+            <Label Grid.Column="1"
+                   Text="ACHIEVEMENTS"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" />
+        </Grid>
 
-      <!-- AgainstList removed logically, kept bound to null in code-behind -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,8,20,24" Spacing="0">
 
-    </VerticalStackLayout>
-  </ScrollView>
+                <Label Text="Milestones"
+                       FontSize="28"
+                       FontAttributes="Bold"
+                       TextColor="#EEEEEE" />
+                <Label Text="Badges you unlock by beating the engine."
+                       FontSize="13"
+                       TextColor="#777777"
+                       Margin="0,4,0,28" />
+
+                <!-- ── Quick wins vs AI ── -->
+                <Label Text="QUICK WINS VS AI"
+                       FontSize="10"
+                       FontAttributes="Bold"
+                       CharacterSpacing="2"
+                       TextColor="#444444"
+                       Margin="0,0,0,12" />
+
+                <CollectionView x:Name="QuickWinsList" Margin="0,0,0,28">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2"
+                                         HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#1A1A1A"
+                                    StrokeThickness="1.5"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12,16">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Achieved}" Value="True">
+                                        <Setter Property="Stroke" Value="#C8963E" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="★"
+                                           FontSize="22"
+                                           TextColor="#333333"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Achieved}" Value="True">
+                                                <Setter Property="TextColor" Value="#C8963E" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="{Binding Name}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#888888"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Achieved}" Value="True">
+                                                <Setter Property="TextColor" Value="#EEEEEE" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- ── Openings ── -->
+                <Label Text="WINS BY OPENING"
+                       FontSize="10"
+                       FontAttributes="Bold"
+                       CharacterSpacing="2"
+                       TextColor="#444444"
+                       Margin="0,0,0,12" />
+
+                <CollectionView x:Name="WithList">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="2"
+                                         HorizontalItemSpacing="10" VerticalItemSpacing="10" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="#1A1A1A"
+                                    StrokeThickness="1.5"
+                                    Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 14"
+                                    Padding="12,16">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding Achieved}" Value="True">
+                                        <Setter Property="Stroke" Value="#C8963E" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="♞"
+                                           FontSize="22"
+                                           TextColor="#333333"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Achieved}" Value="True">
+                                                <Setter Property="TextColor" Value="#C8963E" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="{Binding Name}"
+                                           FontSize="12"
+                                           FontAttributes="Bold"
+                                           TextColor="#888888"
+                                           HorizontalTextAlignment="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Achieved}" Value="True">
+                                                <Setter Property="TextColor" Value="#EEEEEE" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
 </ContentPage>

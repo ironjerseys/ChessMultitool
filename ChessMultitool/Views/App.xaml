@@ -9,10 +9,10 @@
                 <ResourceDictionary Source="../Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Default = Dark mode so UI is already dark before visiting SettingsPage -->
-            <Color x:Key="GlobalBackgroundColor">#333333</Color>
-            <Color x:Key="GlobalTextColor">#FFFFFF</Color>
-            <Color x:Key="GlobalControlBackgroundColor">#444444</Color>
+            <!-- Dark minimal theme (shared design with ChessPuzzles) -->
+            <Color x:Key="GlobalBackgroundColor">#111111</Color>
+            <Color x:Key="GlobalTextColor">#EEEEEE</Color>
+            <Color x:Key="GlobalControlBackgroundColor">#1E1E1E</Color>
 
             <!-- Default board image (must exist in Resources/Images) -->
             <x:String x:Key="BoardImageSource">board_brown.png</x:String>

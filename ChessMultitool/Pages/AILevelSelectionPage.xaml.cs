@@ -10,8 +10,14 @@ namespace ChessMultitool;
 /// </summary>
 public partial class AILevelSelectionPage : ContentPage
 {
-    /// <summary>Couleur jouée par l'humain (blanc par défaut).</summary>
-    private Player humanColor = Player.White;
+    /// <summary>Modes de sélection de couleur.</summary>
+    private enum ColorMode { White, Black, Alternate }
+
+    /// <summary>Mode de couleur choisi (blanc par défaut).</summary>
+    private ColorMode colorMode = ColorMode.White;
+
+    /// <summary>Clé de préférence: dernière couleur jouée en mode alterné ("white"/"black").</summary>
+    private const string LastAlternateColorKey = "pref_alternate_last_color";
 
     /// <summary>Temps de réflexion fixe de l'IA pour chaque coup (détermine la difficulté).</summary>
     private TimeSpan aiThinkingTime = TimeSpan.FromSeconds(2);
@@ -37,29 +43,44 @@ public partial class AILevelSelectionPage : ContentPage
     /// <summary>Click sélection Blanc.</summary>
     private void OnWhiteClicked(object sender, EventArgs e)
     {
-        humanColor = Player.White;
+        colorMode = ColorMode.White;
         UpdateColorButtons();
     }
 
     /// <summary>Click sélection Noir.</summary>
     private void OnBlackClicked(object sender, EventArgs e)
     {
-        humanColor = Player.Black;
+        colorMode = ColorMode.Black;
         UpdateColorButtons();
     }
 
-    /// <summary>Met à jour l'état visuel des boutons de couleur.</summary>
+    /// <summary>Click sélection Alterné (une partie avec les blancs, la suivante avec les noirs).</summary>
+    private void OnAlternateClicked(object sender, EventArgs e)
+    {
+        colorMode = ColorMode.Alternate;
+        UpdateColorButtons();
+    }
+
+    /// <summary>Met à jour l'état visuel des cartes de couleur.</summary>
     private void UpdateColorButtons()
     {
-        WhiteBtn.BackgroundColor = Colors.White;
-        WhiteBtn.Text = string.Empty;
-        WhiteBtn.BorderWidth = (humanColor == Player.White) ? 3 : 1;
-        WhiteBtn.BorderColor = (humanColor == Player.White) ? Colors.DeepSkyBlue : Colors.Gray;
+        var accent = Color.FromArgb("#C8963E");
+        WhiteCard.Stroke = (colorMode == ColorMode.White) ? accent : Colors.Transparent;
+        AlternateCard.Stroke = (colorMode == ColorMode.Alternate) ? accent : Colors.Transparent;
+        BlackCard.Stroke = (colorMode == ColorMode.Black) ? accent : Colors.Transparent;
+    }
 
-        BlackBtn.BackgroundColor = Colors.Black;
-        BlackBtn.Text = string.Empty;
-        BlackBtn.BorderWidth = (humanColor == Player.Black) ? 3 : 1;
-        BlackBtn.BorderColor = (humanColor == Player.Black) ? Colors.DeepSkyBlue : Colors.Gray;
+    /// <summary>Résout la couleur effective pour la partie à lancer.
+    /// En mode alterné, joue l'opposé de la dernière couleur jouée et mémorise le choix.</summary>
+    private Player ResolveHumanColor()
+    {
+        if (colorMode == ColorMode.White) return Player.White;
+        if (colorMode == ColorMode.Black) return Player.Black;
+
+        var last = Preferences.Get(LastAlternateColorKey, "black");
+        var next = last == "white" ? Player.Black : Player.White;
+        Preferences.Set(LastAlternateColorKey, next == Player.White ? "white" : "black");
+        return next;
     }
 
     /// <summary>Charge la base d'ouvertures depuis le fichier JSON embarqué.</summary>
@@ -146,7 +167,7 @@ public partial class AILevelSelectionPage : ContentPage
         // IA rating indicatif (unique) si besoin pour achievements
         int aiRating = 600;
 
-        await Navigation.PushAsync(new ChessGame(humanColor, aiThinkingTime, chosenLine, selectedOpeningName, aiRating));
+        await Navigation.PushAsync(new ChessGame(ResolveHumanColor(), aiThinkingTime, chosenLine, selectedOpeningName, aiRating));
     }
 
     /// <summary>Ouvre la page d'exploration des ouvertures.</summary>

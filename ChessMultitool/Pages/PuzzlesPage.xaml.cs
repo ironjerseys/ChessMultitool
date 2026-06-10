@@ -103,7 +103,26 @@ public partial class PuzzlesPage : ContentPage
         puzzles = await PuzzlesService.EnsurePuzzlesCachedAsync(5000);
         if (puzzles.Count == 0) return;
         index = Math.Clamp(index, 0, puzzles.Count - 1);
+
+        // Publish to the shared store so the Library page can list them
+        PuzzleStore.Puzzles = puzzles;
+        PuzzleStore.CurrentIndex = index;
+        PuzzleStore.NotifyLoaded();
+
         LoadPuzzle();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        // The Library page may have requested a specific puzzle
+        if (PuzzleStore.PendingIndex is int requested && puzzles.Count > 0)
+        {
+            PuzzleStore.PendingIndex = null;
+            index = Math.Clamp(requested, 0, puzzles.Count - 1);
+            Preferences.Set("puzzles_index", index);
+            LoadPuzzle();
+        }
     }
 
     private void ClearAllHighlights()
@@ -144,6 +163,7 @@ public partial class PuzzlesPage : ContentPage
         hadWrongAttempt = false;
 
         var p = puzzles[index];
+        PuzzleStore.CurrentIndex = index;
         state = PuzzlesService.LoadPuzzlePosition(p);
         solution = PuzzlesService.GetSolutionMoves(p).ToList();
         isFlipped = state.CurrentPlayer == Player.Black; // initial orientation
@@ -152,8 +172,8 @@ public partial class PuzzlesPage : ContentPage
         // remember this puzzle in recent history to avoid immediate repeats
         AddToRecent(p.Id);
 
-        // Set puzzle rating in the header
-        RatingLabel.Text = $"Rating: {p.Rating}";
+        // Set puzzle rating in the header pill
+        RatingLabel.Text = p.Rating.ToString();
 
         // After initial render, auto-play the first solution move (computer), then keep current flip logic
         if (solution.Count > 0)
@@ -305,7 +325,9 @@ public partial class PuzzlesPage : ContentPage
 
     private void UpdateTurnLabel()
     {
-        TurnLabel.Text = state.CurrentPlayer == Player.White ? "White to move" : "Black to move";
+        bool white = state.CurrentPlayer == Player.White;
+        TurnLabel.Text = white ? "White to move" : "Black to move";
+        SideDot.Color = white ? Color.FromArgb("#EEEEEE") : Color.FromArgb("#444444");
     }
 
     private void InitBoard()
@@ -694,6 +716,16 @@ public partial class PuzzlesPage : ContentPage
     {
         if (!isFlipped) return (uiRow,uiCol);
         return (7 - uiRow, 7 - uiCol);
+    }
+
+    /// <summary>Ouvre le plateau d'analyse libre sur la position actuellement affichée.</summary>
+    private async void OnAnalysisClicked(object sender, EventArgs e)
+    {
+        if (puzzles.Count == 0) return;
+        var p = puzzles[index];
+        // Reconstruit la position affichée: FEN du puzzle + coups joués jusqu'au curseur de relecture
+        var played = solution.Take(navPtr).ToList();
+        await Navigation.PushAsync(new AnalysisPage(p.Fen, played, isFlipped));
     }
 
     private void OnHintClicked(object sender, EventArgs e)

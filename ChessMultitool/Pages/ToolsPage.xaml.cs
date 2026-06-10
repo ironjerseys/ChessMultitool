@@ -21,4 +21,9 @@ public partial class ToolsPage : ContentPage
     {
         await Navigation.PushAsync(new ClockPage());
     }
+
+    private async void OnOpenStatsClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new StatsPage());
+    }
 }

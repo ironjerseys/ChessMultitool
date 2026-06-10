@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentPage
+    x:Class="ChessMultitool.AnalysisPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:ChessMultitool"
+    BackgroundColor="#111111"
+    Shell.NavBarIsVisible="False"
+    Title="Analysis">
+
+    <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0">
+
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" Padding="20,52,20,12" ColumnDefinitions="*,Auto,*">
+
+            <HorizontalStackLayout Grid.Column="0" Spacing="8" HorizontalOptions="Start" VerticalOptions="Center">
+                <!-- Back -->
+                <Border BackgroundColor="#1E1E1E"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 20"
+                        Padding="13,8"
+                        VerticalOptions="Center">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackClicked" />
+                    </Border.GestureRecognizers>
+                    <Label Text="←" FontSize="14" FontAttributes="Bold" TextColor="#CCCCCC" VerticalTextAlignment="Center" />
+                </Border>
+            </HorizontalStackLayout>
+
+            <Label Grid.Column="1"
+                   Text="ANALYSIS"
+                   FontSize="13"
+                   FontAttributes="Bold"
+                   CharacterSpacing="3"
+                   TextColor="#555555"
+                   HorizontalTextAlignment="Center"
+                   VerticalTextAlignment="Center" />
+
+            <Border Grid.Column="2"
+                    BackgroundColor="#1E1E1E"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 20"
+                    Padding="13,8"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center">
+                <HorizontalStackLayout Spacing="7" VerticalOptions="Center">
+                    <BoxView x:Name="SideDot"
+                             WidthRequest="9" HeightRequest="9"
+                             CornerRadius="4.5"
+                             Color="#EEEEEE"
+                             VerticalOptions="Center" />
+                    <Label x:Name="TurnLabel"
+                           Text="White to move"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           TextColor="#CCCCCC"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- ── Board area ── -->
+        <Grid Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Fill" Padding="12,0">
+            <Border BackgroundColor="#0A0A0A" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="0">
+                <Grid x:Name="BoardGrid" HorizontalOptions="Fill" HeightRequest="360">
+                    <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill"
+                           InputTransparent="True" ZIndex="0" />
+                    <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="1" />
+                    <Grid x:Name="PieceGrid" RowSpacing="0" ColumnSpacing="0"
+                          BackgroundColor="Transparent" ZIndex="2" />
+                    <Grid x:Name="PromotionContainer" IsVisible="False"
+                          BackgroundColor="#CC000000" ZIndex="3" RowSpacing="0" ColumnSpacing="0">
+                        <local:PromotionMenu x:Name="PromotionMenuView"
+                                             HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- ── Bottom bar ── -->
+        <Grid Grid.Row="2" Padding="16,14,16,20" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+
+            <!-- Undo last move -->
+            <Button x:Name="UndoBtn" Grid.Column="0" Text="←" Clicked="OnUndoClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+            <!-- Flip board -->
+            <Button Grid.Column="1" Text="⇅" Clicked="OnFlipClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#AAAAAA"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+            <!-- Reset to starting position -->
+            <Button x:Name="ResetBtn" Grid.Column="2" Text="↺" Clicked="OnResetClicked"
+                    BackgroundColor="#1E1E1E" TextColor="#C8963E"
+                    FontSize="20" CornerRadius="12" HeightRequest="48" Padding="0" />
+
+        </Grid>
+
+    </Grid>
+</ContentPage>
