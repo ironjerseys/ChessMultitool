@@ -78,7 +78,7 @@
         <Grid Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Fill" Padding="12,0">
             <Border BackgroundColor="#0A0A0A" StrokeThickness="0" StrokeShape="RoundRectangle 8" Padding="0">
                 <Grid x:Name="BoardGrid" HorizontalOptions="Fill" HeightRequest="360">
-                    <Image Source="{DynamicResource BoardImageSource}" Aspect="AspectFill"
+                    <Image Source="{DynamicResource BoardImageSource}" Aspect="Fill"
                            InputTransparent="True" ZIndex="0" />
                     <Grid x:Name="HighlightGrid" RowSpacing="0" ColumnSpacing="0"
                           BackgroundColor="Transparent" ZIndex="1" />
